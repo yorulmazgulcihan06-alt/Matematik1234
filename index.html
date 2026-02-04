@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5. Sınıf Matematik Yarışması</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e0f7fa; text-align: center; padding: 20px; }
+        .game-container { background: white; max-width: 500px; margin: auto; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        h1 { color: #00796b; }
+        #soru { font-size: 24px; font-weight: bold; margin: 20px 0; color: #333; }
+        input { padding: 10px; font-size: 18px; width: 80px; text-align: center; border: 2px solid #00796b; border-radius: 10px; }
+        button { background: #00796b; color: white; border: none; padding: 10px 25px; font-size: 18px; border-radius: 10px; cursor: pointer; margin-left: 10px; }
+        #mesaj { margin-top: 20px; font-weight: bold; font-size: 18px; }
+        .skor { color: #f57c00; font-size: 20px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Matematik Yarışması</h1>
+        <p>5. Sınıf Seviyesi</p>
+        <div id="soru">Soru Yükleniyor...</div>
+        <input type="number" id="cevap" placeholder="?">
+        <button onclick="kontrolEt()">Cevapla</button>
+        <div id="mesaj"></div>
+        <div class="skor">Skor: <span id="skor">0</span></div>
+    </div>
+
+    <script>
+        let dogruCevap;
+        let puan = 0;
+
+        function yeniSoru() {
+            const islemler = ['+', '-', '*'];
+            const islem = islemler[Math.floor(Math.random() * 3)];
+            let n1, n2;
+
+            if (islem === '+') { n1 = Math.floor(Math.random() * 90) + 10; n2 = Math.floor(Math.random() * 90) + 10; dogruCevap = n1 + n2; }
+            else if (islem === '-') { n1 = Math.floor(Math.random() * 100) + 50; n2 = Math.floor(Math.random() * 50) + 1; dogruCevap = n1 - n2; }
+            else { n1 = Math.floor(Math.random() * 12) + 2; n2 = Math.floor(Math.random() * 12) + 2; dogruCevap = n1 * n2; }
+
+            document.getElementById('soru').innerText = `${n1} ${islem === '*' ? 'x' : islem} ${n2} = ?`;
+            document.getElementById('cevap').value = '';
+            document.getElementById('cevap').focus();
+        }
+
+        function kontrolEt() {
+            const kullaniciCevabi = parseInt(document.getElementById('cevap').value);
+            const mesaj = document.getElementById('mesaj');
+            if (kullaniciCevabi === dogruCevap) {
+                puan += 10;
+                mesaj.innerText = "✅ Harika! Doğru cevap.";
+                mesaj.style.color = "green";
+            } else {
+                mesaj.innerText = `❌ Yanlış! Doğru: ${dogruCevap}`;
+                mesaj.style.color = "red";
+            }
+            document.getElementById('skor').innerText = puan;
+            setTimeout(yeniSoru, 1500);
+        }
+        yeniSoru();
+    </script>
+</body>
+</html>
