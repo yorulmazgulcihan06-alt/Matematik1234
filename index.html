@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Matematik - Troll Edition</title>
+    <title>Hacker Matematik - Troll Edition v2</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { background-color: black; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; transition: background-color 0.2s; }
@@ -13,13 +13,15 @@
         
         .container { background: rgba(0, 15, 0, 0.95); border: 2px solid #0f0; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px #0f0; width: 85%; max-width: 450px; z-index: 1; position: relative; }
         
-        /* Şaka Mesajı Stili */
+        /* DEV GÜLÜCÜKLÜ ŞAKA MESAJI */
         #prank-message {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0, 50, 0, 0.9); border: 3px solid #0f0; color: white;
-            padding: 20px; font-size: 24px; text-align: center; z-index: 2000;
-            display: none; border-radius: 20px; box-shadow: 0 0 50px #0f0;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 30, 0, 0.95); display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            z-index: 9999; color: white; text-align: center; padding: 20px;
         }
+        #prank-text { font-size: 30px; margin-bottom: 20px; font-weight: bold; }
+        #big-smile { font-size: 150px; color: #ff0; text-shadow: 0 0 30px #ff0; }
 
         .level-tag { color: #ff0; font-weight: bold; margin-bottom: 10px; display: block; border: 1px solid #ff0; padding: 5px; }
         button { background: transparent; color: #0f0; border: 2px solid #0f0; padding: 12px 20px; font-size: 16px; cursor: pointer; font-family: 'Courier New', Courier, monospace; margin-top: 15px; width: 100%; }
@@ -36,7 +38,8 @@
     <canvas id="matrix-canvas"></canvas>
 
     <div id="prank-message">
-        Merak etmeyin korkmayın Bu sadece bir matematik oyunu :)
+        <div id="prank-text">Merak etmeyin korkmayın<br>Bu sadece bir matematik oyunu</div>
+        <div id="big-smile">:)</div>
     </div>
 
     <div id="secret-trigger" onclick="openSecretPanel()">[ ENCRYPTED ]</div>
@@ -61,13 +64,13 @@
     </div>
 
     <script>
-        // 15 Saniye Ayarı
+        // 15 Saniye sonra dev gülücük çıkar
         setTimeout(() => {
             const prank = document.getElementById('prank-message');
-            prank.style.display = 'block';
-            // 5 saniye sonra mesaj kendiliğinden kaybolsun ki oyuna devam edebilsinler
-            setTimeout(() => { prank.style.display = 'none'; }, 5000);
-        }, 15000); // 15000 milisaniye = 15 saniye
+            prank.style.display = 'flex';
+            // 6 saniye ekranda kalsın
+            setTimeout(() => { prank.style.display = 'none'; }, 6000);
+        }, 15000);
 
         const synth = window.speechSynthesis;
         function playSound(text) {
@@ -166,7 +169,7 @@
         }
 
         function exitSystem() {
-            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SİSTEM KAPANDI</h1>";
+            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SİSTEM İMHA EDİLDİ</h1>";
             setTimeout(() => { window.close(); }, 2000);
         }
     </script>
