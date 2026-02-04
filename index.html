@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hacker Matematik - 5. Sınıf</title>
+    <style>
+        body { background-color: black; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+        .container { background: rgba(0, 20, 0, 0.9); border: 2px solid #0f0; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 20px #0f0; width: 90%; max-width: 500px; z-index: 1; }
+        h1 { font-size: 22px; text-shadow: 0 0 10px #0f0; }
+        p { font-size: 16px; margin: 15px 0; }
+        button { background: transparent; color: #0f0; border: 2px solid #0f0; padding: 12px 25px; font-size: 18px; cursor: pointer; font-family: 'Courier New', Courier, monospace; transition: 0.3s; }
+        button:hover { background: #0f0; color: black; box-shadow: 0 0 20px #0f0; }
+        .hidden { display: none; }
+        input { background: black; border: 1px solid #0f0; color: #0f0; padding: 10px; font-size: 18px; text-align: center; width: 120px; outline: none; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix-canvas"></canvas>
+
+    <div id="intro" class="container">
+        <h1>> MERHABA 5. SINIF HACKER'I</h1>
+        <p>Sisteme sızmak için matematik şifrelerini çözmelisin.</p>
+        <p>Konu: Milyonlar ve Dört İşlem</p>
+        <button onclick="startGame()">OYUNA BAŞLA</button>
+    </div>
+
+    <div id="game" class="container hidden">
+        <h2 id="question-text">Soru Yükleniyor...</h2>
+        <input type="number" id="answer-input" placeholder="Cevap?">
+        <br>
+        <button onclick="checkAnswer()">GÖNDER</button>
+        <p id="feedback"></p>
+        <p>Skor: <span id="score">0</span></p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#0f0";
+            ctx.font = fontSize + "px monospace";
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33);
+
+        let score = 0;
+        let currentQuestion = 0;
+        const questions = [
+            { q: "450.000 + 120.000 = ?", a: 570000 },
+            { q: "5'in karesi (5x5) kaçtır?", a: 25 },
+            { q: "81 / 9 kaçtır?", a: 9 },
+            { q: "750 - 250 kaçtır?", a: 500 },
+            { q: "100'ün 1/4'ü kaçtır?", a: 25 }
+        ];
+
+        function startGame() {
+            document.getElementById('intro').classList.add('hidden');
+            document.getElementById('game').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestion < questions.length) {
+                document.getElementById('question-text').innerText = questions[currentQuestion].q;
+                document.getElementById('answer-input').value = "";
+                document.getElementById('feedback').innerText = "";
+            } else {
+                document.getElementById('game').innerHTML = "<h1>SİSTEME SIZILDI! ✅</h1><p>Tebrikler, tüm şifreleri çözdün.</p><p>Skorun: " + score + "</p><button onclick='location.reload()'>TEKRAR OYNA</button>";
+            }
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answer-input').value;
+            if (userAnswer == questions[currentQuestion].a) {
+                score += 20;
+                document.getElementById('score').innerText = score;
+                document.getElementById('feedback').innerText = "ERİŞİM ONAYLANDI...";
+                currentQuestion++;
+                setTimeout(showQuestion, 1000);
+            } else {
+                document.getElementById('feedback').innerText = "HATALI ŞİFRE! TEKRAR DENE.";
+            }
+        }
+    </script>
+</body>
+</html>
