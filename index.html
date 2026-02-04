@@ -8,11 +8,15 @@
     <style>
         body { background-color: black; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
         #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-        #secret-trigger { position: absolute; top: 10px; right: 15px; font-size: 10px; color: #002200; cursor: pointer; z-index: 100; }
         
-        /* İmza Ekranı */
-        #credits { color: #0f0; font-size: 20px; text-align: center; margin-bottom: 20px; border-bottom: 1px solid #0f0; padding-bottom: 10px; }
+        /* İLK AÇILIŞ EKRANI */
+        #loading-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; display: flex; justify-content: center; align-items: center;
+            z-index: 10000; color: #0f0; font-size: 25px; text-align: center;
+        }
 
+        #secret-trigger { position: absolute; top: 10px; right: 15px; font-size: 10px; color: #002200; cursor: pointer; z-index: 100; }
         .container { background: rgba(0, 15, 0, 0.95); border: 2px solid #0f0; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px #0f0; width: 85%; max-width: 450px; z-index: 1; }
         
         #prank-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 30, 0, 0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; }
@@ -23,14 +27,16 @@
         button:hover { background: #0f0; color: black; }
         input { background: black; border: 1px solid #0f0; color: #0f0; padding: 12px; font-size: 22px; text-align: center; width: 80%; outline: none; }
         .hidden { display: none; }
-        .exit-btn { border-color: red; color: red; }
-        @keyframes shake { 0%{transform:translate(1px,1px)} 20%{transform:translate(-3px,0px)} 100%{transform:translate(0px,0px)} }
-        .shake { animation: shake 0.3s; }
+        @keyframes fadeOut { from {opacity: 1;} to {opacity: 0;} }
     </style>
 </head>
 <body>
 
     <canvas id="matrix-canvas"></canvas>
+
+    <div id="loading-screen">
+        <h1 id="splash-text">Bunu Utkan ve Gemini yaptı :)</h1>
+    </div>
 
     <div id="prank-message">
         <div style="font-size: 30px;">Merak etmeyin korkmayın<br>Bu sadece bir matematik oyunu</div>
@@ -39,9 +45,7 @@
 
     <div id="secret-trigger" onclick="openSecretPanel()">[ ENCRYPTED ]</div>
 
-    <div id="intro" class="container">
-        <div id="credits">Bunu Utkan ve Gemini yaptı :)</div>
-        
+    <div id="intro" class="container hidden">
         <h1>> SİSTEME GİRİŞ YAPILIYOR...</h1>
         <p>100 Katmanlı Matematik Güvenlik Protokolü</p>
         <button onclick="startGame()">PROTOKOLÜ BAŞLAT</button>
@@ -51,18 +55,26 @@
         <span id="level-indicator" class="level-tag">KATMAN: 1 / 100</span>
         <h2 id="question-text">Yükleniyor...</h2>
         <input type="text" id="answer-input" placeholder="Şifre?" onkeydown="if(event.key==='Enter') checkAnswer()">
-        <p id="feedback"></p>
         <button onclick="checkAnswer()">VERİYİ DOĞRULA</button>
     </div>
 
     <div id="final-screen" class="container hidden">
         <h1>SİSTEM ELE GEÇİRİLDİ ✅</h1>
-        <p>Tüm katmanlar aşıldı.</p>
-        <button class="exit-btn" onclick="exitSystem()">SİSTEMİ KAPAT</button>
+        <button onclick="location.reload()">SİSTEMİ YENİDEN BAŞLAT</button>
     </div>
 
     <script>
-        // 15 Saniye Şakası
+        // Açılış ekranı animasyonu (3 saniye sonra oyun gelir)
+        setTimeout(() => {
+            const ls = document.getElementById('loading-screen');
+            ls.style.animation = "fadeOut 1s forwards";
+            setTimeout(() => {
+                ls.style.display = "none";
+                document.getElementById('intro').classList.remove('hidden');
+            }, 1000);
+        }, 3000);
+
+        // 15 Saniye Şakası (Gülücük)
         setTimeout(() => {
             const prank = document.getElementById('prank-message');
             prank.style.display = 'flex';
@@ -86,28 +98,23 @@
         setInterval(drawMatrix, 40);
 
         let currentLevel = 1;
-        const totalLevels = 100;
         let currentAnswer = 0;
 
         function generateQuestion() {
             let num1, num2, op;
             if (currentLevel <= 30) {
-                num1 = Math.floor(Math.random() * 50) + 10;
-                num2 = Math.floor(Math.random() * 50) + 5;
+                num1 = Math.floor(Math.random() * 40) + 10;
+                num2 = Math.floor(Math.random() * 40) + 5;
                 op = Math.random() > 0.5 ? "+" : "-";
                 currentAnswer = op === "+" ? num1 + num2 : num1 - num2;
-            } else if (currentLevel <= 70) {
+            } else {
                 num1 = Math.floor(Math.random() * 12) + 2;
                 num2 = Math.floor(Math.random() * 10) + 2;
                 op = "x";
                 currentAnswer = num1 * num2;
-            } else {
-                num1 = Math.floor(Math.random() * 10) + 2;
-                op = "karesi + 10";
-                currentAnswer = (num1 * num1) + 10;
             }
             document.getElementById('level-indicator').innerText = "KATMAN: " + currentLevel + " / 100";
-            document.getElementById('question-text').innerText = num1 + " " + (op === "karesi + 10" ? "karesi + 10" : op + " " + num2) + " ?";
+            document.getElementById('question-text').innerText = num1 + " " + op + " " + num2 + " ?";
         }
 
         function startGame() {
@@ -118,19 +125,15 @@
 
         function checkAnswer() {
             const val = document.getElementById('answer-input').value;
-            if (val === "2016") { currentLevel = 100; finishGame(); return; }
+            if (val === "2016") { finishGame(); return; }
             if (val == currentAnswer || val === "-0") {
-                if (currentLevel >= totalLevels) {
+                if (currentLevel >= 100) {
                     finishGame();
                 } else {
                     currentLevel++;
                     generateQuestion();
                     document.getElementById('answer-input').value = "";
-                    document.getElementById('answer-input').focus();
                 }
-            } else {
-                document.getElementById('game').classList.add('shake');
-                setTimeout(() => document.getElementById('game').classList.remove('shake'), 300);
             }
         }
 
@@ -145,12 +148,6 @@
             if (code === "2015") { currentLevel = 70; generateQuestion(); startGame(); }
             if (code === "2014") { currentLevel = 1; generateQuestion(); startGame(); }
         }
-
-        function exitSystem() {
-            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SİSTEM KAPATILDI.</h1>";
-            setTimeout(() => { window.close(); }, 2000);
-        }
     </script>
 </body>
 </html>
-
