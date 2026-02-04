@@ -3,37 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Matematik - Final Edition</title>
+    <title>Hacker Matematik - Sesli Sürüm</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { background-color: black; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; transition: background-color 0.2s; }
         #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-        
-        /* Gizli Buton */
         #secret-trigger { position: absolute; top: 10px; right: 15px; font-size: 10px; color: #002200; cursor: pointer; z-index: 100; user-select: none; }
         #secret-trigger:hover { color: #0f0; }
-
         .container { background: rgba(0, 15, 0, 0.95); border: 2px solid #0f0; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px #0f0; width: 85%; max-width: 450px; z-index: 1; position: relative; }
         .level-tag { color: #ff0; font-weight: bold; margin-bottom: 10px; display: block; border: 1px solid #ff0; padding: 5px; }
-        
         button { background: transparent; color: #0f0; border: 2px solid #0f0; padding: 12px 20px; font-size: 16px; cursor: pointer; font-family: 'Courier New', Courier, monospace; margin-top: 15px; width: 100%; }
         button:hover { background: #0f0; color: black; box-shadow: 0 0 15px #0f0; }
-        
         input { background: black; border: 1px solid #0f0; color: #0f0; padding: 12px; font-size: 22px; text-align: center; width: 80%; outline: none; margin-top: 10px; }
-        
         .hidden { display: none; }
         #feedback { height: 25px; margin-top: 10px; font-weight: bold; }
         .exit-btn { border-color: #ff0000; color: #ff0000; margin-top: 25px; }
-
-        /* Sallanma Efekti */
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            40% { transform: translate(3px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            80% { transform: translate(3px, -1px) rotate(1deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
-        }
+        @keyframes shake { 0%{transform:translate(1px,1px)} 20%{transform:translate(-3px,0px)} 40%{transform:translate(3px,2px)} 60%{transform:translate(-3px,1px)} 80%{transform:translate(3px,-1px)} 100%{transform:translate(1px,-2px)} }
         .shake { animation: shake 0.3s; }
     </style>
 </head>
@@ -45,7 +30,7 @@
 
     <div id="intro" class="container">
         <h1>> SİSTEME SIZILIYOR...</h1>
-        <p>Matematik bariyerlerini aşarak ana servera ulaş.</p>
+        <p>Sesli protokoller aktif edildi.</p>
         <button onclick="startGame()">SİSTEMİ BAŞLAT</button>
     </div>
 
@@ -59,11 +44,32 @@
 
     <div id="final-screen" class="container hidden">
         <h1>ERİŞİM SAĞLANDI ✅</h1>
-        <p>Tüm sistem kontrolün altında hacker.</p>
+        <p>Tüm sistem kontrolün altında.</p>
         <button class="exit-btn" onclick="exitSystem()">SİSTEMİ İMHA ET VE ÇIK</button>
     </div>
 
     <script>
+        // Ses Efektleri (Browser'ın sentezleyici sesini kullanıyoruz)
+        const synth = window.speechSynthesis;
+        function playSound(text) {
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'en-US'; // Hacker sesi gibi olsun diye İngilizce tonlama
+            utter.rate = 1.2;
+            utter.pitch = 0.5;
+            synth.speak(utter);
+        }
+
+        // Bip Sesi (Beep)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function beep(freq, dur) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            osc.start();
+            setTimeout(() => osc.stop(), dur);
+        }
+
         // Matrix Efekti
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
@@ -80,15 +86,15 @@
         }
         setInterval(drawMatrix, 40);
 
-        // Oyun Mantığı
         let currentIdx = 0;
         let questions = [
-            { q: "25 x 4 ?", a: 100, l: "KOLAY" },
-            { q: "450 / 5 ?", a: 90, l: "ORTA" },
-            { q: "(12 x 5) + 40 ?", a: 100, l: "ZOR" }
+            { q: "40 x 5 ?", a: 200, l: "GÜVENLİK 1" },
+            { q: "900 / 3 ?", a: 300, l: "GÜVENLİK 2" },
+            { q: "120 + 380 ?", a: 500, l: "GÜVENLİK 3" }
         ];
 
         function startGame() {
+            beep(440, 100);
             document.getElementById('intro').classList.add('hidden');
             document.getElementById('game').classList.remove('hidden');
             showQuestion();
@@ -104,6 +110,7 @@
                 document.getElementById('game').classList.add('hidden');
                 document.getElementById('final-screen').classList.remove('hidden');
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                playSound("Access Granted. System is yours.");
             }
         }
 
@@ -113,16 +120,16 @@
             
             if (val == questions[currentIdx].a) {
                 currentIdx++;
+                beep(880, 50);
                 document.getElementById('feedback').style.color = "#0f0";
-                document.getElementById('feedback').innerText = "DOĞRU. SONRAKİ KATMAN...";
-                setTimeout(showQuestion, 600);
+                document.getElementById('feedback').innerText = "DOĞRU.";
+                setTimeout(showQuestion, 500);
             } else {
-                // HATA EFEKTİ
+                beep(110, 200);
                 document.body.style.backgroundColor = "#330000";
                 gameContainer.classList.add('shake');
                 document.getElementById('feedback').style.color = "red";
-                document.getElementById('feedback').innerText = "!!! YANLIŞ ŞİFRE - ALARM !!!";
-                
+                document.getElementById('feedback').innerText = "HATALI ŞİFRE!";
                 setTimeout(() => {
                     document.body.style.backgroundColor = "black";
                     gameContainer.classList.remove('shake');
@@ -131,26 +138,24 @@
             }
         }
 
-        // GİZLİ KOD (2015)
         function openSecretPanel() {
             let code = prompt("GİZLİ ERİŞİM ŞİFRESİ:");
             if (code === "2015") {
-                alert("ULTRA HACKER MODU AKTİF!");
+                beep(1200, 300);
+                alert("ULTRA HACKER MODU!");
                 questions = [
-                    { q: "500 x 40 ?", a: 20000, l: "HACKER SEVİYE 1" },
-                    { q: "8800 / 11 ?", a: 800, l: "HACKER SEVİYE 2" },
-                    { q: "12'nin karesi ?", a: 144, l: "HACKER SEVİYE 3" }
+                    { q: "25 x 25 ?", a: 625, l: "ULTRA 1" },
+                    { q: "10000 / 4 ?", a: 2500, l: "ULTRA 2" }
                 ];
                 currentIdx = 0;
                 startGame();
-            } else {
-                alert("Geçersiz Kod!");
             }
         }
 
         function exitSystem() {
-            document.body.innerHTML = "<div style='color:red; text-align:center; margin-top:20%; font-family:monospace;'><h1>> SİSTEM İMHA EDİLDİ.</h1><p>Bağlantı kesiliyor...</p></div>";
-            setTimeout(() => { window.close(); }, 2000);
+            playSound("System destruction in three, two, one.");
+            document.body.innerHTML = "<div style='color:red; text-align:center; margin-top:20%; font-family:monospace;'><h1>> SİSTEM İMHA EDİLDİ.</h1></div>";
+            setTimeout(() => { window.close(); }, 3000);
         }
     </script>
 </body>
