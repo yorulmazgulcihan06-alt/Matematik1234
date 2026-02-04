@@ -3,151 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Matematik - Utkan & Gemini</title>
+    <title>THIS_IS_MY_KING_UTKAN</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { background-color: black; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
+        body { background: #000; color: #0ff; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; height: 100vh; }
+        canvas { position: fixed; top: 0; left: 0; z-index: -1; }
         
-        /* İLK AÇILIŞ EKRANI */
-        #loading-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; display: flex; justify-content: center; align-items: center;
-            z-index: 10000; color: #0f0; font-size: 25px; text-align: center;
+        /* EN ÜSTTEKİ KRAL YAZISI */
+        #king-header {
+            width: 100%; text-align: center; background: rgba(0, 255, 255, 0.1);
+            padding: 15px 0; font-size: 35px; font-weight: bold;
+            letter-spacing: 10px; border-bottom: 2px solid #0ff;
+            text-shadow: 0 0 20px #0ff; color: #fff;
         }
 
-        #secret-trigger { position: absolute; top: 10px; right: 15px; font-size: 10px; color: #002200; cursor: pointer; z-index: 100; }
-        .container { background: rgba(0, 15, 0, 0.95); border: 2px solid #0f0; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px #0f0; width: 85%; max-width: 450px; z-index: 1; }
-        
-        #prank-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 30, 0, 0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; }
-        #big-smile { font-size: 150px; color: #ff0; text-shadow: 0 0 30px #ff0; }
+        #terminal {
+            width: 95vw; height: 75vh; margin: 2vh auto;
+            background: rgba(0, 0, 0, 0.85); border: 1px solid #444;
+            padding: 30px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;
+            position: relative;
+        }
 
-        .level-tag { color: #ff0; font-weight: bold; margin-bottom: 10px; display: block; border: 1px solid #ff0; padding: 5px; }
-        button { background: transparent; color: #0f0; border: 2px solid #0f0; padding: 12px 20px; cursor: pointer; width: 100%; margin-top: 15px; font-family: 'Courier New'; font-size: 16px; }
-        button:hover { background: #0f0; color: black; }
-        input { background: black; border: 1px solid #0f0; color: #0f0; padding: 12px; font-size: 22px; text-align: center; width: 80%; outline: none; }
-        .hidden { display: none; }
-        @keyframes fadeOut { from {opacity: 1;} to {opacity: 0;} }
+        #kali-logo {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60%; opacity: 0.1; pointer-events: none; z-index: 0;
+        }
+
+        #math-zone { text-align: center; z-index: 10; margin-top: 30px; }
+        #question { font-size: 120px; color: #fff; text-shadow: 0 0 30px #0ff; font-weight: bold; }
+        input { background: transparent; border: none; border-bottom: 4px solid #0ff; color: #0ff; font-size: 70px; text-align: center; width: 400px; outline: none; }
+
+        #footer-prompt { position: absolute; bottom: 20px; left: 30px; font-size: 20px; color: #fff; }
+        .cursor { animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        #prank { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: none; flex-direction: column; justify-content: center; align-items: center; border: 15px solid #0ff; }
     </style>
 </head>
 <body>
 
-    <canvas id="matrix-canvas"></canvas>
+    <div id="king-header">THIS IS MY KING</div>
 
-    <div id="loading-screen">
-        <h1 id="splash-text">Bunu Utkan ve Gemini yaptı :)</h1>
+    <canvas id="matrix"></canvas>
+
+    <div id="terminal">
+        <svg id="kali-logo" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#0ff" d="M250,50 L300,150 L200,150 Z M100,250 L200,200 L200,300 Z M400,250 L300,200 L300,300 Z M250,450 L200,350 L300,350 Z" opacity="0.6"/>
+            <circle cx="250" cy="250" r="150" stroke="#0ff" fill="none" stroke-width="2" />
+        </svg>
+
+        <div id="math-zone">
+            <div style="color: #0ff; font-size: 20px; letter-spacing: 5px;">SECURITY LAYER: <span id="layer">1</span></div>
+            <div id="question">--+--</div>
+            <input type="number" id="ans" placeholder="PASSCODE" autofocus>
+        </div>
+
+        <div id="footer-prompt">kali@utkan:~/king_test# <span class="cursor">_</span></div>
     </div>
 
-    <div id="prank-message">
-        <div style="font-size: 30px;">Merak etmeyin korkmayın<br>Bu sadece bir matematik oyunu</div>
-        <div id="big-smile">:)</div>
-    </div>
-
-    <div id="secret-trigger" onclick="openSecretPanel()">[ ENCRYPTED ]</div>
-
-    <div id="intro" class="container hidden">
-        <h1>> SİSTEME GİRİŞ YAPILIYOR...</h1>
-        <p>100 Katmanlı Matematik Güvenlik Protokolü</p>
-        <button onclick="startGame()">PROTOKOLÜ BAŞLAT</button>
-    </div>
-
-    <div id="game" class="container hidden">
-        <span id="level-indicator" class="level-tag">KATMAN: 1 / 100</span>
-        <h2 id="question-text">Yükleniyor...</h2>
-        <input type="text" id="answer-input" placeholder="Şifre?" onkeydown="if(event.key==='Enter') checkAnswer()">
-        <button onclick="checkAnswer()">VERİYİ DOĞRULA</button>
-    </div>
-
-    <div id="final-screen" class="container hidden">
-        <h1>SİSTEM ELE GEÇİRİLDİ ✅</h1>
-        <button onclick="location.reload()">SİSTEMİ YENİDEN BAŞLAT</button>
+    <div id="prank">
+        <div style="font-size: 250px;">:)</div>
+        <h1 style="color: #fff; letter-spacing: 5px;">THIS IS MY KING: UTKAN</h1>
+        <p style="color: #0ff; font-size: 25px;">System Secured. Mission Accomplished.</p>
     </div>
 
     <script>
-        // Açılış ekranı animasyonu (3 saniye sonra oyun gelir)
-        setTimeout(() => {
-            const ls = document.getElementById('loading-screen');
-            ls.style.animation = "fadeOut 1s forwards";
-            setTimeout(() => {
-                ls.style.display = "none";
-                document.getElementById('intro').classList.remove('hidden');
-            }, 1000);
-        }, 3000);
-
-        // 15 Saniye Şakası (Gülücük)
-        setTimeout(() => {
-            const prank = document.getElementById('prank-message');
-            prank.style.display = 'flex';
-            setTimeout(() => { prank.style.display = 'none'; }, 6000);
-        }, 15000);
-
-        // Matrix Arkaplan
-        const canvas = document.getElementById('matrix-canvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const drops = Array(Math.floor(canvas.width / 16)).fill(1);
-        function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#0f0";
+        // Matrix Yağmuru
+        const c = document.getElementById('matrix');
+        const ctx = c.getContext('2d');
+        c.width = window.innerWidth; c.height = window.innerHeight;
+        const drops = Array(Math.floor(c.width/20)).fill(1);
+        function draw() {
+            ctx.fillStyle = "rgba(0,0,0,0.1)"; ctx.fillRect(0,0,c.width,c.height);
+            ctx.fillStyle = "#033"; ctx.font = "15px monospace";
             drops.forEach((y, i) => {
-                ctx.fillText(Math.floor(Math.random()*2), i * 16, y * 16);
-                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                ctx.fillText(Math.floor(Math.random()*2), i*20, y*20);
+                if(y*20 > c.height && Math.random() > 0.98) drops[i] = 0;
                 drops[i]++;
             });
         }
-        setInterval(drawMatrix, 40);
+        setInterval(draw, 50);
 
-        let currentLevel = 1;
-        let currentAnswer = 0;
+        // Matematik Motoru
+        let level = 1, currentAns = 0;
+        function generate() {
+            let n1 = Math.floor(Math.random() * 50) + level;
+            let n2 = Math.floor(Math.random() * 50);
+            currentAns = n1 + n2;
+            document.getElementById('question').innerText = n1 + " + " + n2;
+            document.getElementById('layer').innerText = level;
+        }
 
-        function generateQuestion() {
-            let num1, num2, op;
-            if (currentLevel <= 30) {
-                num1 = Math.floor(Math.random() * 40) + 10;
-                num2 = Math.floor(Math.random() * 40) + 5;
-                op = Math.random() > 0.5 ? "+" : "-";
-                currentAnswer = op === "+" ? num1 + num2 : num1 - num2;
-            } else {
-                num1 = Math.floor(Math.random() * 12) + 2;
-                num2 = Math.floor(Math.random() * 10) + 2;
-                op = "x";
-                currentAnswer = num1 * num2;
+        document.getElementById('ans').addEventListener('input', function() {
+            if(this.value == currentAns || this.value == "2016") {
+                if(this.value == "2016") confetti({ particleCount: 200, colors: ['#00ffff', '#ffffff'] });
+                level++; this.value = ""; generate();
             }
-            document.getElementById('level-indicator').innerText = "KATMAN: " + currentLevel + " / 100";
-            document.getElementById('question-text').innerText = num1 + " " + op + " " + num2 + " ?";
-        }
+        });
 
-        function startGame() {
-            document.getElementById('intro').classList.add('hidden');
-            document.getElementById('game').classList.remove('hidden');
-            generateQuestion();
-        }
+        generate();
 
-        function checkAnswer() {
-            const val = document.getElementById('answer-input').value;
-            if (val === "2016") { finishGame(); return; }
-            if (val == currentAnswer || val === "-0") {
-                if (currentLevel >= 100) {
-                    finishGame();
-                } else {
-                    currentLevel++;
-                    generateQuestion();
-                    document.getElementById('answer-input').value = "";
-                }
-            }
-        }
-
-        function finishGame() {
-            document.getElementById('game').classList.add('hidden');
-            document.getElementById('final-screen').classList.remove('hidden');
-            confetti({ particleCount: 200, spread: 90 });
-        }
-
-        function openSecretPanel() {
-            let code = prompt("KOD:");
-            if (code === "2015") { currentLevel = 70; generateQuestion(); startGame(); }
-            if (code === "2014") { currentLevel = 1; generateQuestion(); startGame(); }
-        }
+        // Şovun Sonu (15. saniye)
+        setTimeout(() => {
+            document.getElementById('prank').style.display = 'flex';
+            setTimeout(() => { document.getElementById('prank').style.display = 'none'; }, 6000);
+        }, 15000);
     </script>
 </body>
 </html>
