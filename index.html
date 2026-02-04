@@ -3,26 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Matematik - Troll Edition v2</title>
+    <title>Hacker Matematik - Developer Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { background-color: black; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; transition: background-color 0.2s; }
         #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
         #secret-trigger { position: absolute; top: 10px; right: 15px; font-size: 10px; color: #002200; cursor: pointer; z-index: 100; user-select: none; }
         #secret-trigger:hover { color: #0f0; }
-        
         .container { background: rgba(0, 15, 0, 0.95); border: 2px solid #0f0; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px #0f0; width: 85%; max-width: 450px; z-index: 1; position: relative; }
-        
-        /* DEV GÜLÜCÜKLÜ ŞAKA MESAJI */
-        #prank-message {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 30, 0, 0.95); display: none;
-            flex-direction: column; justify-content: center; align-items: center;
-            z-index: 9999; color: white; text-align: center; padding: 20px;
-        }
+        #prank-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 30, 0, 0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; padding: 20px; }
         #prank-text { font-size: 30px; margin-bottom: 20px; font-weight: bold; }
         #big-smile { font-size: 150px; color: #ff0; text-shadow: 0 0 30px #ff0; }
-
         .level-tag { color: #ff0; font-weight: bold; margin-bottom: 10px; display: block; border: 1px solid #ff0; padding: 5px; }
         button { background: transparent; color: #0f0; border: 2px solid #0f0; padding: 12px 20px; font-size: 16px; cursor: pointer; font-family: 'Courier New', Courier, monospace; margin-top: 15px; width: 100%; }
         button:hover { background: #0f0; color: black; }
@@ -46,7 +37,7 @@
 
     <div id="intro" class="container">
         <h1>> SİSTEME SIZILIYOR...</h1>
-        <p>Hile: -0 | Ultra: 2015 | Normal: 2014</p>
+        <p>Hileler: -0 (Atla) | 2016 (Bitir)</p>
         <button onclick="startGame()">SİSTEMİ BAŞLAT</button>
     </div>
 
@@ -60,15 +51,14 @@
 
     <div id="final-screen" class="container hidden">
         <h1>ERİŞİM SAĞLANDI ✅</h1>
+        <p>Tebrikler Hacker!</p>
         <button class="exit-btn" onclick="exitSystem()">SİSTEMİ İMHA ET VE ÇIK</button>
     </div>
 
     <script>
-        // 15 Saniye sonra dev gülücük çıkar
         setTimeout(() => {
             const prank = document.getElementById('prank-message');
             prank.style.display = 'flex';
-            // 6 saniye ekranda kalsın
             setTimeout(() => { prank.style.display = 'none'; }, 6000);
         }, 15000);
 
@@ -132,14 +122,27 @@
                 document.getElementById('answer-input').value = "";
                 document.getElementById('answer-input').focus();
             } else {
-                document.getElementById('game').classList.add('hidden');
-                document.getElementById('final-screen').classList.remove('hidden');
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                finishGame();
             }
+        }
+
+        function finishGame() {
+            document.getElementById('game').classList.add('hidden');
+            document.getElementById('final-screen').classList.remove('hidden');
+            confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
+            playSound("Access Granted.");
         }
 
         function checkAnswer() {
             const val = document.getElementById('answer-input').value;
+            
+            // TEST KODU: 2016 (Oyun sonuna git)
+            if (val === "2016") {
+                finishGame();
+                return;
+            }
+
+            // HİLE KODU: -0 (Soru atla)
             if (val === questions[currentIdx].a || val === "-0") {
                 currentIdx++;
                 beep(880, 50);
@@ -156,20 +159,16 @@
         }
 
         function openSecretPanel() {
-            let code = prompt("GİZLİ KOD:");
+            let code = prompt("ERİŞİM KODU:");
             if (code === "2015") {
-                questions = ultraQuestions;
-                currentIdx = 0;
-                startGame();
+                questions = ultraQuestions; currentIdx = 0; startGame();
             } else if (code === "2014") {
-                questions = normalQuestions;
-                currentIdx = 0;
-                startGame();
+                questions = normalQuestions; currentIdx = 0; startGame();
             }
         }
 
         function exitSystem() {
-            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SİSTEM İMHA EDİLDİ</h1>";
+            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SİSTEM İMHASI...</h1>";
             setTimeout(() => { window.close(); }, 2000);
         }
     </script>
