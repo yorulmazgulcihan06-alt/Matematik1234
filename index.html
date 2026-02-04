@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Matematik - Developer Edition</title>
+    <title>Hacker Matematik - 100 Bölüm</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        body { background-color: black; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; transition: background-color 0.2s; }
+        body { background-color: black; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
         #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-        #secret-trigger { position: absolute; top: 10px; right: 15px; font-size: 10px; color: #002200; cursor: pointer; z-index: 100; user-select: none; }
-        #secret-trigger:hover { color: #0f0; }
-        .container { background: rgba(0, 15, 0, 0.95); border: 2px solid #0f0; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px #0f0; width: 85%; max-width: 450px; z-index: 1; position: relative; }
-        #prank-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 30, 0, 0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; padding: 20px; }
-        #prank-text { font-size: 30px; margin-bottom: 20px; font-weight: bold; }
+        #secret-trigger { position: absolute; top: 10px; right: 15px; font-size: 10px; color: #002200; cursor: pointer; z-index: 100; }
+        .container { background: rgba(0, 15, 0, 0.95); border: 2px solid #0f0; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px #0f0; width: 85%; max-width: 450px; z-index: 1; }
+        #prank-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 30, 0, 0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; }
         #big-smile { font-size: 150px; color: #ff0; text-shadow: 0 0 30px #ff0; }
         .level-tag { color: #ff0; font-weight: bold; margin-bottom: 10px; display: block; border: 1px solid #ff0; padding: 5px; }
-        button { background: transparent; color: #0f0; border: 2px solid #0f0; padding: 12px 20px; font-size: 16px; cursor: pointer; font-family: 'Courier New', Courier, monospace; margin-top: 15px; width: 100%; }
+        button { background: transparent; color: #0f0; border: 2px solid #0f0; padding: 12px 20px; cursor: pointer; width: 100%; margin-top: 15px; font-family: 'Courier New'; }
         button:hover { background: #0f0; color: black; }
-        input { background: black; border: 1px solid #0f0; color: #0f0; padding: 12px; font-size: 22px; text-align: center; width: 80%; outline: none; }
+        input { background: black; border: 1px solid #0f0; color: #0f0; padding: 12px; font-size: 22px; text-align: center; width: 80%; }
         .hidden { display: none; }
-        .exit-btn { border-color: #ff0000; color: #ff0000; margin-top: 25px; }
-        @keyframes shake { 0%{transform:translate(1px,1px)} 20%{transform:translate(-3px,0px)} 40%{transform:translate(3px,2px)} 60%{transform:translate(-3px,1px)} 80%{transform:translate(3px,-1px)} 100%{transform:translate(1px,-2px)} }
+        .exit-btn { border-color: red; color: red; }
+        @keyframes shake { 0%{transform:translate(1px,1px)} 20%{transform:translate(-3px,0px)} 100%{transform:translate(0px,0px)} }
         .shake { animation: shake 0.3s; }
     </style>
 </head>
@@ -29,63 +27,48 @@
     <canvas id="matrix-canvas"></canvas>
 
     <div id="prank-message">
-        <div id="prank-text">Merak etmeyin korkmayın<br>Bu sadece bir matematik oyunu</div>
+        <div style="font-size: 30px;">Merak etmeyin korkmayın<br>Bu sadece bir matematik oyunu</div>
         <div id="big-smile">:)</div>
     </div>
 
     <div id="secret-trigger" onclick="openSecretPanel()">[ ENCRYPTED ]</div>
 
     <div id="intro" class="container">
-        <h1>> SİSTEME SIZILIYOR...</h1>
-        <p>Hileler: -0 (Atla) | 2016 (Bitir)</p>
+        <h1>> 100 KATMANLI SİSTEM</h1>
+        <p>Tüm şifreleri çöz, sistemi tamamen ele geçir.</p>
         <button onclick="startGame()">SİSTEMİ BAŞLAT</button>
     </div>
 
     <div id="game" class="container hidden">
-        <span id="level-indicator" class="level-tag">SEVİYE: 1</span>
-        <h2 id="question-text">...</h2>
+        <span id="level-indicator" class="level-tag">KATMAN: 1 / 100</span>
+        <h2 id="question-text">Yükleniyor...</h2>
         <input type="text" id="answer-input" placeholder="Şifre?" onkeydown="if(event.key==='Enter') checkAnswer()">
         <p id="feedback"></p>
         <button onclick="checkAnswer()">VERİYİ DOĞRULA</button>
     </div>
 
     <div id="final-screen" class="container hidden">
-        <h1>ERİŞİM SAĞLANDI ✅</h1>
-        <p>Tebrikler Hacker!</p>
-        <button class="exit-btn" onclick="exitSystem()">SİSTEMİ İMHA ET VE ÇIK</button>
+        <h1>SİSTEM ELE GEÇİRİLDİ ✅</h1>
+        <p>100 katmanlı korumayı aştın!</p>
+        <button class="exit-btn" onclick="exitSystem()">SİSTEMİ KAPAT VE İZLERİ SİL</button>
     </div>
 
     <script>
+        // 15 Saniye Şakası
         setTimeout(() => {
             const prank = document.getElementById('prank-message');
             prank.style.display = 'flex';
             setTimeout(() => { prank.style.display = 'none'; }, 6000);
         }, 15000);
 
-        const synth = window.speechSynthesis;
-        function playSound(text) {
-            const utter = new SpeechSynthesisUtterance(text);
-            utter.lang = 'en-US'; utter.rate = 1.1; utter.pitch = 0.5;
-            synth.speak(utter);
-        }
-
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function beep(freq, dur) {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.frequency.value = freq;
-            osc.start();
-            setTimeout(() => osc.stop(), dur);
-        }
-
+        // Matrix Arkaplan
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
         const drops = Array(Math.floor(canvas.width / 16)).fill(1);
         function drawMatrix() {
             ctx.fillStyle = "rgba(0, 0, 0, 0.1)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#0f0"; ctx.font = "15px monospace";
+            ctx.fillStyle = "#0f0";
             drops.forEach((y, i) => {
                 ctx.fillText(Math.floor(Math.random()*2), i * 16, y * 16);
                 if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
@@ -94,81 +77,77 @@
         }
         setInterval(drawMatrix, 40);
 
-        let currentIdx = 0;
-        let questions = [];
-        const normalQuestions = [
-            { q: "40 x 5 ?", a: "200", l: "GÜVENLİK 1" },
-            { q: "900 / 3 ?", a: "300", l: "GÜVENLİK 2" },
-            { q: "120 + 380 ?", a: "500", l: "GÜVENLİK 3" }
-        ];
-        const ultraQuestions = [
-            { q: "25 x 25 ?", a: "625", l: "ULTRA HACKER 1" },
-            { q: "10000 / 4 ?", a: "2500", l: "ULTRA HACKER 2" }
-        ];
+        let currentLevel = 1;
+        const totalLevels = 100;
+        let currentAnswer = 0;
 
-        questions = normalQuestions;
-
-        function startGame() {
-            beep(440, 100);
-            document.getElementById('intro').classList.add('hidden');
-            document.getElementById('game').classList.remove('hidden');
-            showQuestion();
+        // Rastgele Soru Oluşturucu (100 Soru İçin)
+        function generateQuestion() {
+            let num1, num2, op;
+            if (currentLevel <= 30) { // Toplama - Çıkarma
+                num1 = Math.floor(Math.random() * 50) + 10;
+                num2 = Math.floor(Math.random() * 50) + 5;
+                op = Math.random() > 0.5 ? "+" : "-";
+                currentAnswer = op === "+" ? num1 + num2 : num1 - num2;
+            } else if (currentLevel <= 70) { // Çarpma - Bölme
+                num1 = Math.floor(Math.random() * 12) + 2;
+                num2 = Math.floor(Math.random() * 10) + 2;
+                op = "x";
+                currentAnswer = num1 * num2;
+            } else { // Zor Seviye (Kareler ve İşlem Önceliği)
+                num1 = Math.floor(Math.random() * 10) + 2;
+                op = "karesi + 10";
+                currentAnswer = (num1 * num1) + 10;
+            }
+            
+            document.getElementById('level-indicator').innerText = "KATMAN: " + currentLevel + " / 100";
+            document.getElementById('question-text').innerText = num1 + " " + (op === "karesi + 10" ? "karesi + 10" : op + " " + num2) + " ?";
         }
 
-        function showQuestion() {
-            if (currentIdx < questions.length) {
-                document.getElementById('level-indicator').innerText = questions[currentIdx].l;
-                document.getElementById('question-text').innerText = questions[currentIdx].q;
-                document.getElementById('answer-input').value = "";
-                document.getElementById('answer-input').focus();
+        function startGame() {
+            document.getElementById('intro').classList.add('hidden');
+            document.getElementById('game').classList.remove('hidden');
+            generateQuestion();
+        }
+
+        function checkAnswer() {
+            const val = document.getElementById('answer-input').value;
+            
+            if (val === "2016") { currentLevel = 100; finishGame(); return; } // Hızlı bitirme
+
+            if (val == currentAnswer || val === "-0") {
+                if (currentLevel >= totalLevels) {
+                    finishGame();
+                } else {
+                    currentLevel++;
+                    generateQuestion();
+                    document.getElementById('answer-input').value = "";
+                    document.getElementById('answer-input').focus();
+                }
             } else {
-                finishGame();
+                document.body.style.backgroundColor = "#330000";
+                document.getElementById('game').classList.add('shake');
+                setTimeout(() => {
+                    document.body.style.backgroundColor = "black";
+                    document.getElementById('game').classList.remove('shake');
+                }, 300);
             }
         }
 
         function finishGame() {
             document.getElementById('game').classList.add('hidden');
             document.getElementById('final-screen').classList.remove('hidden');
-            confetti({ particleCount: 200, spread: 90, origin: { y: 0.6 } });
-            playSound("Access Granted.");
-        }
-
-        function checkAnswer() {
-            const val = document.getElementById('answer-input').value;
-            
-            // TEST KODU: 2016 (Oyun sonuna git)
-            if (val === "2016") {
-                finishGame();
-                return;
-            }
-
-            // HİLE KODU: -0 (Soru atla)
-            if (val === questions[currentIdx].a || val === "-0") {
-                currentIdx++;
-                beep(880, 50);
-                setTimeout(showQuestion, 500);
-            } else {
-                beep(110, 200);
-                document.body.style.backgroundColor = "#330000";
-                document.getElementById('game').classList.add('shake');
-                setTimeout(() => {
-                    document.body.style.backgroundColor = "black";
-                    document.getElementById('game').classList.remove('shake');
-                }, 500);
-            }
+            confetti({ particleCount: 200, spread: 90 });
         }
 
         function openSecretPanel() {
-            let code = prompt("ERİŞİM KODU:");
-            if (code === "2015") {
-                questions = ultraQuestions; currentIdx = 0; startGame();
-            } else if (code === "2014") {
-                questions = normalQuestions; currentIdx = 0; startGame();
-            }
+            let code = prompt("KOD:");
+            if (code === "2015") { currentLevel = 70; generateQuestion(); alert("70. SEVİYEYE ATLANDI!"); }
+            if (code === "2014") { currentLevel = 1; generateQuestion(); alert("BAŞA DÖNÜLDÜ."); }
         }
 
         function exitSystem() {
-            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SİSTEM İMHASI...</h1>";
+            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SİSTEM İMHA EDİLDİ...</h1>";
             setTimeout(() => { window.close(); }, 2000);
         }
     </script>
