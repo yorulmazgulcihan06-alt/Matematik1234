@@ -3,19 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hacker Matematik - 100 Bölüm</title>
+    <title>Hacker Matematik - Utkan & Gemini</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { background-color: black; color: #0f0; font-family: 'Courier New', Courier, monospace; margin: 0; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
         #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; }
         #secret-trigger { position: absolute; top: 10px; right: 15px; font-size: 10px; color: #002200; cursor: pointer; z-index: 100; }
+        
+        /* İmza Ekranı */
+        #credits { color: #0f0; font-size: 20px; text-align: center; margin-bottom: 20px; border-bottom: 1px solid #0f0; padding-bottom: 10px; }
+
         .container { background: rgba(0, 15, 0, 0.95); border: 2px solid #0f0; padding: 30px; border-radius: 15px; text-align: center; box-shadow: 0 0 30px #0f0; width: 85%; max-width: 450px; z-index: 1; }
+        
         #prank-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 30, 0, 0.95); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 9999; color: white; text-align: center; }
         #big-smile { font-size: 150px; color: #ff0; text-shadow: 0 0 30px #ff0; }
+
         .level-tag { color: #ff0; font-weight: bold; margin-bottom: 10px; display: block; border: 1px solid #ff0; padding: 5px; }
-        button { background: transparent; color: #0f0; border: 2px solid #0f0; padding: 12px 20px; cursor: pointer; width: 100%; margin-top: 15px; font-family: 'Courier New'; }
+        button { background: transparent; color: #0f0; border: 2px solid #0f0; padding: 12px 20px; cursor: pointer; width: 100%; margin-top: 15px; font-family: 'Courier New'; font-size: 16px; }
         button:hover { background: #0f0; color: black; }
-        input { background: black; border: 1px solid #0f0; color: #0f0; padding: 12px; font-size: 22px; text-align: center; width: 80%; }
+        input { background: black; border: 1px solid #0f0; color: #0f0; padding: 12px; font-size: 22px; text-align: center; width: 80%; outline: none; }
         .hidden { display: none; }
         .exit-btn { border-color: red; color: red; }
         @keyframes shake { 0%{transform:translate(1px,1px)} 20%{transform:translate(-3px,0px)} 100%{transform:translate(0px,0px)} }
@@ -34,9 +40,11 @@
     <div id="secret-trigger" onclick="openSecretPanel()">[ ENCRYPTED ]</div>
 
     <div id="intro" class="container">
-        <h1>> 100 KATMANLI SİSTEM</h1>
-        <p>Tüm şifreleri çöz, sistemi tamamen ele geçir.</p>
-        <button onclick="startGame()">SİSTEMİ BAŞLAT</button>
+        <div id="credits">Bunu Utkan ve Gemini yaptı :)</div>
+        
+        <h1>> SİSTEME GİRİŞ YAPILIYOR...</h1>
+        <p>100 Katmanlı Matematik Güvenlik Protokolü</p>
+        <button onclick="startGame()">PROTOKOLÜ BAŞLAT</button>
     </div>
 
     <div id="game" class="container hidden">
@@ -49,8 +57,8 @@
 
     <div id="final-screen" class="container hidden">
         <h1>SİSTEM ELE GEÇİRİLDİ ✅</h1>
-        <p>100 katmanlı korumayı aştın!</p>
-        <button class="exit-btn" onclick="exitSystem()">SİSTEMİ KAPAT VE İZLERİ SİL</button>
+        <p>Tüm katmanlar aşıldı.</p>
+        <button class="exit-btn" onclick="exitSystem()">SİSTEMİ KAPAT</button>
     </div>
 
     <script>
@@ -81,25 +89,23 @@
         const totalLevels = 100;
         let currentAnswer = 0;
 
-        // Rastgele Soru Oluşturucu (100 Soru İçin)
         function generateQuestion() {
             let num1, num2, op;
-            if (currentLevel <= 30) { // Toplama - Çıkarma
+            if (currentLevel <= 30) {
                 num1 = Math.floor(Math.random() * 50) + 10;
                 num2 = Math.floor(Math.random() * 50) + 5;
                 op = Math.random() > 0.5 ? "+" : "-";
                 currentAnswer = op === "+" ? num1 + num2 : num1 - num2;
-            } else if (currentLevel <= 70) { // Çarpma - Bölme
+            } else if (currentLevel <= 70) {
                 num1 = Math.floor(Math.random() * 12) + 2;
                 num2 = Math.floor(Math.random() * 10) + 2;
                 op = "x";
                 currentAnswer = num1 * num2;
-            } else { // Zor Seviye (Kareler ve İşlem Önceliği)
+            } else {
                 num1 = Math.floor(Math.random() * 10) + 2;
                 op = "karesi + 10";
                 currentAnswer = (num1 * num1) + 10;
             }
-            
             document.getElementById('level-indicator').innerText = "KATMAN: " + currentLevel + " / 100";
             document.getElementById('question-text').innerText = num1 + " " + (op === "karesi + 10" ? "karesi + 10" : op + " " + num2) + " ?";
         }
@@ -112,9 +118,7 @@
 
         function checkAnswer() {
             const val = document.getElementById('answer-input').value;
-            
-            if (val === "2016") { currentLevel = 100; finishGame(); return; } // Hızlı bitirme
-
+            if (val === "2016") { currentLevel = 100; finishGame(); return; }
             if (val == currentAnswer || val === "-0") {
                 if (currentLevel >= totalLevels) {
                     finishGame();
@@ -125,12 +129,8 @@
                     document.getElementById('answer-input').focus();
                 }
             } else {
-                document.body.style.backgroundColor = "#330000";
                 document.getElementById('game').classList.add('shake');
-                setTimeout(() => {
-                    document.body.style.backgroundColor = "black";
-                    document.getElementById('game').classList.remove('shake');
-                }, 300);
+                setTimeout(() => document.getElementById('game').classList.remove('shake'), 300);
             }
         }
 
@@ -142,14 +142,15 @@
 
         function openSecretPanel() {
             let code = prompt("KOD:");
-            if (code === "2015") { currentLevel = 70; generateQuestion(); alert("70. SEVİYEYE ATLANDI!"); }
-            if (code === "2014") { currentLevel = 1; generateQuestion(); alert("BAŞA DÖNÜLDÜ."); }
+            if (code === "2015") { currentLevel = 70; generateQuestion(); startGame(); }
+            if (code === "2014") { currentLevel = 1; generateQuestion(); startGame(); }
         }
 
         function exitSystem() {
-            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SİSTEM İMHA EDİLDİ...</h1>";
+            document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%;'>SİSTEM KAPATILDI.</h1>";
             setTimeout(() => { window.close(); }, 2000);
         }
     </script>
 </body>
 </html>
+
