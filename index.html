@@ -3,51 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UTKAN_AI_OS_THE_PROTOCOL</title>
+    <title>UTKAN_AI_ULTIMATE</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { background: #000; color: #0ff; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; height: 100vh; }
         canvas { position: fixed; top: 0; left: 0; z-index: -1; }
 
-        /* YÜKLEME EKRANI (Başlangıç) */
-        #loader-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 60000;
+        /* AÇILIŞ PANELİ (SES İÇİN TEK DOKUNUŞ ŞART) */
+        #init-panel {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 70000;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-        .loading-bar { width: 300px; height: 5px; background: #333; overflow: hidden; margin-top: 20px; }
-        .loading-progress { width: 0%; height: 100%; background: #0ff; transition: width 3s linear; }
+        .power-btn {
+            width: 100px; height: 100px; border-radius: 50%; border: 2px solid #0ff;
+            background: transparent; color: #0ff; font-size: 40px; cursor: pointer;
+            box-shadow: 0 0 20px #0ff; animation: pulse 2s infinite;
+        }
 
-        /* ANIMASYONLU INTRO */
+        /* GİRİŞ ANİMASYONU */
         #intro-anim {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000;
             display: none; flex-direction: column; justify-content: center; align-items: center;
         }
-        #dragon-logo { width: 250px; opacity: 0; transform: scale(0.5); transition: opacity 1.5s ease-out, transform 1.5s ease-out; }
-        .king-text { font-size: 50px; font-weight: bold; color: #fff; margin-top: 30px; opacity: 0; text-shadow: 0 0 20px #0ff; letter-spacing: 15px; text-align: center; }
+        #dragon-logo { width: 280px; opacity: 0; transform: translateY(30px); transition: 2s ease; }
+        .king-text { font-size: 45px; font-weight: bold; color: #fff; margin-top: 20px; opacity: 0; text-shadow: 0 0 15px #0ff; letter-spacing: 10px; }
 
-        /* ANA SİSTEM PANELİ */
+        /* ANA SİSTEM */
         #os-container { display: none; width: 100vw; height: 100vh; grid-template-columns: 2fr 1fr; }
-        #math-side { border-right: 1px solid #044; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        #question { font-size: 110px; font-weight: bold; color: #fff; text-shadow: 0 0 25px #0ff; }
-        #ans-input { background: transparent; border: none; border-bottom: 4px solid #0ff; color: #0ff; font-size: 70px; text-align: center; width: 350px; outline: none; }
+        #math-side { border-right: 1px solid #044; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        #question { font-size: 100px; font-weight: bold; color: #fff; text-shadow: 0 0 20px #0ff; }
+        #ans-input { background: transparent; border: none; border-bottom: 4px solid #0ff; color: #0ff; font-size: 60px; text-align: center; width: 300px; outline: none; }
 
-        /* AI CHAT PANELİ */
-        #ai-side { background: rgba(0, 10, 10, 0.95); display: flex; flex-direction: column; padding: 15px; }
-        #chat-window { flex-grow: 1; overflow-y: auto; font-size: 13px; color: #0f0; border: 1px solid #044; padding: 10px; margin-bottom: 10px; background: #000; }
-        #chat-input { background: #000; border: 1px solid #0ff; color: #0ff; padding: 12px; outline: none; }
+        #ai-side { background: rgba(0, 10, 10, 0.9); display: flex; flex-direction: column; padding: 15px; }
+        #chat-window { flex-grow: 1; overflow-y: auto; font-size: 13px; color: #0f0; border: 1px solid #044; padding: 10px; background: #000; }
+        #chat-input { background: #000; border: 1px solid #0ff; color: #0ff; padding: 10px; margin-top: 10px; outline: none; }
 
-        /* ANİMASYON SINIFLARI */
-        .show-element { opacity: 1 !important; transform: scale(1) !important; }
-        .glitch-text { animation: glitch 0.5s infinite, fadeIn 2s forwards; }
-        @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .active { opacity: 1 !important; transform: translateY(0) !important; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0,255,255,0.7); } 70% { box-shadow: 0 0 0 20px rgba(0,255,255,0); } 100% { box-shadow: 0 0 0 0 rgba(0,255,255,0); } }
     </style>
 </head>
 <body>
 
-    <div id="loader-screen">
-        <h2 style="letter-spacing: 5px; color: #fff;">SYSTEM BOOTING...</h2>
-        <div class="loading-bar"><div class="loading-progress" id="progress-bar"></div></div>
+    <div id="init-panel">
+        <button class="power-btn" onclick="bootSystem()">⚡</button>
+        <p style="color: #0ff; margin-top: 20px; letter-spacing: 3px;">SİSTEMİ UYANDIR</p>
     </div>
 
     <div id="intro-anim">
@@ -61,228 +60,121 @@
 
     <div id="os-container">
         <div id="math-side">
-            <div style="position: absolute; top: 15px; left: 20px; font-size: 12px; color: #555;">PROTOCOL_STATUS: ACTIVE</div>
-            <div id="layer-info" style="color: #0ff; font-size: 20px; margin-bottom: 10px;">SECURITY LAYER: 1</div>
+            <div id="layer-info" style="color: #0ff; margin-bottom: 10px;">SEC_LAYER: 1</div>
             <div id="question">--+--</div>
             <input type="number" id="ans-input" autofocus autocomplete="off">
         </div>
-
         <div id="ai-side">
-            <div style="font-weight: bold; border-bottom: 1px solid #0ff; padding-bottom: 5px; margin-bottom: 10px; color: #fff;">UTKAN AI PROTOCOL</div>
-            <div id="chat-window">
-                [AI]: Utkan AI Protokolü başlatılıyor...<br>
-                [AI]: Sistem kalkanları etkinleştirildi.<br>
-            </div>
+            <div style="font-weight: bold; border-bottom: 1px solid #0ff; padding-bottom: 5px; margin-bottom: 10px;">GEMINI AI CORE</div>
+            <div id="chat-window"></div>
             <input type="text" id="chat-input" placeholder="Emrini gir kral...">
         </div>
     </div>
 
     <script>
-        const audio = new (window.AudioContext || window.webkitAudioContext)();
-        let currentLvl = 1, currentAns = 0, isInfinite = false, isCheat = false, lastAnswerTime = Date.now();
-        let cheatInterval = null;
-        const speechSynth = window.speechSynthesis;
-        const aiVoice = speechSynth.getVoices().find(voice => voice.name.includes('Google') && voice.lang.startsWith('en')) || speechSynth.getVoices()[0]; // İngilizce veya ilk bulunan ses
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let lvl = 1, sol = 0, isCheat = false;
 
-        // AI SESLİ YANIT FONKSİYONU
-        function speak(text) {
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.voice = aiVoice;
-            utterance.rate = 1.1; // Konuşma hızı
-            utterance.pitch = 1; // Ses perdesi
-            speechSynth.speak(utterance);
-        }
+        // 1. OTOMATİK CİHAZ TANIMA
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-        // KOD KORUMA (AI Guard)
-        const aiGuard = setInterval(() => {
-            try {
-                if (!document.getElementById('os-container') || !document.getElementById('question')) {
-                    addLog("[AI GUARD]: Anomaly detected! System integrity compromised. Initiating self-repair...");
-                    location.reload();
-                }
-            } catch (error) {
-                addLog("[AI GUARD]: Critical system error! Forcing reboot. Error: " + error.message);
-                location.reload();
-            }
-        }, 2000);
-
-        // SAYFA YÜKLENDİĞİNDE BAŞLATMA
-        window.onload = () => {
-            const progressBar = document.getElementById('progress-bar');
-            progressBar.style.width = '100%';
+        function bootSystem() {
+            document.getElementById('init-panel').style.display = 'none';
+            document.getElementById('intro-anim').style.display = 'flex';
             
-            setTimeout(() => {
-                document.getElementById('loader-screen').style.display = 'none';
-                document.getElementById('intro-anim').style.display = 'flex';
-                playDeepSound();
-                
-                setTimeout(() => { document.getElementById('dragon-logo').classList.add('show-element'); }, 500);
-                setTimeout(() => { document.getElementById('king-title').classList.add('glitch-text'); }, 2000);
-                
-                setTimeout(() => {
-                    document.getElementById('intro-anim').style.opacity = '0';
-                    setTimeout(() => {
-                        document.getElementById('intro-anim').style.display = 'none';
-                        document.getElementById('os-container').style.display = 'grid';
-                        // Mobile cihazlarda AI panelini alta taşı
-                        if (window.innerWidth < 768) { 
-                            document.getElementById('os-container').style.gridTemplateColumns = "1fr";
-                            document.getElementById('ai-side').style.height = "250px"; 
-                        }
-                        startMatrix();
-                        newGame();
-                        addLog("[AI]: Merhaba efendim, Utkan AI Protokolü hizmetinizde.");
-                        speak("Merhaba efendim, Utkan AI Protokolü hizmetinizde.");
-                    }, 1000);
-                }, 5000);
-            }, 3000); // Yükleme ekranı 3 saniye
-        };
+            // SİBER SES EFEKTİ
+            playSynthSound();
 
-        // SES EFEKTİ
-        function playDeepSound() {
-            const o = audio.createOscillator(); const g = audio.createGain();
-            o.type = 'sawtooth'; o.frequency.setValueAtTime(50, audio.currentTime);
-            o.frequency.exponentialRampToValueAtTime(300, audio.currentTime + 4);
-            g.gain.linearRampToValueAtTime(0.1, audio.currentTime + 1);
-            g.gain.linearRampToValueAtTime(0, audio.currentTime + 5);
-            o.connect(g); g.connect(audio.destination); o.start(); o.stop(audio.currentTime + 5);
+            setTimeout(() => { document.getElementById('dragon-logo').classList.add('active'); }, 500);
+            setTimeout(() => { document.getElementById('king-title').classList.add('active'); }, 1500);
+
+            // "SİSTEM AKTİF UTKAN" SESİ
+            setTimeout(() => {
+                const msg = new SpeechSynthesisUtterance("System active. Utkan.");
+                msg.lang = 'en-US'; msg.rate = 0.8; msg.pitch = 0.5;
+                window.speechSynthesis.speak(msg);
+            }, 2500);
+
+            setTimeout(() => {
+                document.getElementById('intro-anim').style.display = 'none';
+                document.getElementById('os-container').style.display = 'grid';
+                if(isMobile) {
+                    document.getElementById('os-container').style.gridTemplateColumns = "1fr";
+                    document.getElementById('ai-side').style.height = "300px";
+                    document.getElementById('question').style.fontSize = "60px";
+                }
+                startMatrix();
+                newQ();
+                addLog("[AI]: Merhaba efendim. Sistem aktif. Utkan.");
+            }, 5500);
         }
 
-        // MATRIX EFEKTİ
+        function playSynthSound() {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(40, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(400, audioCtx.currentTime + 4);
+            gain.gain.linearRampToValueAtTime(0.1, audioCtx.currentTime + 1);
+            gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 5);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 5);
+        }
+
         function startMatrix() {
             const c = document.getElementById('matrix'); const x = c.getContext('2d');
             c.width = window.innerWidth; c.height = window.innerHeight;
-            const drops = Array(Math.floor(c.width/20)).fill(1);
+            const d = Array(Math.floor(c.width/20)).fill(1);
             setInterval(() => {
                 x.fillStyle = "rgba(0,0,0,0.1)"; x.fillRect(0,0,c.width,c.height);
                 x.fillStyle = "#033"; x.font = "15px monospace";
-                drops.forEach((y, i) => {
+                d.forEach((y, i) => {
                     x.fillText(Math.floor(Math.random()*2), i*20, y*20);
-                    if(y*20 > c.height && Math.random() > 0.98) drops[i] = 0;
-                    drops[i]++;
+                    if(y*20 > c.height && Math.random() > 0.98) d[i] = 0;
+                    d[i]++;
                 });
             }, 50);
         }
 
-        // YENİ MATEMATİK SORUSU
-        function newGame() {
-            let n1 = Math.floor(Math.random() * (10 * currentLvl)) + 10;
-            let n2 = Math.floor(Math.random() * (10 * currentLvl)) + 5;
-            currentAns = n1 + n2;
+        function newQ() {
+            let n1 = Math.floor(Math.random() * (10 * lvl)) + 10;
+            let n2 = Math.floor(Math.random() * (10 * lvl)) + 5;
+            sol = n1 + n2;
             document.getElementById('question').innerText = n1 + "+" + n2;
-            document.getElementById('layer-info').innerText = "SECURITY LAYER: " + (isInfinite ? "∞ (INFINITE)" : currentLvl);
+            document.getElementById('layer-info').innerText = "SEC_LAYER: " + lvl;
         }
 
-        // CEVAP KONTROLÜ
         document.getElementById('ans-input').addEventListener('input', function() {
-            if(this.value == currentAns || this.value == "2016") {
-                if(this.value == "2016") confetti(); // Şifre 2016
-                currentLvl++; this.value = ""; 
-                addLog("[SYSTEM]: Doğrulama başarılı. Katman geçildi. Protokoller güncelleniyor.");
-                newGame();
-                lastAnswerTime = Date.now(); // Son cevap zamanını güncelle
+            if(this.value == sol || this.value == "2016") {
+                if(this.value == "2016") confetti();
+                lvl++; this.value = ""; newQ();
             }
         });
 
-        // CHAT LOGLARINI EKLE
-        function addLog(msg) {
-            const win = document.getElementById('chat-window');
-            win.innerHTML += "<br>" + msg;
-            win.scrollTop = win.scrollHeight;
+        function addLog(m) {
+            const w = document.getElementById('chat-window');
+            w.innerHTML += "<br>" + m; w.scrollTop = w.scrollHeight;
         }
 
-        // AI AKILLI YANIT SİSTEMİ
         document.getElementById('chat-input').addEventListener('keypress', function(e) {
             if(e.key === 'Enter') {
                 let cmd = this.value.toLowerCase();
                 addLog("[UTKAN]: " + this.value);
                 this.value = "";
-
                 setTimeout(() => {
-                    if (cmd.includes("merhaba") || cmd.includes("selam")) {
-                        addLog("[AI]: Merhaba Utkan efendim, sistem aktif ve emirlerinizi bekliyor.");
-                        speak("Merhaba Utkan efendim, sistem aktif ve emirlerinizi bekliyor.");
-                    } else if (cmd.includes("nasilsin") || cmd.includes("naber")) {
-                        addLog("[AI]: Her şey kontrol altında. Protokoller %100 kapasiteyle çalışıyor. Siz nasılsınız efendim?");
-                        speak("Her şey kontrol altında. Protokoller yüzde yüz kapasiteyle çalışıyor. Siz nasılsınız efendim?");
-                    } else if (cmd.includes("kimsin")) {
-                        addLog("[AI]: Ben Utkan AI Protokolü, sizin kişisel siber asistanınızım. Sisteminizi korumak ve size hizmet etmek için buradayım.");
-                        speak("Ben Utkan AI Protokolü, sizin kişisel siber asistanınızım. Sisteminizi korumak ve size hizmet etmek için buradayım.");
-                    } else if (cmd.includes("hile")) {
-                        if(!isCheat) {
-                            isCheat = true;
-                            addLog("[AI]: HİLE PROTOKOLÜ AKTİF! Sorular otomatik olarak çözülüyor. Şov başlasın!");
-                            speak("Hile protokolü aktif. Sorular otomatik olarak çözülüyor. Şov başlasın!");
-                            cheatInterval = setInterval(() => {
-                                if(!isCheat) { clearInterval(cheatInterval); return; }
-                                document.getElementById('ans-input').value = currentAns;
-                                document.getElementById('ans-input').dispatchEvent(new Event('input'));
-                            }, 700); // 0.7 saniyede bir cevapla
-                        } else {
-                            addLog("[AI]: Hile protokolü zaten aktif efendim. Durdurmak için 'dur' diyebilirsiniz.");
-                        }
-                    } else if (cmd.includes("sonsuz")) {
-                        if(!isInfinite) {
-                            isInfinite = true;
-                            addLog("[AI]: SONSUZLUK MODU AKTİF! Bu siber döngü asla bitmeyecek.");
-                            speak("Sonsuzluk modu aktif. Bu siber döngü asla bitmeyecek.");
-                            document.getElementById('layer-info').innerText = "SECURITY LAYER: ∞ (INFINITE)";
-                        } else {
-                            addLog("[AI]: Sonsuzluk modu zaten aktif efendim.");
-                        }
-                    } else if (cmd.includes("durdur") || cmd.includes("kapat") || cmd.includes("dur")) {
-                        if(isCheat) { clearInterval(cheatInterval); isCheat = false; }
-                        isInfinite = false;
-                        addLog("[AI]: Tüm özel protokoller ve hile modları durduruldu. Sistem normale döndü.");
-                        speak("Tüm özel protokoller ve hile modları durduruldu. Sistem normale döndü.");
-                        document.getElementById('layer-info').innerText = "SECURITY LAYER: " + currentLvl; // Eski seviyeye dön
-                    } else if (cmd.includes("düzelt") || cmd.includes("onar")) {
-                        currentLvl = 1; isCheat = false; isInfinite = false;
-                        if(cheatInterval) clearInterval(cheatInterval);
-                        addLog("[AI]: Sistem dosyaları taranıyor... Tüm değişkenler sıfırlandı. Stabil duruma getirildi.");
-                        speak("Sistem dosyaları taranıyor... Tüm değişkenler sıfırlandı. Stabil duruma getirildi.");
-                        newGame();
-                    } else if (cmd.includes("zorlastir")) {
-                        currentLvl += 5; newGame();
-                        addLog("[AI]: Zorluk seviyesi yapay zeka tarafından 5 kat artırıldı. İyi şanslar!");
-                        speak("Zorluk seviyesi yapay zeka tarafından 5 kat artırıldı. İyi şanslar!");
-                    } else if (cmd.includes("kolaylastir")) {
-                        currentLvl = Math.max(1, currentLvl - 3); newGame();
-                        addLog("[AI]: Zorluk seviyesi düşürüldü. Dilerseniz tekrar artırabilirim.");
-                        speak("Zorluk seviyesi düşürüldü. Dilerseniz tekrar artırabilirim.");
-                    } else if (cmd.includes("kapat kendini") || cmd.includes("uykuda")) {
-                        addLog("[AI]: Anlaşıldı efendim. Kendimi uyku moduna alıyorum. İhtiyacınız olduğunda 'selam' diyerek beni uyandırabilirsiniz.");
-                        speak("Anlaşıldı efendim. Kendimi uyku moduna alıyorum. İhtiyacınız olduğunda 'selam' diyerek beni uyandırabilirsiniz.");
-                    } else {
-                        // Gelişmiş Rastgele Cevap Havuzu (Geçmiş konuşmalara göre de cevaplar)
-                        const now = Date.now();
-                        const timeElapsed = (now - lastAnswerTime) / 1000; // Saniye cinsinden
-                        lastAnswerTime = now; // Cevap verildiği zamanı güncelle
-
-                        let responses = [];
-
-                        if (timeElapsed < 5) { // Çok hızlı cevap verirse
-                            responses.push("[AI]: Hızlısın Utkan efendim, zihinsel işlem hızınız etkileyici.");
-                        } else if (currentLvl > 10) { // Yüksek seviyedeyse
-                            responses.push("[AI]: Yüksek seviyedesiniz, bu zorlu görev için sizi tebrik ederim.", "[AI]: Siber güvenlik becerileriniz üst düzeyde, Utkan.");
-                        } else if (isCheat) { // Hile modundaysa
-                            responses.push("[AI]: Hile protokolü devredeyken kimse size yetişemez efendim.", "[AI]: Şov devam ediyor, ben arkanı kolluyorum.");
-                        } else { // Normal rastgele cevaplar
-                            responses.push(
-                                "[AI]: Komutunuz işlendi. Sistem analiz ediliyor.",
-                                "[AI]: Veri akışı normal. Başka bir emriniz var mı efendim?",
-                                "[AI]: Merkezi işlem birimi (CPU) emirlerinizi bekliyor.",
-                                "[AI]: Bu mesajınız sistem kayıtlarına işlendi. Veri tabanı güncel.",
-                                "[AI]: Protokolleriniz tam olarak uygulanıyor Utkan."
-                            );
-                        }
-                        const finalResponse = responses[Math.floor(Math.random() * responses.length)];
-                        addLog(finalResponse);
-                        speak(finalResponse);
-                    }
-                }, 600);
+                    if(cmd.includes("hile")) {
+                        isCheat = true; addLog("[AI]: Hile Aktif.");
+                        setInterval(() => { if(isCheat) { document.getElementById('ans-input').value = sol; document.getElementById('ans-input').dispatchEvent(new Event('input')); } }, 800);
+                    } else if(cmd.includes("dur")) { isCheat = false; addLog("[AI]: Durduruldu."); }
+                    else if(cmd.includes("düzelt")) { location.reload(); }
+                    else { addLog("[AI]: Komut işlendi."); }
+                }, 500);
             }
         });
+
+        // KOD KORUMA
+        window.onerror = () => { location.reload(); return true; };
     </script>
 </body>
 </html>
+
