@@ -3,141 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UTKAN_AI_HYBRID_KING</title>
+    <title>UTKAN_ULTIMATE_AI_SHIELD</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { background: #000; color: #0ff; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; height: 100vh; }
         canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-
-        /* GİRİŞ EKRANI */
-        #boot-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 50000; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; gap: 20px;
-        }
-        .boot-btn {
-            padding: 15px 40px; background: transparent; border: 2px solid #0ff;
-            color: #0ff; font-size: 20px; cursor: pointer; transition: 0.3s;
-            box-shadow: 0 0 15px #055; letter-spacing: 5px;
-        }
-        .boot-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 40px #0ff; }
-
-        /* ANIMASYONLU INTRO */
-        #intro-anim {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 10000; display: none; flex-direction: column;
-            justify-content: center; align-items: center;
-        }
-        #dragon-logo { width: 250px; opacity: 0; transform: scale(0.5); transition: 2s; }
-        .king-text { 
-            font-size: 50px; font-weight: bold; color: #fff; margin-top: 30px;
-            opacity: 0; text-shadow: 0 0 20px #0ff; letter-spacing: 15px;
-        }
-
-        /* ANA SİSTEM PANELİ */
+        #boot-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 50000; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 20px; }
+        .boot-btn { padding: 15px 40px; background: transparent; border: 2px solid #0ff; color: #0ff; font-size: 20px; cursor: pointer; letter-spacing: 5px; box-shadow: 0 0 15px #055; }
         #os-container { display: none; width: 100vw; height: 100vh; grid-template-columns: 2fr 1fr; }
         #math-side { border-right: 1px solid #044; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
         #question { font-size: 110px; font-weight: bold; color: #fff; text-shadow: 0 0 25px #0ff; }
         #ans-input { background: transparent; border: none; border-bottom: 4px solid #0ff; color: #0ff; font-size: 70px; text-align: center; width: 350px; outline: none; }
-
-        /* AI CHAT PANELİ */
         #ai-side { background: rgba(0, 10, 10, 0.95); display: flex; flex-direction: column; padding: 15px; }
         #chat-window { flex-grow: 1; overflow-y: auto; font-size: 13px; color: #0f0; border: 1px solid #044; padding: 10px; margin-bottom: 10px; background: #000; }
         #chat-input { background: #000; border: 1px solid #0ff; color: #0ff; padding: 12px; outline: none; }
-
-        /* ANİMASYON TETİKLEYİCİLER */
-        .show-dragon { opacity: 1 !important; transform: scale(1) !important; }
-        .show-text { animation: glitch 0.5s infinite, fadeIn 2s forwards; }
-        @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="boot-screen">
-        <h2 style="letter-spacing: 8px;">GEMINI AI PROTOCOL</h2>
-        <button class="boot-btn" onclick="startSequence('pc')">BOOT PC_CORE</button>
-        <button class="boot-btn" onclick="startSequence('mobile')">BOOT MOBILE_CORE</button>
-    </div>
-
-    <div id="intro-anim">
-        <svg id="dragon-logo" viewBox="0 0 500 500">
-            <path fill="#0ff" d="M250,50 L300,150 L200,150 Z M100,250 L200,200 L200,300 Z M400,250 L300,200 L300,300 Z M250,450 L200,350 L300,350 Z" />
-        </svg>
-        <div id="king-title" class="king-text">BENİM KRALIM BU</div>
+        <h1 style="letter-spacing: 8px;">UTKAN_AI_PROTOCOL_v9</h1>
+        <button class="boot-btn" onclick="init('pc')">START SYSTEM_CORE</button>
     </div>
 
     <canvas id="matrix"></canvas>
 
     <div id="os-container">
         <div id="math-side">
-            <div style="position: absolute; top: 15px; left: 20px; font-size: 12px; color: #555;">ROOT@UTKAN_KING_OS:~#</div>
+            <div style="position: absolute; top: 15px; left: 20px; font-size: 12px; color: #555;">SECURITY_STATUS: ACTIVE</div>
             <div id="layer-info" style="color: #0ff; font-size: 20px; margin-bottom: 10px;">LAYER: 1</div>
             <div id="question">--+--</div>
             <input type="number" id="ans-input" autofocus autocomplete="off">
         </div>
 
         <div id="ai-side">
-            <div style="font-weight: bold; border-bottom: 1px solid #0ff; padding-bottom: 5px; margin-bottom: 10px;">AI ASSISTANT: GEMINI</div>
+            <div style="font-weight: bold; border-bottom: 1px solid #0ff; padding-bottom: 5px; margin-bottom: 10px; color: #fff;">GEMINI GUARDIAN AI</div>
             <div id="chat-window">
-                [AI]: Sistem dosyaları kontrol edildi.<br>
-                [AI]: Hoş geldin Utkan. Animasyonlu giriş tamamlandı.<br>
-                [AI]: Şimdi tüm kontrol sende kral.
+                [AI]: Sistem kalkanları aktif edildi.<br>
+                [AI]: Hoş geldin Utkan. Tüm kodlar koruma altında.<br>
+                [AI]: Hile, Sonsuz veya Düzelt komutları için hazırım.
             </div>
-            <input type="text" id="chat-input" placeholder="Yapay zekaya komut ver...">
+            <input type="text" id="chat-input" placeholder="Emrini gir kral...">
         </div>
     </div>
 
     <script>
-        const audio = new (window.AudioContext || window.webkitAudioContext)();
-        let currentLvl = 1, currentAns = 0;
+        let layer = 1, currentAns = 0, isInfinite = false, isCheat = false;
 
-        function startSequence(mode) {
-            if(mode === 'mobile') {
-                document.getElementById('os-container').style.gridTemplateColumns = "1fr";
-                document.getElementById('ai-side').style.height = "250px";
+        // KOD KORUMA SİSTEMİ (Self-Shield)
+        const shield = setInterval(() => {
+            if (!document.getElementById('os-container')) {
+                alert("AI: Sisteme müdahale algılandı! Onarılıyor...");
+                location.reload();
             }
-            
+        }, 1000);
+
+        function init(mode) {
             document.getElementById('boot-screen').style.display = 'none';
-            document.getElementById('intro-anim').style.display = 'flex';
-            
-            // Ses ve Animasyon Başlangıcı
-            playDeepSound();
-            
-            setTimeout(() => {
-                document.getElementById('dragon-logo').classList.add('show-dragon');
-            }, 500);
-
-            setTimeout(() => {
-                document.getElementById('king-title').classList.add('show-text');
-            }, 2000);
-
-            setTimeout(() => {
-                document.getElementById('intro-anim').style.opacity = '0';
-                setTimeout(() => {
-                    document.getElementById('intro-anim').style.display = 'none';
-                    document.getElementById('os-container').style.display = 'grid';
-                    startMatrix();
-                    newGame();
-                }, 1000);
-            }, 5000);
-        }
-
-        function playDeepSound() {
-            const o = audio.createOscillator();
-            const g = audio.createGain();
-            o.type = 'sawtooth';
-            o.frequency.setValueAtTime(50, audio.currentTime);
-            o.frequency.exponentialRampToValueAtTime(300, audio.currentTime + 4);
-            g.gain.linearRampToValueAtTime(0.1, audio.currentTime + 1);
-            g.gain.linearRampToValueAtTime(0, audio.currentTime + 5);
-            o.connect(g); g.connect(audio.destination);
-            o.start(); o.stop(audio.currentTime + 5);
+            document.getElementById('os-container').style.display = 'grid';
+            startMatrix();
+            generate();
         }
 
         function startMatrix() {
-            const c = document.getElementById('matrix');
-            const x = c.getContext('2d');
+            const c = document.getElementById('matrix'); const x = c.getContext('2d');
             c.width = window.innerWidth; c.height = window.innerHeight;
             const drops = Array(Math.floor(c.width/20)).fill(1);
             setInterval(() => {
@@ -151,21 +80,19 @@
             }, 50);
         }
 
-        function newGame() {
-            let n1 = Math.floor(Math.random() * (10 * currentLvl)) + 10;
-            let n2 = Math.floor(Math.random() * (10 * currentLvl)) + 5;
+        function generate() {
+            let n1 = Math.floor(Math.random() * (10 * layer)) + 5;
+            let n2 = Math.floor(Math.random() * (10 * layer)) + 5;
             currentAns = n1 + n2;
             document.getElementById('question').innerText = n1 + "+" + n2;
-            document.getElementById('layer-info').innerText = "LAYER: " + currentLvl;
-            addLog("[AI]: Yeni görev belirlendi.");
+            document.getElementById('layer-info').innerText = "LAYER: " + (isInfinite ? "INFINITY" : layer);
         }
 
         document.getElementById('ans-input').addEventListener('input', function() {
             if(this.value == currentAns || this.value == "2016") {
                 if(this.value == "2016") confetti();
-                currentLvl++; this.value = ""; 
-                addLog("[SYSTEM]: Katman geçildi. Seviye yükseliyor.");
-                newGame();
+                layer++; this.value = ""; generate();
+                addLog("[SYSTEM]: Doğrulama başarılı. Katman geçildi.");
             }
         });
 
@@ -175,22 +102,47 @@
             win.scrollTop = win.scrollHeight;
         }
 
+        // ÖZEL KOMUT MERKEZİ
         document.getElementById('chat-input').addEventListener('keypress', function(e) {
             if(e.key === 'Enter') {
+                let cmd = this.value.toLowerCase();
                 addLog("[UTKAN]: " + this.value);
-                let val = this.value.toLowerCase();
-                setTimeout(() => {
-                    if(val.includes("naber")) addLog("[AI]: İyiyim Utkan kral, sistemler 100% kapasite çalışıyor.");
-                    else if(val.includes("temizle")) { document.getElementById('chat-window').innerHTML = "[AI]: Chat temizlendi."; }
-                    else addLog("[AI]: Anlaşıldı. Algoritmalar güncelleniyor.");
-                }, 500);
                 this.value = "";
+
+                setTimeout(() => {
+                    if(cmd.includes("hile")) {
+                        isCheat = true;
+                        addLog("[AI]: HİLE MODU AKTİF! Sorular otomatik çözülüyor...");
+                        let hileDöngü = setInterval(() => {
+                            if(!isCheat) { clearInterval(hileDöngü); return; }
+                            document.getElementById('ans-input').value = currentAns;
+                            document.getElementById('ans-input').dispatchEvent(new Event('input'));
+                        }, 1000);
+                    } 
+                    else if(cmd.includes("dur") || cmd.includes("kapat")) {
+                        isCheat = false; isInfinite = false;
+                        addLog("[AI]: Tüm özel protokoller durduruldu.");
+                    }
+                    else if(cmd.includes("sonsuz")) {
+                        isInfinite = true;
+                        addLog("[AI]: SONSUZ SORU MODU AKTİF! Sistem asla bitmeyecek.");
+                    }
+                    else if(cmd.includes("düzelt") || cmd.includes("onar")) {
+                        addLog("[AI]: Sistem dosyaları taranıyor... Hatalar giderildi.");
+                        layer = 1; generate();
+                    }
+                    else if(cmd.includes("selam")) {
+                        addLog("[AI]: Selam Utkan kral, kalkanlar %100 kapasitede.");
+                    } else {
+                        addLog("[AI]: Komut işlendi. Sistemi senin için optimize ediyorum.");
+                    }
+                }, 500);
             }
         });
 
+        // OTOMATİK HATA DÜZELTME
         window.onerror = () => {
-            addLog("[AI]: KRİTİK HATA! Sistem kendini onarıyor...");
-            setTimeout(() => { location.reload(); }, 1000);
+            addLog("[AI]: KRİTİK HATA ENGELLENDİ! Kod koruma devrede.");
             return true;
         };
     </script>
