@@ -6,10 +6,9 @@
     <title>MEB-TECH NEXUS | Utkan</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --meb: #005596; --eba: #ff6600; --basari: #22c55e; --bg: #f1f5f9; }
+        :root { --meb: #005596; --eba: #ff6600; --basari: #22c55e; --bg: #f1f5f9; --zor: #e30613; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; transition: 0.3s; }
         
-        /* KURULUM EKRANI */
         #setup { position: fixed; inset: 0; background: var(--meb); z-index: 10000; display: flex; align-items: center; justify-content: center; color: white; }
         .setup-card { background: white; color: #333; padding: 40px; border-radius: 30px; width: 400px; text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
         .hint { font-size: 12px; background: #fff3e0; border: 1px solid var(--eba); padding: 10px; border-radius: 10px; margin-bottom: 20px; }
@@ -17,55 +16,51 @@
         .opt-btn { flex: 1; padding: 12px; border: 2px solid #eee; border-radius: 12px; cursor: pointer; font-weight: bold; }
         .opt-btn.active { border-color: var(--meb); background: #e0f2fe; }
 
-        /* ANA PANEL */
         #app { display: none; }
         header { background: white; border-bottom: 2px solid #e2e8f0; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-        
         .main-grid { display: grid; grid-template-columns: 300px 1fr 320px; gap: 25px; max-width: 1400px; margin: 25px auto; padding: 0 20px; }
 
-        /* GERÇEK ZAMANLI SAYAÇ */
         .timer-card { background: linear-gradient(135deg, var(--meb), #00335c); color: white; padding: 25px; border-radius: 20px; text-align: center; }
         #clock { font-size: 32px; font-weight: 800; font-family: monospace; }
 
-        /* MODÜLLER */
-        .card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; transition: 0.3s; }
+        .card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
         .modul-btn { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: 15px; background: #f8fafc; cursor: pointer; margin-bottom: 10px; border: 1px solid transparent; }
         .modul-btn:hover { border-color: var(--eba); background: white; transform: scale(1.02); }
 
-        /* GRAFİK VE CİHAZ AYARLARI */
+        /* ZORLUK SEÇİMİ STİLLERİ */
+        .zorluk-pali { display: flex; gap: 5px; margin: 10px 0; }
+        .z-btn { flex: 1; padding: 8px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; font-size: 11px; color: white; opacity: 0.6; }
+        .z-btn.active { opacity: 1; transform: scale(1.05); }
+        .z-kolay { background: var(--basari); }
+        .z-orta { background: var(--eba); }
+        .z-zor { background: var(--zor); }
+
         .mobile-mode .main-grid { grid-template-columns: 1fr !important; }
-        .mobile-mode .side-menu { display: none; }
         .low-gfx * { box-shadow: none !important; animation: none !important; }
 
-        /* SORU MODAL */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 10001; }
         .modal-box { background: white; padding: 35px; border-radius: 25px; width: 450px; text-align: center; }
-        input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; margin: 15px 0; font-size: 18px; }
-        .btn-check { background: var(--eba); color: white; border: none; padding: 15px 30px; border-radius: 12px; cursor: pointer; font-weight: 800; width: 100%; }
+        input { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 12px; margin: 15px 0; font-size: 18px; text-align: center; }
+        .btn-check { background: var(--meb); color: white; border: none; padding: 15px 30px; border-radius: 12px; cursor: pointer; font-weight: 800; width: 100%; }
     </style>
 </head>
 <body>
 
     <div id="setup">
         <div class="setup-card">
-            <h2 style="margin-top:0">MEB-TECH NEXUS</h2>
+            <h2>MEB-TECH NEXUS</h2>
             <div class="hint">🔑 <b>TC: 2015 | Şifre: utkan9393</b></div>
-            
-            <small>Cihaz Seçimi</small>
             <div class="option-group">
-                <div class="opt-btn active" id="p-pc" onclick="config('dev','pc')">💻 Masaüstü</div>
+                <div class="opt-btn active" id="p-pc" onclick="config('dev','pc')">💻 PC</div>
                 <div class="opt-btn" id="p-mob" onclick="config('dev','mob')">📱 Mobil</div>
             </div>
-
-            <small>Grafik Kalitesi</small>
             <div class="option-group">
-                <div class="opt-btn active" id="g-hi" onclick="config('gfx','hi')">✨ Yüksek</div>
-                <div class="opt-btn" id="g-lo" onclick="config('gfx','lo')">⚡ Hızlı</div>
+                <div class="opt-btn active" id="g-hi" onclick="config('gfx','hi')">✨ High</div>
+                <div class="opt-btn" id="g-lo" onclick="config('gfx','lo')">⚡ Low</div>
             </div>
-
-            <input type="text" id="tc-in" placeholder="T.C. Kimlik No">
+            <input type="text" id="tc-in" placeholder="TC No">
             <input type="password" id="ps-in" placeholder="Şifre">
-            <button class="btn-check" onclick="launch()">SİSTEMİ ÇALIŞTIR</button>
+            <button class="btn-check" onclick="launch()" style="background:var(--eba)">SİSTEMİ ÇALIŞTIR</button>
         </div>
     </div>
 
@@ -78,49 +73,46 @@
         <div class="main-grid">
             <aside>
                 <div class="timer-card">
-                    <small>BU OTURUMDA ÇALIŞMA SÜREN</small>
+                    <small>ÇALIŞMA SÜRESİ</small>
                     <div id="clock">00:00:00</div>
                 </div>
                 <div class="card" style="margin-top:20px">
-                    <h3>📊 Gelişim Özeti</h3>
-                    <p>Akademik XP: <b id="xp-val">0</b></p>
-                    <p>Tamamlanan Görev: <b id="task-val">0</b></p>
+                    <h3>📊 Gelişim</h3>
+                    <p>XP: <b id="xp-val">0</b> | Seviye: <b id="lvl">1</b></p>
                     <div style="height:10px; background:#eee; border-radius:5px; overflow:hidden">
-                        <div id="prog-bar" style="height:100%; width:0%; background:var(--basari); transition:1s"></div>
+                        <div id="prog-bar" style="height:100%; width:0%; background:var(--basari); transition:0.5s"></div>
                     </div>
                 </div>
             </aside>
 
             <main>
                 <div class="card">
-                    <h2 style="margin-top:0">📑 Kaynak Kütüphanesi</h2>
-                    <div class="modul-btn" onclick="openQuest('eba')"><span>🍊</span> <b>EBA Akademik Testler</b></div>
-                    <div class="modul-btn" onclick="openQuest('ods')"><span>🔍</span> <b>ÖDS Kazanım İzleme</b></div>
-                    <div class="modul-btn" onclick="openQuest('tubitak')"><span>🧪</span> <b>TÜBİTAK 4006 Proje Görevleri</b></div>
-                    <div class="modul-btn" onclick="openQuest('atik')"><span>♻️</span> <b>Sıfır Atık Veri Girişi</b></div>
+                    <h2 style="margin-top:0">📑 Görev Seçimi</h2>
+                    <p style="font-size:12px; color:#666">Önce zorluk seç, sonra modüle tıkla!</p>
+                    
+                    <div class="zorluk-pali">
+                        <button class="z-btn z-kolay active" id="z-k" onclick="setDiff('kolay')">KOLAY (+50 XP)</button>
+                        <button class="z-btn z-orta" id="z-o" onclick="setDiff('orta')">ORTA (+150 XP)</button>
+                        <button class="z-btn z-zor" id="z-z" onclick="setDiff('zor')">ZOR (+500 XP)</button>
+                    </div>
+
+                    <div class="modul-btn" onclick="openQuest('Matematik')"><span>🔢</span> <b>Matematik Kazanımları</b></div>
+                    <div class="modul-btn" onclick="openQuest('Problem')"><span>🤔</span> <b>Yeni Nesil Problemler</b></div>
+                    <div class="modul-btn" onclick="openQuest('Hiz')"><span>⚡</span> <b>Hızlı İşlem Modu</b></div>
                 </div>
                 
                 <div class="card">
-                    <h3>📝 Son Aktiviteler</h3>
-                    <div id="logs" style="font-size:13px; color:#666">Sistem başlatıldı. Çalışma süresi sayılıyor...</div>
+                    <h3>📝 Aktivite Logları</h3>
+                    <div id="logs" style="font-size:12px; color:#666; height:100px; overflow-y:auto">Sistem hazır.</div>
                 </div>
             </main>
 
             <aside>
                 <div class="card" style="border-top: 6px solid var(--basari);">
-                    <h3 style="margin:0 0 15px 0">📊 e-Okul Canlı Karne</h3>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px">
-                        <span>Matematik</span> <b id="n1" style="color:var(--basari)">0</b>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px">
-                        <span>Fen Bilimleri</span> <b id="n2" style="color:var(--basari)">0</b>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px">
-                        <span>Proje Notu</span> <b id="n3" style="color:var(--basari)">0</b>
-                    </div>
+                    <h3>📊 e-Okul Canlı</h3>
+                    <div style="display:flex; justify-content:space-between"><span>Ortalama</span> <b id="n1">0</b></div>
                     <hr>
-                    <small><b>Öğretmen Görüşü:</b></small><br>
-                    <i id="hoca-msg" style="font-size:12px">Sistem Utkan'ın performansını analiz ediyor...</i>
+                    <i id="hoca-msg" style="font-size:11px">Analiz bekleniyor...</i>
                 </div>
             </aside>
         </div>
@@ -128,16 +120,23 @@
 
     <div id="q-modal" class="modal">
         <div class="modal-box">
-            <h3 id="q-title" style="color:var(--meb)">EBA Soru Modülü</h3>
-            <p id="q-text" style="font-size: 20px; font-weight: 600; margin: 25px 0;"></p>
-            <input type="number" id="q-ans" placeholder="Cevabınızı girin">
-            <button class="btn-check" onclick="checkAns()">CEVABI ONAYLA</button>
+            <h3 id="q-title" style="color:var(--meb)">Soru Paneli</h3>
+            <div id="q-badge" style="display:inline-block; padding:4px 10px; border-radius:5px; color:white; font-size:12px; margin-bottom:10px"></div>
+            <p id="q-text" style="font-size: 20px; font-weight: 600; margin: 15px 0;"></p>
+            <input type="number" id="q-ans" placeholder="Cevap">
+            <button class="btn-check" onclick="checkAns()">ONAYLA</button>
         </div>
     </div>
 
     <script>
-        let state = { xp: 0, tasks: 0, sec: 0, device: 'pc', gfx: 'hi' };
+        let state = { xp: 0, tasks: 0, sec: 0, device: 'pc', gfx: 'hi', diff: 'kolay' };
         let curA = 0;
+
+        function setDiff(d) {
+            state.diff = d;
+            document.querySelectorAll('.z-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('z-' + d[0]).classList.add('active');
+        }
 
         function config(type, val) {
             if(type==='dev') {
@@ -152,67 +151,66 @@
         }
 
         function launch() {
-            let tc = document.getElementById('tc-in').value;
-            let ps = document.getElementById('ps-in').value;
-            if(tc === "2015" && ps === "utkan9393") {
+            if(document.getElementById('tc-in').value === "2015" && document.getElementById('ps-in').value === "utkan9393") {
                 if(state.device === 'mob') document.body.classList.add('mobile-mode');
                 if(state.gfx === 'lo') document.body.classList.add('low-gfx');
                 document.getElementById('setup').style.display = 'none';
                 document.getElementById('app').style.display = 'block';
-                startClock();
-                speak("Utkan Nexus sistemi aktif. Çalışma süren kaydediliyor.");
-            } else { alert("TC veya Şifre Yanlış!"); }
-        }
-
-        function startClock() {
-            setInterval(() => {
-                state.sec++;
-                let h = Math.floor(state.sec / 3600);
-                let m = Math.floor((state.sec % 3600) / 60);
-                let s = state.sec % 60;
-                document.getElementById('clock').innerText = 
-                    `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-            }, 1000);
+                setInterval(() => {
+                    state.sec++;
+                    let h=Math.floor(state.sec/3600), m=Math.floor((state.sec%3600)/60), s=state.sec%60;
+                    document.getElementById('clock').innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                }, 1000);
+                speak("Hoş geldin Utkan. Zorluk seviyesini seçip başlayabilirsin.");
+            } else { alert("Hatalı!"); }
         }
 
         function openQuest(m) {
             document.getElementById('q-modal').style.display = 'flex';
-            let n1 = Math.floor(Math.random()*90)+10;
-            let txt = "";
-            if(m==='eba') { curA = n1 + 10; txt = `${n1} sayısının 10 fazlası kaçtır?`; }
-            else if(m==='ods') { curA = n1 * 2; txt = `${n1} sayısının 2 katı kaçtır?`; }
-            else if(m==='atik') { curA = 5; txt = "10 kg kağıdın yarısı geri dönüşürse kaç kg kalır?"; }
-            else { curA = 100; txt = "5. Sınıf TÜBİTAK projesinde hedef puan kaçtır?"; }
-            document.getElementById('q-text').innerText = txt;
-            speak(txt);
+            let b = document.getElementById('q-badge');
+            let n1, n2;
+            
+            if(state.diff === 'kolay') {
+                n1 = Math.floor(Math.random()*50); n2 = Math.floor(Math.random()*50);
+                curA = n1 + n2; q = `${n1} + ${n2} toplamı kaçtır?`;
+                b.innerText = "KOLAY"; b.style.backgroundColor = "var(--basari)";
+            } else if(state.diff === 'orta') {
+                n1 = Math.floor(Math.random()*100); n2 = Math.floor(Math.random()*10);
+                curA = n1 * n2; q = `${n1} x ${n2} çarpımı kaçtır?`;
+                b.innerText = "ORTA"; b.style.backgroundColor = "var(--eba)";
+            } else {
+                n1 = Math.floor(Math.random()*500); n2 = Math.floor(Math.random()*250);
+                curA = n1 + n2 + 100; q = `${n1} + ${n2} işleminin 100 fazlası kaçtır?`;
+                b.innerText = "ZOR"; b.style.backgroundColor = "var(--zor)";
+            }
+            document.getElementById('q-text').innerText = q;
+            speak(q);
         }
 
         function checkAns() {
-            let val = parseInt(document.getElementById('q-ans').value);
-            if(val === curA) {
-                state.xp += 150; state.tasks++;
+            if(parseInt(document.getElementById('q-ans').value) === curA) {
+                let add = state.diff === 'kolay' ? 50 : (state.diff === 'orta' ? 150 : 500);
+                state.xp += add; state.tasks++;
                 update();
                 document.getElementById('q-modal').style.display = 'none';
-                log("Bir görev başarıyla tamamlandı: +150 XP");
-                speak("Mükemmel, puanın eklendi.");
+                log(`Görev Tamam: +${add} XP (${state.diff})`);
+                speak("Tebrikler doğru cevap.");
             } else { speak("Hatalı cevap."); }
             document.getElementById('q-ans').value = "";
         }
 
         function update() {
             document.getElementById('xp-val').innerText = state.xp;
-            document.getElementById('task-val').innerText = state.tasks;
-            let p = Math.min(100, state.tasks * 20);
+            let p = Math.min(100, state.xp / 20);
             document.getElementById('prog-bar').style.width = p + "%";
-            document.getElementById('n1').innerText = p;
-            document.getElementById('n2').innerText = Math.max(0, p - 5);
-            document.getElementById('n3').innerText = Math.min(100, p + 10);
-            if(p >= 80) document.getElementById('hoca-msg').innerText = "Utkan'ın çalışma süresi ve başarısı harika!";
+            document.getElementById('n1').innerText = Math.floor(p);
+            document.getElementById('lvl').innerText = Math.floor(state.xp / 1000) + 1;
+            if(p >= 90) document.getElementById('hoca-msg').innerText = "Utkan tam bir dahi!";
         }
 
         function log(m) {
             let l = document.getElementById('logs');
-            l.innerHTML = `<div>> ${m}</div>` + l.innerHTML;
+            l.innerHTML = `<div>> [${new Date().toLocaleTimeString()}] ${m}</div>` + l.innerHTML;
         }
 
         function speak(t) {
