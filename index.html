@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V36 - INFINITE</title>
     <style>
+        /* ZORUNLU TAM EKRAN AYARI */
+        html, body { 
+            margin: 0 !important; 
+            padding: 0 !important; 
+            width: 100vw !important; 
+            height: 100vh !important; 
+            overflow: hidden !important;
+            background-color: #0f172a;
+        }
+
         :root { --primary: #2563eb; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
         
         @keyframes startup {
@@ -12,32 +21,32 @@
             100% { opacity: 1; transform: scale(1); filter: blur(0px); }
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; }
         
         .navbar { 
             height: 70px; background: var(--card); border-bottom: 1px solid #334155; 
-            display: flex; align-items: center; padding: 0 30px; justify-content: space-between;
+            display: flex; align-items: center; padding: 0 20px; justify-content: space-between;
+            width: 100%; box-sizing: border-box;
         }
 
         .nav-brand { color: var(--primary); font-weight: 900; letter-spacing: 3px; font-size: 22px; cursor: pointer; }
-        .nav-links { display: flex; gap: 20px; }
+        .nav-links { display: flex; gap: 10px; }
 
         .nav-btn { 
             background: rgba(37, 99, 235, 0.1); border: 1px solid var(--primary); 
-            color: var(--text); padding: 12px 25px; cursor: pointer; border-radius: 10px; 
-            transition: 0.3s; font-size: 16px; font-weight: bold;
+            color: var(--text); padding: 10px 15px; cursor: pointer; border-radius: 8px; 
+            transition: 0.3s; font-size: 14px; font-weight: bold; white-space: nowrap;
         }
-        .nav-btn:hover { background: var(--primary); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4); }
 
-        .main-content { flex: 1; position: relative; }
+        .main-content { flex: 1; position: relative; width: 100%; }
         .overlay-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        #eba-logo { font-size: 100px; font-weight: 900; color: var(--primary); letter-spacing: 15px; animation: startup 1.2s ease-out; font-family: monospace; }
+        #eba-logo { font-size: clamp(40px, 10vw, 100px); font-weight: 900; color: var(--primary); letter-spacing: 10px; animation: startup 1.2s ease-out; font-family: monospace; }
         
-        .card { background: var(--card); padding: 40px; border-radius: 25px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); width: 500px; }
-        .action-btn { background: var(--primary); color: white; padding: 15px 35px; border-radius: 12px; cursor: pointer; border: none; font-weight: bold; margin-top: 20px; transition: 0.3s; font-size: 18px; }
+        .card { background: var(--card); padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); width: 80%; max-width: 500px; }
+        .action-btn { background: var(--primary); color: white; padding: 15px 30px; border-radius: 12px; cursor: pointer; border: none; font-weight: bold; margin-top: 20px; font-size: 16px; }
         
-        input { padding: 15px; font-size: 32px; width: 180px; text-align: center; background: #0f172a; color: white; border: 2px solid #334155; border-radius: 15px; margin: 20px 0; outline: none; }
+        input { padding: 12px; font-size: 24px; width: 140px; text-align: center; background: #0f172a; color: white; border: 2px solid #334155; border-radius: 12px; margin: 15px 0; outline: none; }
     </style>
 </head>
 <body>
@@ -45,26 +54,26 @@
 <div class="navbar">
     <div class="nav-brand" onclick="location.reload()">NEXUS</div>
     <div class="nav-links">
-        <button class="nav-btn" onclick="startMode('islem')">🔢 SONSUZ İŞLEM</button>
-        <button class="nav-btn" onclick="startMode('problem')">🧠 SONSUZ PROBLEM</button>
+        <button class="nav-btn" onclick="startMode('islem')">🔢 İŞLEM</button>
+        <button class="nav-btn" onclick="startMode('problem')">🧠 PROBLEM</button>
     </div>
-    <div id="counter" style="color: #4ade80; font-weight: bold;">ÇÖZÜLEN: 0</div>
+    <div id="counter" style="color: #4ade80; font-weight: bold; font-size: 12px;">Puan: 0</div>
 </div>
 
 <div class="main-content">
     <div id="welcome" class="overlay-screen">
         <div id="eba-logo">EBA_XXX</div>
-        <p style="letter-spacing: 10px; color: #94a3b8; font-weight: bold;">SINIRSIZ MODÜL YÜKLENDİ</p>
+        <p style="letter-spacing: 5px; color: #94a3b8; font-weight: bold; font-size: 12px;">SİSTEM HAZIR</p>
     </div>
 
     <div id="quiz-area" class="overlay-screen" style="display:none;">
         <div class="card">
-            <h2 id="mode-title" style="color: #60a5fa; font-size: 14px; text-transform: uppercase;">Modül</h2>
-            <div id="question-text" style="font-size: 30px; font-weight: bold; margin: 25px 0; min-height: 120px; display: flex; align-items: center; justify-content: center; line-height: 1.4;">...</div>
+            <h2 id="mode-title" style="color: #60a5fa; font-size: 12px; text-transform: uppercase;">Modül</h2>
+            <div id="question-text" style="font-size: 24px; font-weight: bold; margin: 20px 0; min-height: 100px; display: flex; align-items: center; justify-content: center;">...</div>
             <input type="number" id="user-answer" placeholder="?">
             <br>
-            <button class="action-btn" onclick="checkAnswer()">SİSTEME GÖNDER</button>
-            <p id="feedback" style="margin-top: 25px; font-weight: bold; font-size: 20px; min-height: 30px;"></p>
+            <button class="action-btn" onclick="checkAnswer()">GÖNDER</button>
+            <p id="feedback" style="margin-top: 20px; font-weight: bold; font-size: 18px;"></p>
         </div>
     </div>
 </div>
@@ -84,42 +93,22 @@
 
     function generateNext() {
         if(currentMode === 'islem') {
-            const n1 = Math.floor(Math.random() * 50) + 10;
-            const n2 = Math.floor(Math.random() * 40) + 5;
-            const ops = ['+', '-', '*'];
-            const op = ops[Math.floor(Math.random() * ops.length)];
-            
-            if(op === '*') {
-                const s1 = Math.floor(Math.random() * 12) + 2;
-                const s2 = Math.floor(Math.random() * 12) + 2;
-                document.getElementById('question-text').innerText = `${s1} × ${s2} kaçtır?`;
-                currentAnswer = s1 * s2;
-            } else if(op === '+') {
-                document.getElementById('question-text').innerText = `${n1} + ${n2} işleminin sonucu nedir?`;
-                currentAnswer = n1 + n2;
-            } else {
-                document.getElementById('question-text').innerText = `${n1 + n2} - ${n1} işleminin sonucu nedir?`;
-                currentAnswer = n2;
-            }
+            const s1 = Math.floor(Math.random() * 12) + 2;
+            const s2 = Math.floor(Math.random() * 12) + 2;
+            document.getElementById('question-text').innerText = `${s1} × ${s2} kaçtır?`;
+            currentAnswer = s1 * s2;
         } else {
-            // Problem Üretici (Sonsuz varyasyon için kalıplar)
             const templates = [
-                { q: (a,b) => `Bir manavda ${a} kg elma, elmalardan ${b} kg fazla armut vardır. Toplam kaç kg meyve vardır?`, a: (a,b) => a + (a + b) },
-                { q: (a,b) => `Bir sınıfta ${a} sıra vardır. Her sırada ${b} öğrenci oturduğuna göre sınıfta toplam kaç öğrenci vardır?`, a: (a,b) => a * b },
                 { q: (a,b) => `${a} sayısının 2 katının ${b} fazlası kaçtır?`, a: (a,b) => (a * 2) + b },
-                { q: (a,b) => `Cebimdeki ${a * b} TL parayı ${a} arkadaşıma eşit bölersem her birine kaç TL düşer?`, a: (a,b) => b },
-                { q: (a,b) => `Bir otoparkta ${a} araba vardır. Her arabada 4 tekerlek olduğuna göre toplam kaç tekerlek vardır?`, a: (a,b) => a * 4 }
+                { q: (a,b) => `Tanesi ${a} TL olan kalemden ${b} tane alırsam kaç TL öderim?`, a: (a,b) => a * b },
+                { q: (a,b) => `Cebimdeki ${a*b} TL'yi ${a} kişiye bölersem kişi başı kaç TL düşer?`, a: (a,b) => b }
             ];
             const temp = templates[Math.floor(Math.random() * templates.length)];
-            const r1 = Math.floor(Math.random() * 15) + 5;
+            const r1 = Math.floor(Math.random() * 10) + 5;
             const r2 = Math.floor(Math.random() * 10) + 2;
             document.getElementById('question-text').innerText = temp.q(r1, r2);
             currentAnswer = temp.a(r1, r2);
         }
-        resetField();
-    }
-
-    function resetField() {
         document.getElementById('user-answer').value = "";
         document.getElementById('feedback').innerText = "";
         document.getElementById('user-answer').focus();
@@ -128,15 +117,15 @@
     function checkAnswer() {
         const val = document.getElementById('user-answer').value;
         const fb = document.getElementById('feedback');
-        if(val === "") return;
+        if(val === "" || isNaN(val)) return;
 
         if(parseInt(val) === currentAnswer) {
             solvedCount++;
-            document.getElementById('counter').innerText = `ÇÖZÜLEN: ${solvedCount}`;
-            fb.innerText = "SİSTEM ONAYI: DOĞRU ✅"; fb.style.color = "#4ade80";
-            setTimeout(generateNext, 1200);
+            document.getElementById('counter').innerText = `Puan: ${solvedCount * 10}`;
+            fb.innerText = "DOĞRU ✅"; fb.style.color = "#4ade80";
+            setTimeout(generateNext, 1000);
         } else {
-            fb.innerText = "ERİŞİM REDDEDİLDİ: HATALI ❌"; fb.style.color = "#f87171";
+            fb.innerText = "HATALI ❌"; fb.style.color = "#f87171";
         }
     }
 </script>
