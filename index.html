@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V27 - Matematik Projesi</title>
+    <title>NEXUS V28 - Matematik Projesi</title>
     <style>
         :root { --primary: #2563eb; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 260px; background: var(--card); border-right: 1px solid #334155; display: flex; flex-direction: column; padding: 20px; }
+        .sidebar { width: 260px; background: var(--card); border-right: 1px solid #334155; display: flex; flex-direction: column; padding: 20px; z-index: 10; }
         .sidebar h2 { color: var(--primary); text-align: center; margin-bottom: 30px; letter-spacing: 2px; }
-        .nav-btn { background: transparent; border: none; color: var(--text); padding: 12px; text-align: left; cursor: pointer; border-radius: 8px; margin-bottom: 8px; transition: 0.3s; font-size: 14px; }
+        .nav-btn { background: transparent; border: none; color: var(--text); padding: 12px; text-align: left; cursor: pointer; border-radius: 8px; margin-bottom: 8px; transition: 0.3s; font-size: 14px; width: 100%; }
         .nav-btn:hover { background: var(--primary); transform: translateX(5px); }
-        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; }
         .header { padding: 15px 30px; background: var(--card); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-        #view-area { flex: 1; position: relative; background: #f1f5f9; }
+        
+        /* İçerik Alanları */
+        #view-area { flex: 1; background: #f1f5f9; position: relative; }
         #content-frame { width: 100%; height: 100%; border: none; display: none; }
-        .welcome-screen, .local-panel { height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #1e293b; padding: 20px; text-align: center; }
+        
+        .overlay-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; color: #1e293b; text-align: center; padding: 20px; box-sizing: border-box; }
+        
+        .external-link-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .external-btn { background: #ea580c; color: white; text-decoration: none; padding: 15px 25px; border-radius: 8px; font-weight: bold; display: inline-block; margin-top: 20px; transition: 0.3s; }
+        .external-btn:hover { background: #c2410c; }
+
         .quiz-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
         input { padding: 10px; font-size: 18px; width: 80px; text-align: center; border: 2px solid #cbd5e1; border-radius: 8px; margin: 20px 0; }
         .check-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
@@ -24,102 +32,103 @@
 <body>
 
 <div class="sidebar">
-    <h2>NEXUS V27</h2>
-    <button class="nav-btn" onclick="openPage('https://www.eba.gov.tr')">🌐 EBA Akademik</button>
-    <button class="nav-btn" onclick="openPage('https://www.geogebra.org/calculator')">📈 GeoGebra Çizici</button>
-    <button class="nav-btn" onclick="openPage('https://www.matematik.io')">📚 Konu Anlatımı</button>
+    <h2>NEXUS V28</h2>
+    <button class="nav-btn" onclick="handlePage('https://www.eba.gov.tr', 'EBA Akademik Destek')">🌐 EBA Akademik</button>
+    <button class="nav-btn" onclick="handlePage('https://www.geogebra.org/calculator', 'GeoGebra Çizici', true)">📈 GeoGebra (İçeride Aç)</button>
+    <button class="nav-btn" onclick="handlePage('https://www.matematik.io', 'Matematik Konu Anlatımı')">📚 Konu Anlatımı</button>
     <hr style="width:100%; border: 0.1px solid #334155; margin: 15px 0;">
     <button class="nav-btn" onclick="startQuiz()" style="background: #1e293b; border: 1px solid var(--primary);">📝 Sınırsız Test Çöz</button>
 </div>
 
 <div class="main-content">
     <div class="header">
-        <span id="status" style="font-weight: bold; color: var(--primary);">Utkan Proje Paneli</span>
-        <button onclick="location.reload()" style="background:#ef4444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Sistemi Yenile</button>
+        <span id="status" style="font-weight: bold; color: var(--primary);">NEXUS Matematik Portalı</span>
+        <button onclick="location.reload()" style="background:#ef4444; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer;">Sıfırla</button>
     </div>
     
     <div id="view-area">
-        <div id="welcome" class="welcome-screen">
-            <h1 style="font-size: 3rem; margin-bottom: 10px;">NEXUS</h1>
-            <p style="font-size: 1.2rem; color: #64748b;">Matematik Öğrenme ve Uygulama Platformu</p>
+        <div id="welcome" class="overlay-screen">
+            <h1 style="font-size: 3.5rem; margin:0;">NEXUS</h1>
+            <p style="font-size: 1.2rem; color: #64748b;">Geleceğin Matematik Platformu</p>
         </div>
 
-        <iframe id="content-frame"></iframe>
+        <div id="external-card" class="overlay-screen" style="display:none;">
+            <div class="external-link-card">
+                <h2 id="ext-title">Site Hazır</h2>
+                <p>Güvenlik nedeniyle bu kaynak yeni sekmede açılmalıdır.</p>
+                <a href="#" id="ext-link" target="_blank" class="external-btn">Siteye Git ve Çalışmaya Başla</a>
+            </div>
+        </div>
 
-        <div id="quiz-area" class="local-panel" style="display:none;">
+        <div id="quiz-area" class="overlay-screen" style="display:none;">
             <div class="quiz-card">
-                <h3 id="question-text" style="font-size: 24px;">Soru Hazırlanıyor...</h3>
+                <h3 id="question-text" style="font-size: 24px;">Soru...</h3>
                 <input type="number" id="user-answer" placeholder="?">
                 <br>
-                <button class="check-btn" onclick="checkAnswer()">Cevabı Kontrol Et</button>
+                <button class="check-btn" onclick="checkAnswer()">Kontrol Et</button>
                 <p id="feedback" style="margin-top: 15px; font-weight: bold;"></p>
             </div>
         </div>
+
+        <iframe id="content-frame"></iframe>
     </div>
 </div>
 
 <script>
     let currentAnswer = 0;
 
-    function openPage(url) {
+    function handlePage(url, title, canIframe = false) {
+        // Her şeyi gizle
         document.getElementById('welcome').style.display = 'none';
         document.getElementById('quiz-area').style.display = 'none';
-        const frame = document.getElementById('content-frame');
-        frame.style.display = 'block';
-        frame.src = url;
-        document.getElementById('status').innerText = "Bağlanıyor: " + url;
+        document.getElementById('external-card').style.display = 'none';
+        document.getElementById('content-frame').style.display = 'none';
+
+        if(canIframe) {
+            const frame = document.getElementById('content-frame');
+            frame.style.display = 'block';
+            frame.src = url;
+            document.getElementById('status').innerText = "Aktif: " + title;
+        } else {
+            document.getElementById('external-card').style.display = 'flex';
+            document.getElementById('ext-title').innerText = title;
+            document.getElementById('ext-link').href = url;
+            document.getElementById('status').innerText = "Dış Bağlantı: " + title;
+        }
     }
 
     function startQuiz() {
         document.getElementById('welcome').style.display = 'none';
         document.getElementById('content-frame').style.display = 'none';
+        document.getElementById('external-card').style.display = 'none';
         document.getElementById('quiz-area').style.display = 'flex';
+        document.getElementById('status').innerText = "Mod: Matematik Testi";
         generateQuestion();
     }
 
     function generateQuestion() {
-        // Rastgele sayılar ve işlem seçimi
         const s1 = Math.floor(Math.random() * 20) + 1;
         const s2 = Math.floor(Math.random() * 20) + 1;
-        const islemTipi = Math.floor(Math.random() * 3); // 0: Toplama, 1: Çıkarma, 2: Çarpma
+        const islem = Math.floor(Math.random() * 3);
         
-        let soru = "";
-        if(islemTipi === 0) {
-            soru = `${s1} + ${s2} = ?`;
-            currentAnswer = s1 + s2;
-        } else if(islemTipi === 1) {
-            soru = `${s1 + s2} - ${s1} = ?`; // Negatif çıkmasın diye
-            currentAnswer = s2;
-        } else {
-            const m1 = Math.floor(Math.random() * 10) + 1;
-            const m2 = Math.floor(Math.random() * 10) + 1;
-            soru = `${m1} x ${m2} = ?`;
-            currentAnswer = m1 * m2;
-        }
+        if(islem === 0) { currentAnswer = s1 + s2; document.getElementById('question-text').innerText = `${s1} + ${s2} = ?`; }
+        else if(islem === 1) { currentAnswer = s1; document.getElementById('question-text').innerText = `${s1 + s2} - ${s2} = ?`; }
+        else { currentAnswer = s1 * 5; document.getElementById('question-text').innerText = `${s1} x 5 = ?`; }
 
-        document.getElementById('question-text').innerText = soru;
         document.getElementById('user-answer').value = "";
         document.getElementById('feedback').innerText = "";
-        document.getElementById('user-answer').focus();
     }
 
     function checkAnswer() {
-        const userVal = document.getElementById('user-answer').value;
-        const feedback = document.getElementById('feedback');
-
-        if(userVal === "") {
-            feedback.innerText = "Lütfen bir cevap yaz kanka!";
-            feedback.style.color = "orange";
-            return;
-        }
-
-        if(parseInt(userVal) === currentAnswer) {
-            feedback.innerText = "Doğru! 🎉 Yeni soruya geçiliyor...";
-            feedback.style.color = "green";
-            setTimeout(generateQuestion, 1500); // 1.5 saniye sonra yeni soru
+        const val = document.getElementById('user-answer').value;
+        if(val === "") return;
+        if(parseInt(val) === currentAnswer) {
+            document.getElementById('feedback').innerText = "Harika Utkan! 🎉 Yeni soru geliyor...";
+            document.getElementById('feedback').style.color = "green";
+            setTimeout(generateQuestion, 1200);
         } else {
-            feedback.innerText = "Hatalı! Tekrar dene ❌";
-            feedback.style.color = "red";
+            document.getElementById('feedback').innerText = "Hatalı, tekrar dene! ❌";
+            document.getElementById('feedback').style.color = "red";
         }
     }
 </script>
