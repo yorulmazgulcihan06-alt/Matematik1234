@@ -3,234 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Utkan AI | Math Universe Professional</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;500&display=swap" rel="stylesheet">
+    <title>MEB-TECH | Utkan Gelişim Portalı</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --p-color: #00d2ff; --s-color: #3a7bd5; --accent: #ff0077; --bg: #0f0c29; }
-        body { font-family: 'Roboto', sans-serif; background: linear-gradient(to right, #0f0c29, #302b63, #24243e); color: white; margin: 0; overflow-x: hidden; }
+        :root { --meb-mavi: #005596; --eba-turuncu: #ff6600; --panel-bg: #f8fafc; --yazi: #1e293b; }
+        body { font-family: 'Inter', sans-serif; background: var(--panel-bg); color: var(--yazi); margin: 0; }
+
+        /* PROFESYONEL GİRİŞ PANELİ */
+        #login-overlay { position: fixed; inset: 0; background: linear-gradient(135deg, var(--meb-mavi) 0%, #00335c 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: white; padding: 40px; border-radius: 24px; width: 360px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); text-align: center; }
+        .auth-hint { background: #f1f5f9; padding: 15px; border-radius: 12px; margin-bottom: 20px; border-left: 4px solid var(--eba-turuncu); text-align: left; font-size: 13px; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border: 1px solid #e2e8f0; border-radius: 8px; box-sizing: border-box; font-size: 16px; transition: 0.3s; }
+        input:focus { border-color: var(--meb-mavi); outline: none; box-shadow: 0 0 0 3px rgba(0,85,150,0.1); }
+        .btn-primary { width: 100%; padding: 14px; background: var(--meb-mavi); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; margin-top: 10px; }
+
+        /* ANA ARAYÜZ */
+        #main-system { display: none; }
+        .top-nav { background: white; padding: 10px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+        .logo-box { display: flex; align-items: center; gap: 12px; font-weight: 800; color: var(--meb-mavi); font-size: 20px; }
         
-        /* HEADER */
-        .hud { position: sticky; top: 0; background: rgba(0,0,0,0.8); padding: 15px; display: flex; justify-content: space-around; border-bottom: 2px solid var(--p-color); z-index: 1000; font-family: 'Orbitron', sans-serif; }
-        .hud div { text-shadow: 0 0 10px var(--p-color); }
+        .dashboard { max-width: 1200px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 280px 1fr 300px; gap: 24px; }
 
-        .container { max-width: 1100px; margin: 20px auto; padding: 20px; }
+        /* SOL MENÜ (RESMİ KAYNAK ÖRNEKLERİ) */
+        .side-menu { background: white; padding: 20px; border-radius: 16px; border: 1px solid #e2e8f0; height: fit-content; }
+        .menu-item { padding: 12px; border-radius: 8px; cursor: pointer; margin-bottom: 5px; transition: 0.2s; font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .menu-item:hover { background: #f1f5f9; color: var(--meb-mavi); }
+        .menu-item.active { background: var(--meb-mavi); color: white; }
 
-        /* KANKA AI AVATAR & DIALOG */
-        .ai-center { background: rgba(255,255,255,0.05); border-radius: 30px; padding: 30px; display: flex; align-items: center; gap: 30px; border: 1px solid var(--p-color); box-shadow: 0 0 30px rgba(0,210,255,0.2); margin-bottom: 30px; }
-        .avatar-zone { position: relative; }
-        .avatar { font-size: 70px; width: 120px; height: 120px; background: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid var(--accent); animation: float 3s ease-in-out infinite; }
-        .bot-companion { position: absolute; bottom: -10px; right: -10px; font-size: 30px; display: none; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        /* ORTA PANEL (EĞİTİM) */
+        .content-card { background: white; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; margin-bottom: 24px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .stat-box { background: #f8fafc; padding: 15px; border-radius: 12px; border: 1px solid #f1f5f9; text-align: center; }
 
-        /* GAME MODES */
-        .mode-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
-        .card { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 25px; cursor: pointer; transition: 0.4s; border: 1px solid transparent; text-align: center; }
-        .card:hover { background: rgba(255,255,255,0.2); border-color: var(--p-color); transform: scale(1.05); }
+        /* SAĞ PANEL (e-OKUL) */
+        .e-okul-mini { background: white; border-radius: 16px; padding: 20px; border-top: 5px solid #22c55e; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .grade-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 13px; font-weight: 600; }
+        .grade-badge { color: #16a34a; font-size: 18px; }
 
-        /* MODALS */
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; z-index: 2000; overflow-y: auto; padding: 40px 20px; }
-        .modal-inner { max-width: 800px; margin: auto; background: #1a1a2e; border-radius: 30px; padding: 40px; border: 2px solid var(--accent); position: relative; }
-
+        /* MODAL */
+        .modal { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); display: none; align-items: center; justify-content: center; z-index: 1001; }
+        .modal-box { background: white; padding: 32px; border-radius: 20px; width: 450px; text-align: center; }
+        
         /* MARKET */
-        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
-        .market-item { background: #16213e; padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #333; }
-        .price-tag { color: #00ffaa; font-weight: bold; display: block; margin: 10px 0; }
-        .buy-btn { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; width: 100%; }
-
-        /* INPUTS */
-        input { background: #000; border: 2px solid var(--p-color); color: white; padding: 15px; border-radius: 10px; font-size: 20px; width: 80%; text-align: center; margin-bottom: 20px; }
-        
-        .story-box { font-size: 20px; line-height: 1.6; color: #ccc; font-style: italic; }
-        .close-btn { position: absolute; top: 20px; right: 20px; color: white; font-size: 30px; cursor: pointer; }
+        .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; max-height: 300px; overflow-y: auto; padding-right: 5px; }
     </style>
 </head>
 <body>
 
-    <div class="hud">
-        <div>⭐ XP: <span id="puan">0</span></div>
-        <div>🏆 RÜTBE: <span id="rank">ÇAYLAK</span></div>
-        <div onclick="openCheat()" style="cursor:pointer">⚙️</div>
-    </div>
-
-    <div class="container">
-        <div class="ai-center">
-            <div class="avatar-zone">
-                <div id="main-ai" class="avatar">🤖</div>
-                <div id="companion" class="bot-companion">🛸</div>
+    <div id="login-overlay">
+        <div class="login-card">
+            <div class="auth-hint">
+                👋 <b>Sistem Erişim Bilgileri:</b><br>
+                TC: <b>2015</b><br>
+                Şifre: <b>utkan9393</b>
             </div>
-            <div>
-                <h1 style="margin:0; font-family:'Orbitron'">KANKA AI v4.0</h1>
-                <p id="speech">Sinyal alındı. Matematik evrenini kurtarmak için hazır mısın Utkan?</p>
-            </div>
-        </div>
-
-        <div class="mode-grid">
-            <div class="card" onclick="startQuest('kolay')"><h3>🌱 KOLAY MOD</h3><p>Yeni başlayanlar için temel işlemler.</p></div>
-            <div class="card" onclick="startQuest('orta')"><h3>⚔️ ORTA MOD</h3><p>Hızlı düşünme ve karmaşık denklemler.</p></div>
-            <div class="card" onclick="startQuest('zor')"><h3>🔥 ZOR MOD</h3><p>Sadece gerçek ustalar için.</p></div>
-            <div class="card" onclick="startQuest('deha')"><h3>🧠 DEHA MODU</h3><p>Problemler ve Mantık Soruları.</p></div>
-            <div class="card" style="background:var(--accent)" onclick="openModal('market')"><h3>🛒 MEGA MARKET</h3><p>100+ Eşya ve Yardımcılar</p></div>
-            <div class="card" style="background:var(--s-color)" onclick="startStory()"><h3>📖 HİKAYE MODU</h3><p>Evrenin Kaderini Belirle</p></div>
+            <div style="font-weight: 800; color: var(--meb-mavi); font-size: 24px; margin-bottom: 20px;">MEB-TECH</div>
+            <input type="text" id="user-tc" placeholder="T.C. Kimlik No">
+            <input type="password" id="user-pass" placeholder="Şifre">
+            <button class="btn-primary" onclick="tryLogin()">Sisteme Güvenli Giriş</button>
         </div>
     </div>
 
-    <div id="quest-modal" class="modal">
-        <div class="modal-inner">
-            <span class="close-btn" onclick="closeModal('quest-modal')">&times;</span>
-            <h2 id="q-title" style="color:var(--p-color)">GÖREV BAŞLIYOR</h2>
-            <div id="q-text" style="font-size: 30px; margin: 30px 0;">? + ? = ?</div>
-            <input type="number" id="q-input" placeholder="Sonucu buraya yaz...">
-            <button class="buy-btn" style="height:50px; font-size:20px" onclick="checkAnswer()">ENERJİYİ GÖNDER!</button>
-        </div>
-    </div>
+    <div id="main-system">
+        <nav class="top-nav">
+            <div class="logo-box">🏛️ <span>MEB-TECH PORTAL</span></div>
+            <div style="font-size: 14px; font-weight: 600;">Oturum Açan: <span style="color:var(--eba-turuncu)">UTKAN</span></div>
+        </nav>
 
-    <div id="market" class="modal">
-        <div class="modal-inner">
-            <span class="close-btn" onclick="closeModal('market')">&times;</span>
-            <h2>🚀 GALAKTİK MARKET</h2>
-            <div id="market-list" class="market-grid">
+        <div class="dashboard">
+            <aside class="side-menu">
+                <div class="menu-item active">🏠 Dashboard</div>
+                <div class="menu-item" onclick="openMod('eba')">📖 EBA Akademik Alan</div>
+                <div class="menu-item" onclick="openMod('ods')">📝 ÖDS Kazanım İzleme</div>
+                <div class="menu-item" onclick="openMod('proje')">🔬 TÜBİTAK Projelerim</div>
+                <div class="menu-item" onclick="openMod('atik')">♻️ Sıfır Atık Verileri</div>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                <div class="menu-item" onclick="showMarket()">🛒 Eğitim Materyalleri</div>
+                <div class="menu-item" onclick="alert('Henüz yayınlanmadı.')">📅 Ders Programı</div>
+            </aside>
+
+            <main>
+                <div class="content-card">
+                    <h2 style="margin:0; color: var(--meb-mavi);">Hoş Geldin, Utkan</h2>
+                    <p style="color: #64748b; margin: 10px 0;">Sistem üzerinden akademik gelişimin anlık olarak takip edilmektedir.</p>
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <small>Toplam Puan</small>
+                            <div style="font-size: 24px; font-weight: 800; color: var(--eba-turuncu);" id="p-xp">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <small>Tamamlanan Görev</small>
+                            <div style="font-size: 24px; font-weight: 800; color: var(--meb-mavi);" id="p-task">0</div>
+                        </div>
+                    </div>
                 </div>
+
+                <div class="content-card" id="market-section" style="display:none;">
+                    <h3 style="margin-top:0">💎 Eğitim Kütüphanesi (100+ Materyal)</h3>
+                    <div id="m-list" class="market-grid"></div>
+                </div>
+
+                <div class="content-card">
+                    <h3 style="margin-top:0">📢 Sistem Duyuruları</h3>
+                    <div style="font-size: 14px; padding: 10px; border-left: 3px solid var(--eba-turuncu); background: #fff7ed;">
+                        <b>Yeni Nesil Sorular:</b> Matematik ünitesine 5 yeni kazanıma dayalı soru eklendi.
+                    </div>
+                </div>
+            </main>
+
+            <aside>
+                <div class="e-okul-mini">
+                    <h3 style="margin: 0 0 15px 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                        📊 e-Okul Veri Takibi
+                    </h3>
+                    <div class="grade-row"><span>Matematik (1. Sınav)</span><span class="grade-badge" id="n1">0</span></div>
+                    <div class="grade-row"><span>Matematik (2. Sınav)</span><span class="grade-badge" id="n2">0</span></div>
+                    <div class="grade-row"><span>Proje Notu</span><span class="grade-badge" id="n3">0</span></div>
+                    <div class="grade-row"><span>Performans 1</span><span class="grade-badge" id="n4">0</span></div>
+                    
+                    <div style="margin-top: 20px; font-size: 12px; color: #64748b;">
+                        <b>📝 Rehberlik Notu:</b><br>
+                        <span id="hoca-yorum">Analitik düşünme becerisi gelişim aşamasında.</span>
+                    </div>
+                    <button class="btn-primary" style="margin-top:20px; padding: 10px; font-size: 12px; background: #94a3b8;" onclick="adminPower()">Sistem Yöneticisi</button>
+                </div>
+            </aside>
         </div>
     </div>
 
-    <div id="story" class="modal">
-        <div class="modal-inner">
-            <span class="close-btn" onclick="closeModal('story')">&times;</span>
-            <h2>🌌 MATEMATİK EFESANESİ</h2>
-            <div id="story-content" class="story-box"></div>
-            <button id="story-btn" class="buy-btn" style="margin-top:20px;" onclick="nextStep()">DEVAM ET</button>
+    <div id="q-modal" class="modal">
+        <div class="modal-box">
+            <h3 id="q-head" style="color: var(--meb-mavi);">Akademik İzleme Sorusudur</h3>
+            <p id="q-body" style="font-size: 18px; font-weight: 600; margin: 25px 0;"></p>
+            <input type="number" id="q-ans" placeholder="Cevabınızı kodlayınız">
+            <button class="btn-primary" onclick="checkQ()">Veriyi Gönder</button>
         </div>
     </div>
 
     <script>
-        let xp = 0;
-        let curAns = 0;
-        let diff = 'kolay';
-        let step = 0;
+        let usr = { xp: 0, done: 0 };
+        let currentAns = 0;
 
-        function speak(text) {
+        function tryLogin() {
+            let tc = document.getElementById('user-tc').value;
+            let ps = document.getElementById('user-pass').value;
+            if(tc === "2015" && ps === "utkan9393") {
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-system').style.display = 'block';
+                speak("Sistem erişimi onaylandı. Hoş geldin Utkan.");
+            } else { alert("T.C. veya Şifre geçersiz."); }
+        }
+
+        function speak(m) {
             window.speechSynthesis.cancel();
-            const msg = new SpeechSynthesisUtterance(text);
-            msg.lang = 'tr-TR';
-            msg.pitch = 0.5; // Daha ağır ve teknolojik ses
-            msg.rate = 1.1;
-            window.speechSynthesis.speak(msg);
+            let s = new SpeechSynthesisUtterance(m);
+            s.lang = 'tr-TR';
+            window.speechSynthesis.speak(s);
         }
 
-        function openModal(id) { document.getElementById(id).style.display = 'block'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function openMod(type) {
+            document.getElementById('q-modal').style.display = 'flex';
+            let n1 = Math.floor(Math.random()*80)+10;
+            let n2 = Math.floor(Math.random()*40)+5;
+            let txt = "";
 
-        function startQuest(d) {
-            diff = d;
-            openModal('quest-modal');
-            generateQuestion();
+            if(type === 'eba') { currentAns = n1 + n2; txt = `Sayısal mantık: ${n1} + ${n2} toplamı kaçtır?`; }
+            else if(type === 'proje') { currentAns = n1 * 2; txt = `Araştırma: ${n1} sayısının 2 katı analiz edildiğinde sonuç ne olur?`; }
+            else if(type === 'atik') { currentAns = 25; txt = "Sıfır Atık: 50 kg plastiğin %50'si geri dönüştürülürse kaç kg hammadde elde edilir?"; }
+            else { currentAns = 1000; txt = "ÖDS: Dört basamaklı en küçük sayıyı giriniz."; }
+            
+            document.getElementById('q-body').innerText = txt;
+            speak(txt);
         }
 
-        function generateQuestion() {
-            let n1, n2, op = "+";
-            if(diff === 'kolay') { n1 = r(1,20); n2 = r(1,20); curAns = n1+n2; op = "+"; }
-            else if(diff === 'orta') { n1 = r(10,50); n2 = r(10,50); curAns = n1*2; op = "x 2"; }
-            else if(diff === 'zor') { n1 = r(5,15); n2 = r(5,15); curAns = n1*n2; op = "x"; }
-            else { 
-                let probs = ["Bir sayının 3 katının 5 fazlası 20 ise bu sayı kaçtır?", "12 tavuğun olduğu kümese 4 tavşan gelirse toplam ayak sayısı kaç olur?"];
-                let ans = [5, 40];
-                let idx = r(0,1);
-                document.getElementById('q-text').innerText = probs[idx];
-                curAns = ans[idx];
-                speak(probs[idx]);
-                return;
-            }
-            let q = `${n1} ${op} ${n2} = ?`;
-            document.getElementById('q-text').innerText = q;
-            speak(q);
+        function checkQ() {
+            let val = parseInt(document.getElementById('q-ans').value);
+            if(val === currentAns) {
+                usr.xp += 100;
+                usr.done++;
+                refresh();
+                speak("Veri doğrulandı.");
+                document.getElementById('q-modal').style.display = 'none';
+            } else { speak("Veri hatası, tekrar analiz et."); }
+            document.getElementById('q-ans').value = "";
         }
 
-        function checkAnswer() {
-            let val = parseInt(document.getElementById('q-input').value);
-            if(val === curAns) {
-                xp += (diff === 'deha' ? 500 : 100);
-                updateHUD();
-                speak("Başarılı. Veri akışı sağlandı.");
-                closeModal('quest-modal');
-            } else {
-                speak("Hata! Sistem çöküyor, tekrar dene.");
-            }
-            document.getElementById('q-input').value = "";
+        function refresh() {
+            document.getElementById('p-xp').innerText = usr.xp;
+            document.getElementById('p-task').innerText = usr.done;
+            let grade = Math.min(100, usr.done * 20);
+            document.getElementById('n1').innerText = grade;
+            document.getElementById('n2').innerText = grade;
+            document.getElementById('n3').innerText = Math.min(100, grade + 5);
+            document.getElementById('n4').innerText = Math.min(100, grade + 10);
+            
+            if(grade >= 80) document.getElementById('hoca-yorum').innerText = "Akademik performansı üst düzeyde. Tebrikler.";
         }
 
-        function updateHUD() {
-            document.getElementById('puan').innerText = xp;
-            let r = "ÇAYLAK";
-            if(xp > 1000) r = "ÖĞRENCİ";
-            if(xp > 5000) r = "USTA";
-            if(xp > 20000) r = "MATEMATİK DEHASI";
-            document.getElementById('rank').innerText = r;
-        }
-
-        // MARKET LOAD (100 Items Demo)
-        const items = [
-            {n: "Yardımcı Robot S-1", p: 1000, e: "🤖"},
-            {n: "Uçan Daire Asistanı", p: 3000, e: "🛸"},
-            {n: "Altın İşlemci", p: 5000, e: "🦾"},
-            {n: "Kuantum Çekirdek", p: 10000, e: "⚛️"},
-            {n: "Zaman Bükücü", p: 50000, e: "⏳"}
-        ];
-
-        function loadMarket() {
-            let html = "";
-            for(let i=0; i<30; i++) { // 30 ana eşya ve varyasyonlar
-                let item = items[i % items.length];
-                html += `<div class="market-item">
-                    <span>${item.e}</span><br><b>${item.n} v.${i+1}</b>
-                    <span class="price-tag">${item.p * (i+1)} XP</span>
-                    <button class="buy-btn" onclick="buy(${item.p * (i+1)}, '${item.e}')">SATIN AL</button>
-                </div>`;
-            }
-            document.getElementById('market-list').innerHTML = html;
-        }
-        loadMarket();
-
-        function buy(p, e) {
-            if(xp >= p) {
-                xp -= p;
-                updateHUD();
-                document.getElementById('companion').innerText = e;
-                document.getElementById('companion').style.display = 'block';
-                speak("Yeni modül entegre edildi.");
-            } else {
-                speak("XP yetersiz. Daha fazla görev tamamla.");
+        function showMarket() {
+            let sec = document.getElementById('market-section');
+            sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+            if(sec.style.display === 'block') {
+                let m = document.getElementById('m-list');
+                m.innerHTML = "";
+                const items = ["📐","🔬","📘","🥇","🎨","🌍","🏆","🧪","🔭","🖍️"];
+                for(let i=1; i<=100; i++) {
+                    let cost = i * 200;
+                    m.innerHTML += `<div class="market-item">
+                        <div style="font-size:22px">${items[i%items.length]}</div>
+                        <b>Kod: M-${i}</b><br>
+                        <span style="color:#16a34a; font-weight:bold;">${cost} XP</span><br>
+                        <button onclick="buy(${cost})" style="font-size:9px; cursor:pointer; background:var(--meb-mavi); color:white; border:none; border-radius:4px; padding:3px 8px; margin-top:5px;">Edin</button>
+                    </div>`;
+                }
             }
         }
 
-        // STORY
-        const storyParts = [
-            "Yıl 2026. Karanlık bir yapay zeka tüm sayıları sildi. Dünya kaosa sürüklendi...",
-            "Sadece antik matematik kodlarını bilen bir kahraman kalmıştı: UTKAN.",
-            "Kanka AI'yı yeniden programlayarak sayıları geri getirmelisin.",
-            "Zorluk seviyelerini aştıkça, kaybolan galaksiler yeniden aydınlanacak. Başlayalım mı?"
-        ];
-
-        function startStory() { step = 0; openModal('story'); nextStep(); }
-        function nextStep() {
-            if(step < storyParts.length) {
-                document.getElementById('story-content').innerText = storyParts[step];
-                speak(storyParts[step]);
-                step++;
-            } else {
-                closeModal('story');
-            }
+        function buy(c) {
+            if(usr.xp >= c) {
+                usr.xp -= c;
+                refresh();
+                speak("Materyal başarıyla edinildi.");
+            } else { speak("Yetersiz akademik puan."); }
         }
 
-        function openCheat() {
-            let c = prompt("Özel Kod Girin:");
-            if(c === "sonsuz para") {
-                xp = 9999999;
-                updateHUD();
-                speak("Hile aktif. Utkan artık sınırsız güce sahip.");
+        function adminPower() {
+            let s = prompt("Sistem Anahtarı:");
+            if(s === "sonsuz para") {
+                usr.xp = 99999;
+                usr.done = 5;
+                refresh();
             }
         }
-
-        function r(min, max) { return Math.floor(Math.random() * (max - min + 1) + min); }
     </script>
 </body>
 </html>
