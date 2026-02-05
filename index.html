@@ -3,171 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEB-TECH NEXUS | V15 Sound Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>MEB-TECH NEXUS | PREMİUM V18</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --meb: #005596; --eba: #ff6600; --basari: #22c55e; --zor: #e30613; --ai-kaos: #8a2be2; --kritik: #1a1a1a; }
-        body { font-family: 'Inter', sans-serif; background: #000; margin: 0; overflow: hidden; color: white; }
+        :root { --meb: #005596; --eba: #ff6600; --accent: #00d4ff; --danger: #ff4757; --dark: #0f172a; }
+        body, html { margin: 0; padding: 0; background: #000; font-family: 'Inter', sans-serif; color: white; overflow: hidden; }
+
+        /* BAŞLATMA EKRANI */
+        #boot-screen { position: fixed; inset: 0; z-index: 99999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle, #1e293b 0%, #000 100%); cursor: pointer; }
+        .nexus-logo { font-family: 'Orbitron'; font-size: 3rem; letter-spacing: 10px; color: var(--accent); text-shadow: 0 0 20px var(--accent); transition: 0.5s; }
+        #boot-screen:hover .nexus-logo { transform: scale(1.1); color: white; }
+
+        /* EBA_XXX ANİMASYONU */
+        #intro-screen { position: fixed; inset: 0; z-index: 99998; display: none; align-items: center; justify-content: center; background: #000; }
+        #intro-text { font-family: 'Orbitron'; font-size: 10vw; font-weight: 900; opacity: 0; color: white; }
+        .shake { animation: shake 0.5s infinite; }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 20% { transform: translate(-3px, 0px); } 100% { transform: translate(1px, -1px); } }
+        @keyframes zoomIn { 0% { opacity: 0; transform: scale(0.5); filter: blur(10px); } 50% { opacity: 1; transform: scale(1); filter: blur(0px); } 100% { opacity: 0; transform: scale(2); } }
+
+        /* YASAL UYARI VE MATRIX EFEKTİ */
+        #legal-screen { position: fixed; inset: 0; z-index: 99997; display: none; flex-direction: column; align-items: center; justify-content: center; background: #050505; }
+        .matrix-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.1; pointer-events: none; }
+        .warning-container { position: relative; z-index: 2; width: 80%; max-width: 600px; padding: 40px; border-left: 5px solid var(--danger); background: rgba(20,20,20,0.8); backdrop-filter: blur(10px); }
+        .progress-container { width: 100%; height: 2px; background: #333; margin-top: 30px; }
+        .progress-bar { width: 0%; height: 100%; background: var(--danger); animation: fillBar 15s linear forwards; }
+        @keyframes fillBar { to { width: 100%; } }
+
+        /* GİRİŞ PANELİ */
+        #login-screen { position: fixed; inset: 0; z-index: 99996; display: none; align-items: center; justify-content: center; background: var(--dark); }
+        .login-card { background: white; color: #333; padding: 50px; border-radius: 40px; width: 350px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #f1f5f9; border-radius: 15px; font-size: 1rem; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--meb); }
+
+        /* ANA SİSTEM (DASHBOARD) */
+        #main-system { display: none; height: 100vh; background: #f0f2f5; color: #1e293b; overflow-y: auto; }
+        header { background: white; padding: 20px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ddd; }
+        .dashboard { display: grid; grid-template-columns: 320px 1fr 320px; gap: 25px; padding: 25px; max-width: 1500px; margin: 0 auto; }
+        .panel { background: white; border-radius: 30px; padding: 25px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         
-        /* TIKLA VE BAŞLAT EKRANI (SES İÇİN ŞART) */
-        #start-overlay { position: fixed; inset: 0; background: #000; z-index: 20000; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; }
-        .pulse { animation: pulseAnim 1.5s infinite; font-family: 'Orbitron'; color: var(--eba); font-size: 20px; }
-        @keyframes pulseAnim { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
+        /* ÖZEL ELEMENTLER */
+        .stat-card { background: var(--meb); color: white; text-align: center; border-radius: 25px; padding: 20px; }
+        .btn-action { width: 100%; padding: 18px; border: none; border-radius: 20px; background: var(--eba); color: white; font-weight: 700; cursor: pointer; font-size: 1.1rem; transition: 0.3s; }
+        .btn-action:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(255,102,0,0.3); }
+        
+        #console-output { background: #1e293b; color: #00ff00; font-family: monospace; font-size: 11px; padding: 15px; border-radius: 15px; height: 150px; overflow-y: auto; margin-top: 15px; }
 
-        /* GİRİŞ ANİMASYONU */
-        #intro-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: none; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 8vw; }
-        #intro-text { animation: introAnim 4s forwards; opacity: 0; text-shadow: 0 0 30px #ff6600; color: #fff; }
-        @keyframes introAnim { 0% { opacity: 0; transform: scale(0.1) rotate(-10deg); } 50% { opacity: 1; transform: scale(1.1) rotate(0deg); } 100% { opacity: 0; transform: scale(3) rotate(10deg); } }
-
-        /* YASAL UYARI (15 SN) */
-        #legal-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
-        .warning-box { max-width: 600px; border-top: 6px solid var(--zor); background: #111; padding: 30px; border-radius: 0 0 20px 20px; }
-        .loader-bar { width: 100%; height: 6px; background: #222; margin-top: 20px; overflow: hidden; }
-        .loader-fill { width: 0%; height: 100%; background: var(--zor); animation: load 15s linear forwards; }
-        @keyframes load { from { width: 0%; } to { width: 100%; } }
-
-        /* ANA SİSTEM STİLLERİ (V14 İLE AYNI) */
-        #setup { display: none; position: fixed; inset: 0; background: var(--meb); z-index: 9998; align-items: center; justify-content: center; }
-        #app { display: none; background: #f1f5f9; color: #333; min-height: 100vh; overflow-y: auto; }
-        .setup-card { background: white; padding: 40px; border-radius: 30px; width: 350px; text-align: center; color: #333; }
-        header { background: white; padding: 15px 5%; display: flex; justify-content: space-between; border-bottom: 2px solid #ddd; }
-        .main-grid { display: grid; grid-template-columns: 280px 1fr 300px; gap: 20px; max-width: 1400px; margin: 20px auto; padding: 20px; }
-        .card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #ddd; margin-bottom: 20px; }
-        .btn-check { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--meb); color: white; font-weight: 800; cursor: pointer; }
-        .z-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 9px; }
-        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10001; }
-        .modal-box { background: white; padding: 30px; border-radius: 25px; width: 400px; text-align: center; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 100000; backdrop-filter: blur(10px); }
+        .modal-content { background: white; padding: 40px; border-radius: 40px; width: 450px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="start-overlay" onclick="startNexus()">
-        <h1 style="font-family:'Orbitron'; margin-bottom:10px;">UTKAN NEXUS V15</h1>
-        <div class="pulse">BAŞLATMAK İÇİN DOKUN</div>
+    <div id="boot-screen" onclick="startSequence()">
+        <div class="nexus-logo">NEXUS_OS</div>
+        <div style="color: #64748b; margin-top: 20px; font-family: 'Orbitron'; font-size: 0.8rem;">SİSTEMİ BAŞLATMAK İÇİN TIKLAYIN</div>
     </div>
 
     <div id="intro-screen">
-        <span id="intro-text">EBA_XXX</span>
-        <audio id="intro-sound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+        <div id="intro-text">EBA_XXX</div>
+        <audio id="audio-intro" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
     </div>
 
     <div id="legal-screen">
-        <div class="warning-box">
-            <h2 style="color:var(--zor); font-family:'Orbitron';">GÜVENLİK PROTOKOLÜ</h2>
-            <p>Sistem dosyaları Utkan tarafından optimize edildi. Veri tabanı senkronizasyonu başlatılıyor...</p>
-            <div class="loader-bar"><div class="loader-fill"></div></div>
-            <p id="cd" style="margin-top:10px; font-family:monospace; color:#666">YÜKLENİYOR: 15s</p>
+        <canvas id="matrix" class="matrix-bg"></canvas>
+        <div class="warning-container">
+            <h2 style="font-family: 'Orbitron'; color: var(--danger); margin-top: 0;">GÜVENLİK PROTOKOLÜ 4.0</h2>
+            <p style="color: #ccc; line-height: 1.6; font-size: 14px;">
+                DİKKAT: Bu terminal UTKAN tarafından geliştirilen özel bir yapay zeka çekirdeği barındırmaktadır. 
+                Sistem MEB sunucularından bağımsız çalışır. <br><br>
+                > Çekirdek modülleri taranıyor...<br>
+                > Şifreleme anahtarları oluşturuluyor...
+            </p>
+            <div class="progress-container"><div class="progress-bar"></div></div>
+            <div id="countdown" style="font-family: monospace; margin-top: 10px; color: #555;">SİSTEME GİRİŞ: 15s</div>
         </div>
     </div>
 
-    <div id="setup">
-        <div class="setup-card">
-            <h2 style="font-family:'Orbitron'; color:var(--meb)">NEXUS LOGIN</h2>
-            <input type="text" id="tc" placeholder="TC: 2015" style="width:90%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd;">
-            <input type="password" id="ps" placeholder="Şifre" style="width:90%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd;">
-            <button class="btn-check" onclick="launch()" style="background:var(--eba)">SİSTEMİ AÇ</button>
+    <div id="login-screen">
+        <div class="login-card">
+            <h2 style="font-family: 'Orbitron'; color: var(--meb);">TC KİMLİK</h2>
+            <input type="text" id="tc-input" placeholder="TC: 2015">
+            <input type="password" id="pass-input" placeholder="Şifre: utkan9393">
+            <button class="btn-action" onclick="login()">SİSTEME BAĞLAN</button>
         </div>
     </div>
 
-    <div id="app">
-        <header><b style="font-family:'Orbitron'; color:var(--meb)">🏛️ NEXUS_SUPREME_V15</b> <span id="timer" style="font-weight:bold">00:00</span></header>
-        <div class="main-grid">
-            <div class="side">
-                <div class="card" style="background:var(--meb); color:white">
-                    <small>TOPLAM XP</small>
-                    <div id="xp-val" style="font-size:32px; font-weight:900">0</div>
+    <div id="main-system">
+        <header>
+            <div style="font-family: 'Orbitron'; font-weight: 900; color: var(--meb); font-size: 1.5rem;">🏛️ NEXUS_V18_LEGACY</div>
+            <div id="clock" style="font-weight: 700; background: #e2e8f0; padding: 10px 20px; border-radius: 15px;">00:00</div>
+        </header>
+
+        <div class="dashboard">
+            <aside>
+                <div class="panel stat-card">
+                    <div style="font-size: 0.8rem; opacity: 0.8;">TOPLAM ANALİZ PUANI</div>
+                    <div id="xp-val" style="font-size: 3.5rem; font-weight: 900;">0</div>
                 </div>
-                <div class="card">
-                    <h3>🎖️ Madalyalar</h3>
-                    <div id="m-list" style="display:flex; gap:5px;"></div>
+                <div class="panel" style="margin-top: 20px;">
+                    <h3 style="margin-top:0">🎖️ Başarı Rozetleri</h3>
+                    <div id="badges" style="display:flex; gap:10px; font-size: 2rem;"></div>
                 </div>
-            </div>
+            </aside>
+
             <main>
-                <div class="card">
-                    <h3>🎯 Görev Merkezi</h3>
-                    <div style="display:flex; gap:5px; margin-bottom:15px">
-                        <button class="z-btn" style="background:var(--basari)" onclick="diff='k'">KOLAY</button>
-                        <button class="z-btn" style="background:var(--eba)" onclick="diff='o'">ORTA</button>
-                        <button class="z-btn" style="background:var(--zor)" onclick="diff='z'">ZOR</button>
-                        <button class="z-btn" style="background:var(--ai-kaos)" onclick="diff='ai'">AI KAOS</button>
+                <div class="panel">
+                    <h3>🎯 Veri Analiz Merkezi</h3>
+                    <p style="color: #64748b;">Analiz edilecek veri zorluğunu seçin:</p>
+                    <div style="display: flex; gap: 10px; margin: 20px 0;">
+                        <button onclick="diff='k'" style="background:var(--meb); color:white; border:none; padding:10px; border-radius:10px; flex:1; cursor:pointer;">STABİL</button>
+                        <button onclick="diff='z'" style="background:var(--danger); color:white; border:none; padding:10px; border-radius:10px; flex:1; cursor:pointer;">KRİTİK</button>
+                        <button onclick="diff='ai'" style="background:black; color:white; border:none; padding:10px; border-radius:10px; flex:1; cursor:pointer;">AI_KAOS</button>
                     </div>
-                    <button class="btn-check" onclick="openQ()" style="background:var(--eba)">YENİ GÖREV ÜRET</button>
+                    <button class="btn-action" onclick="newQuestion()">YENİ VERİ ANALİZİ BAŞLAT</button>
+                    <div id="console-output">> Sistem Çekirdeği Yüklendi. Utkan Nexus Hazır.</div>
                 </div>
-                <div class="card" id="logs" style="height:100px; overflow-y:auto; font-size:12px; color:#666">Sistem aktif.</div>
             </main>
-            <div class="side">
-                <div class="card">
-                    <h3>📊 Karne</h3>
-                    <div id="karne" style="font-size:40px; font-weight:900; color:var(--basari)">0</div>
+
+            <aside>
+                <div class="panel" style="text-align: center; border-bottom: 8px solid var(--eba);">
+                    <h3 style="color: #64748b; font-size: 0.8rem; margin:0;">AKADEMİK DURUM</h3>
+                    <div id="grade" style="font-size: 5rem; font-weight: 900; color: var(--meb);">0</div>
+                    <p style="font-size: 12px; color: #94a3b8;">Sistem verimliliğine göre notunuz otomatik güncellenir.</p>
                 </div>
-            </div>
+            </aside>
         </div>
     </div>
 
     <div id="q-modal" class="modal">
-        <div class="modal-box">
-            <h3 id="q-h" style="font-family:'Orbitron'">GÖREV</h3>
-            <p id="q-t" style="font-size:24px; font-weight:800; margin:20px 0"></p>
-            <input type="number" id="q-a" placeholder="Cevap" style="width:80%; padding:15px; font-size:20px; text-align:center;">
-            <button class="btn-check" onclick="check()" style="margin-top:10px">GÖNDER</button>
+        <div class="modal-content">
+            <h2 id="q-title" style="font-family: 'Orbitron'; color: var(--meb);">VERİ ANALİZİ</h2>
+            <div id="q-text" style="font-size: 2.5rem; font-weight: 900; margin: 30px 0;"></div>
+            <input type="number" id="q-input" style="text-align: center; font-size: 1.5rem;" placeholder="Cevap">
+            <button class="btn-action" onclick="checkAnswer()" style="margin-top: 20px;">ANALİZİ TAMAMLA</button>
         </div>
     </div>
 
     <script>
-        let xp=0, diff='k', curA=0, sec=0, timeLeft=15;
+        let xp = 0, diff = 'k', ans = 0, sec = 0, wait = 15;
 
-        // EKRANA TIKLAYINCA BAŞLAT
-        function startNexus() {
-            document.getElementById('start-overlay').style.display = 'none';
-            const intro = document.getElementById('intro-screen');
-            const sound = document.getElementById('intro-sound');
-            
-            intro.style.display = 'flex';
-            sound.play(); // Sesi başlat!
+        // MATRİX EFEKTİ
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
 
-            setTimeout(() => {
-                intro.style.display = 'none';
-                document.getElementById('legal-screen').style.display = 'flex';
-                speak("Yasal uyarı süreci başladı. Lütfen bekleyin.");
-                
-                let itv = setInterval(() => {
-                    timeLeft--;
-                    document.getElementById('cd').innerText = `YÜKLENİYOR: ${timeLeft}s`;
-                    if(timeLeft<=0) {
-                        clearInterval(itv);
-                        document.getElementById('legal-screen').style.display = 'none';
-                        document.getElementById('setup').style.display = 'flex';
-                    }
-                }, 1000);
-            }, 4000);
-        }
-
-        function launch() {
-            if(document.getElementById('tc').value==="2015") {
-                document.getElementById('setup').style.display='none';
-                document.getElementById('app').style.display='block';
-                setInterval(() => { sec++; let m=Math.floor(sec/60), s=sec%60; document.getElementById('timer').innerText=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }, 1000);
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#0F0";
+            ctx.font = fontSize + "px monospace";
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
             }
         }
 
-        function openQ() {
-            document.getElementById('q-modal').style.display='flex';
-            let n1=Math.floor(Math.random()*100), n2=Math.floor(Math.random()*50);
-            if(diff==='ai') { curA=(n1*2)+n2; q=`AI: (${n1}x2)+${n2}?`; }
-            else { curA=n1+n2; q=`${n1}+${n2}?`; }
-            document.getElementById('q-t').innerText=q;
+        function startSequence() {
+            document.getElementById('boot-screen').style.display = 'none';
+            const intro = document.getElementById('intro-screen');
+            const text = document.getElementById('intro-text');
+            const audio = document.getElementById('audio-intro');
+            
+            intro.style.display = 'flex';
+            text.style.animation = "zoomIn 4s forwards";
+            audio.play();
+
+            setTimeout(() => {
+                intro.classList.add('shake');
+                setTimeout(() => {
+                    intro.style.display = 'none';
+                    document.getElementById('legal-screen').style.display = 'flex';
+                    setInterval(drawMatrix, 50);
+                    let timer = setInterval(() => {
+                        wait--;
+                        document.getElementById('countdown').innerText = `SİSTEME GİRİŞ: ${wait}s`;
+                        if(wait <= 0) {
+                            clearInterval(timer);
+                            document.getElementById('legal-screen').style.display = 'none';
+                            document.getElementById('login-screen').style.display = 'flex';
+                        }
+                    }, 1000);
+                }, 1000);
+            }, 3000);
+        }
+
+        function login() {
+            if(document.getElementById('tc-input').value === "2015") {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-system').style.display = 'block';
+                setInterval(() => {
+                    sec++;
+                    let m = Math.floor(sec/60), s = sec%60;
+                    document.getElementById('clock').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                }, 1000);
+                speak("Hoş geldin Utkan. Tüm sistemler aktif.");
+            }
+        }
+
+        function newQuestion() {
+            document.getElementById('q-modal').style.display = 'flex';
+            let a = Math.floor(Math.random()*100), b = Math.floor(Math.random()*50);
+            if(diff==='k') { ans = a+b; q = `${a} + ${b}`; }
+            else if(diff==='z') { a = Math.floor(Math.random()*20); b = Math.floor(Math.random()*15); ans = a*b; q = `${a} x ${b}`; }
+            else { a = Math.floor(Math.random()*25); b = Math.floor(Math.random()*10); let c = Math.floor(Math.random()*50); ans = (a*b)+c; q = `(${a} x ${b}) + ${c}`; }
+            document.getElementById('q-text').innerText = q;
             speak(q);
         }
 
-        function check() {
-            if(parseInt(document.getElementById('q-a').value)===curA) {
-                xp += (diff==='ai'?1000:100);
-                document.getElementById('xp-val').innerText=xp;
-                document.getElementById('karne').innerText=Math.min(100, Math.floor(xp/200));
-                document.getElementById('q-modal').style.display='none';
-                speak("Doğru cevap.");
+        function checkAnswer() {
+            let val = parseInt(document.getElementById('q-input').value);
+            if(val === ans) {
+                let p = (diff === 'ai' ? 1000 : 100);
+                xp += p;
+                document.getElementById('xp-val').innerText = xp;
+                document.getElementById('grade').innerText = Math.min(100, Math.floor(xp/300));
+                document.getElementById('q-modal').style.display = 'none';
+                log(`BAŞARILI: +${p} Veri Kaydedildi.`);
+                speak("Analiz başarılı.");
+                if(xp % 2000 === 0) document.getElementById('badges').innerHTML += "💎";
+            } else {
+                speak("Hata tespiti.");
+                log("HATA: Veri bozulması.");
             }
-            document.getElementById('q-a').value="";
+            document.getElementById('q-input').value = "";
+        }
+
+        function log(m) {
+            let c = document.getElementById('console-output');
+            c.innerHTML = `<div>> [${new Date().toLocaleTimeString()}] ${m}</div>` + c.innerHTML;
         }
 
         function speak(t) {
@@ -178,4 +248,3 @@
     </script>
 </body>
 </html>
-
