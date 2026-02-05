@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V31 - EBA EDITION</title>
+    <title>NEXUS V32 - PRO</title>
     <style>
         :root { --primary: #2563eb; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
         
         /* EBA_XXX Giriş Animasyonu */
         @keyframes startup {
-            0% { opacity: 0; transform: scale(0.8); filter: blur(10px); }
-            50% { opacity: 1; transform: scale(1.1); filter: blur(0px); text-shadow: 0 0 20px #2563eb; }
-            100% { opacity: 1; transform: scale(1); }
+            0% { opacity: 0; transform: scale(0.5); filter: blur(20px); }
+            100% { opacity: 1; transform: scale(1); filter: blur(0px); }
         }
 
         @keyframes fadeInUp {
@@ -19,106 +18,73 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            display: flex; 
-            height: 100vh; 
-            overflow: hidden; 
-        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; height: 100vh; overflow: hidden; }
         
-        .sidebar { 
-            width: 280px; 
-            background: var(--card); 
-            border-right: 1px solid #334155; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 25px; 
-            animation: fadeInUp 1s ease-out forwards;
-        }
+        /* Sidebar */
+        .sidebar { width: 280px; background: var(--card); border-right: 1px solid #334155; display: flex; flex-direction: column; padding: 25px; animation: fadeInUp 1s; }
+        .sidebar h2 { color: var(--primary); text-align: center; letter-spacing: 5px; margin-bottom: 30px; }
 
         .nav-btn { 
-            background: rgba(255, 255, 255, 0.03); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            color: var(--text); 
-            padding: 14px; 
-            cursor: pointer; 
-            border-radius: 10px; 
-            margin-bottom: 12px; 
-            transition: 0.4s all; 
+            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); 
+            color: var(--text); padding: 14px; cursor: pointer; border-radius: 10px; 
+            margin-bottom: 12px; transition: 0.3s; text-align: left;
         }
+        .nav-btn:hover { background: var(--primary); transform: translateX(5px); }
+        
+        .main-content { flex: 1; position: relative; display: flex; flex-direction: column; }
+        
+        /* Ekranlar */
+        .overlay-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        #eba-logo { font-size: 90px; font-weight: 900; color: var(--primary); letter-spacing: 15px; animation: startup 1.2s ease-out; font-family: monospace; text-shadow: 0 0 30px rgba(37, 99, 235, 0.5); }
+        
+        .card { background: var(--card); padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); animation: fadeInUp 0.5s; width: 400px; }
+        
+        .action-btn { background: var(--primary); color: white; padding: 15px 30px; border-radius: 10px; cursor: pointer; border: none; font-weight: bold; margin-top: 20px; transition: 0.3s; }
+        .action-btn:hover { transform: scale(1.05); background: #3b82f6; }
 
-        .nav-btn:hover { background: var(--primary); transform: translateX(8px); }
-        
-        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; }
-        
-        #view-area { flex: 1; background: #0a0f1e; position: relative; }
-        
-        /* Karşılama Ekranı - EBA_XXX BURADA */
-        .overlay-screen { 
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-            display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; 
-        }
-        
-        #eba-logo {
-            font-size: 80px;
-            font-weight: 900;
-            color: #2563eb;
-            letter-spacing: 15px;
-            margin-bottom: 10px;
-            animation: startup 1.5s ease-out;
-            font-family: 'Courier New', Courier, monospace;
-        }
+        input { padding: 15px; font-size: 28px; width: 150px; text-align: center; background: #0f172a; color: white; border: 2px solid #334155; border-radius: 12px; margin: 20px 0; outline: none; }
+        input:focus { border-color: var(--primary); }
 
-        .nexus-text {
-            font-size: 24px;
-            color: #94a3b8;
-            letter-spacing: 5px;
-            animation: fadeInUp 2s ease-out;
-        }
-
-        .card { background: var(--card); padding: 40px; border-radius: 20px; animation: fadeInUp 0.6s; text-align: center;}
-        .action-btn { background: var(--primary); color: white; padding: 16px 32px; border-radius: 12px; cursor: pointer; border: none; text-decoration: none; display: inline-block; margin-top: 20px;}
-        
         #content-frame { width: 100%; height: 100%; border: none; display: none; }
-        input { padding: 12px; font-size: 24px; width: 120px; text-align: center; background: #0f172a; color: white; border: 2px solid #334155; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div class="sidebar">
-    <h2 style="color:var(--primary); text-align:center;">NEXUS</h2>
+    <h2>NEXUS</h2>
+    <button class="nav-btn" onclick="showWelcome()">🏠 Ana Panel</button>
     <button class="nav-btn" onclick="handlePage('https://www.eba.gov.tr', 'EBA')">🌐 EBA Akademik</button>
     <button class="nav-btn" onclick="handlePage('https://ogmmateryal.eba.gov.tr', 'OGM')">📚 OGM Materyal</button>
-    <button class="nav-btn" onclick="handlePage('https://www.geogebra.org/calculator', 'GeoGebra', true)">📈 GeoGebra</button>
-    <button class="nav-btn" onclick="startQuiz()" style="margin-top:auto; background:rgba(37,99,235,0.2);">📝 Test Çöz</button>
+    <button class="nav-btn" onclick="handlePage('https://www.geogebra.org/calculator', 'GeoGebra', true)">📈 GeoGebra Çizici</button>
+    
+    <button class="nav-btn" onclick="startQuiz()" style="margin-top:auto; background: #1e3a8a; border-color: #3b82f6; font-weight: bold;">📝 SORU ÇÖZÜMÜ</button>
 </div>
 
 <div class="main-content">
-    <div id="view-area">
+    <div id="view-area" style="flex:1; position:relative;">
+        
         <div id="welcome" class="overlay-screen">
             <div id="eba-logo">EBA_XXX</div>
-            <div class="nexus-text">SİSTEM BAŞLATILIYOR...</div>
+            <p style="letter-spacing: 5px; color: #94a3b8;">SİSTEM AKTİF</p>
+        </div>
+
+        <div id="quiz-area" class="overlay-screen" style="display:none;">
+            <div class="card">
+                <h2 style="color: #60a5fa; margin-bottom: 10px;">Matematik Testi</h2>
+                <div id="question-text" style="font-size: 40px; font-weight: bold; margin: 20px 0;">...</div>
+                <input type="number" id="user-answer" placeholder="Cevap?">
+                <br>
+                <button class="action-btn" onclick="checkAnswer()">CEVABI KONTROL ET</button>
+                <p id="feedback" style="margin-top: 20px; font-weight: bold; font-size: 20px;"></p>
+            </div>
         </div>
 
         <div id="external-card" class="overlay-screen" style="display:none;">
             <div class="card">
                 <h2 id="ext-title" style="color:#60a5fa;">Sistem Bağlantısı</h2>
-                <p>Güvenli protokol için harici pencere açılması gerekiyor.</p>
-                <a href="#" id="ext-link" target="_blank" class="action-btn">Uygulamaya Git</a>
-            </div>
-        </div>
-
-        <div id="quiz-area" class="overlay-screen" style="display:none;">
-            <div class="card">
-                <h3 id="question-text" style="font-size:36px;">...</h3>
-                <input type="number" id="user-answer">
-                <br>
-                <button class="action-btn" onclick="checkAnswer()">KONTROL ET</button>
-                <p id="feedback" style="margin-top:15px;"></p>
+                <p>MEB altyapısı için harici bağlantı kuruluyor.</p>
+                <a href="#" id="ext-link" target="_blank" class="action-btn">Uygulamayı Başlat</a>
             </div>
         </div>
 
@@ -128,11 +94,21 @@
 
 <script>
     let currentAnswer = 0;
-    function handlePage(url, title, canIframe = false) {
+
+    function showWelcome() {
+        hideAll();
+        document.getElementById('welcome').style.display = 'flex';
+    }
+
+    function hideAll() {
         document.getElementById('welcome').style.display = 'none';
         document.getElementById('quiz-area').style.display = 'none';
         document.getElementById('external-card').style.display = 'none';
         document.getElementById('content-frame').style.display = 'none';
+    }
+
+    function handlePage(url, title, canIframe = false) {
+        hideAll();
         if(canIframe) {
             const frame = document.getElementById('content-frame');
             frame.style.display = 'block'; frame.src = url;
@@ -142,28 +118,48 @@
             document.getElementById('ext-link').href = url;
         }
     }
+
     function startQuiz() {
-        document.getElementById('welcome').style.display = 'none';
-        document.getElementById('content-frame').style.display = 'none';
-        document.getElementById('external-card').style.display = 'none';
+        hideAll();
         document.getElementById('quiz-area').style.display = 'flex';
         generateQuestion();
     }
+
     function generateQuestion() {
-        const n1 = Math.floor(Math.random() * 10) + 2;
-        const n2 = Math.floor(Math.random() * 10) + 2;
-        document.getElementById('question-text').innerText = `${n1} x ${n2} = ?`;
-        currentAnswer = n1 * n2;
+        const operators = ['+', '-', 'x'];
+        const op = operators[Math.floor(Math.random() * operators.length)];
+        let n1, n2;
+
+        if(op === 'x') {
+            n1 = Math.floor(Math.random() * 10) + 2;
+            n2 = Math.floor(Math.random() * 10) + 2;
+            currentAnswer = n1 * n2;
+        } else if(op === '+') {
+            n1 = Math.floor(Math.random() * 50) + 10;
+            n2 = Math.floor(Math.random() * 50) + 10;
+            currentAnswer = n1 + n2;
+        } else {
+            n1 = Math.floor(Math.random() * 50) + 30;
+            n2 = Math.floor(Math.random() * 20) + 5;
+            currentAnswer = n1 - n2;
+        }
+
+        document.getElementById('question-text').innerText = `${n1} ${op === 'x' ? '×' : op} ${n2} = ?`;
         document.getElementById('user-answer').value = "";
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('user-answer').focus();
     }
+
     function checkAnswer() {
         const val = document.getElementById('user-answer').value;
         const fb = document.getElementById('feedback');
+        if(val === "") return;
+
         if(parseInt(val) === currentAnswer) {
-            fb.innerText = "DOĞRU! ✅"; fb.style.color = "#10b981";
-            setTimeout(generateQuestion, 1000);
+            fb.innerText = "TEBRİKLER: DOĞRU ✅"; fb.style.color = "#10b981";
+            setTimeout(generateQuestion, 1500);
         } else {
-            fb.innerText = "TEKRAR DENE ❌"; fb.style.color = "#ef4444";
+            fb.innerText = "HATA: TEKRAR DENE ❌"; fb.style.color = "#ef4444";
         }
     }
 </script>
