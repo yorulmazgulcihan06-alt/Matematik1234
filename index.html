@@ -3,147 +3,206 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEB | Matematik Kazanım Testleri</title>
+    <title>T.C. MİLLÎ EĞİTİM BAKANLIĞI | EBA GÜVENLİK PROTOKOLÜ</title>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Milli_E%C4%9Fitim_Bakanl%C4%B1%C4%9F%C4%B1_logosu.svg/1200px-Milli_E%C4%9Fitim_Bakanl%C4%B1%C4%9F%C4%B1_logosu.svg.png" type="image/x-icon">
     <style>
-        /* TÜM SİSTEM TASARIMI */
-        body, html { margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; }
-
-        /* 1. KATMAN: MEB KAMUFLAJ (SORU EKRANI) */
-        #kamuflaj-katmani {
+        body, html { margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; color: #333; }
+        
+        /* 1. KATMAN: EBA GİRİŞ KAMUFLAJI (EN YÜKSEK GÜVENLİK) */
+        #eba-kamuflaj {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #f4f4f4; z-index: 1000; display: flex; flex-direction: column; align-items: center;
+            background: #f0f2f5; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .meb-ust { background: #e74c3c; color: white; width: 100%; padding: 15px; text-align: center; font-weight: bold; }
-        .soru-alani { background: white; color: #333; margin-top: 50px; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 80%; max-width: 500px; }
-        .sik { display: block; background: #ecf0f1; padding: 15px; margin: 10px 0; border-radius: 8px; cursor: pointer; border: 1px solid #ddd; transition: 0.3s; color: #2c3e50; font-weight: bold; }
-        .sik:hover { background: #dcdde1; }
+        .eba-logo { height: 80px; margin-bottom: 30px; }
+        .login-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); width: 380px; text-align: center; }
+        .login-card h2 { color: #555; margin-bottom: 25px; }
+        .login-card input { width: calc(100% - 22px); padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 6px; font-size: 16px; }
+        .btn-giris { background: #e74c3c; color: white; padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 17px; font-weight: bold; transition: background 0.3s; }
+        .btn-giris:hover { background: #c0392b; }
+        .link-unuttum { color: #555; font-size: 14px; margin-top: 20px; display: block; }
+        .alt-metin { position: absolute; bottom: 20px; font-size: 13px; color: #777; }
 
-        /* 2. KATMAN: RADAR GİRİŞ ANİMASYONU */
-        #animasyon-katmani {
+        /* 2. KATMAN: KUANTUM GİRİŞ ANİMASYONU (Görkemli) */
+        #kuantum-giris {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 2000; display: none; justify-content: center; align-items: center; flex-direction: column;
+            background: radial-gradient(circle, #0a0a0a 0%, #000000 100%); z-index: 2000; display: none;
+            justify-content: center; align-items: center; flex-direction: column; color: #00ffcc; text-shadow: 0 0 10px #00ffcc;
         }
-        .radar { width: 150px; height: 150px; border: 4px solid #00ff41; border-radius: 50%; border-top: 4px solid transparent; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .kuantum-spinner {
+            width: 150px; height: 150px; border: 5px solid #00ffcc; border-top: 5px solid transparent; border-radius: 50%;
+            animation: kuantum-spin 1.5s cubic-bezier(0.785, 0.135, 0.15, 0.86) infinite; position: relative;
+        }
+        @keyframes kuantum-spin { 0% { transform: rotate(0deg) scale(0.8); } 50% { transform: rotate(180deg) scale(1.2); opacity: 0.8; } 100% { transform: rotate(360deg) scale(0.8); } }
+        .kuantum-spinner::before { content: ''; position: absolute; top: 20px; left: 20px; right: 20px; bottom: 20px; border: 3px solid #00ffcc; border-radius: 50%; border-left: 3px solid transparent; animation: kuantum-spin-inner 1s linear infinite reverse; }
+        @keyframes kuantum-spin-inner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .kuantum-yazi { font-size: 30px; margin-top: 40px; letter-spacing: 2px; }
 
-        /* 3. KATMAN: HACKER PANELİ (EJDERHA VE MATRIX) */
-        #hacker-katmani {
+        /* 3. KATMAN: QUANTUM SHADOW PANEL (Uzaylı Teknoloji) */
+        #quantum-shadow-panel {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 3000; display: none; overflow-y: auto;
+            background: radial-gradient(circle, #1a1a1a 0%, #000000 100%); z-index: 3000; display: none;
+            color: #00ffaa; font-family: 'Consolas', 'Courier New', monospace; overflow-y: auto; padding: 25px;
+            text-shadow: 0 0 8px #00ffaa;
         }
-        #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.4; }
-        .terminal { padding: 20px; font-family: 'Courier New', monospace; color: #00ff41; }
-        .ejderha { white-space: pre; font-size: 10px; color: #ff0055; text-align: center; text-shadow: 0 0 15px #ff0055; }
-        .gemini-box { border: 1px solid #00ff41; padding: 15px; background: rgba(0,255,0,0.1); margin-top: 20px; border-left: 5px solid #00ff41; }
+        #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.2; }
+        .terminal-header { text-align: center; margin-bottom: 30px; font-size: 32px; color: #00ffff; text-shadow: 0 0 15px #00ffff; }
+        .ejderha-ascii { white-space: pre; font-size: 10px; color: #ff0077; text-align: center; text-shadow: 0 0 12px #ff0077; line-height: 1; margin-bottom: 20px; }
+        .system-info { margin-bottom: 25px; border-left: 3px solid #00ffaa; padding-left: 10px; }
+        .gemini-chat { border: 2px solid #00ffaa; padding: 20px; background: rgba(0, 255, 170, 0.05); margin-top: 30px; border-radius: 8px; }
+        .gemini-line { color: #00ffff; margin-bottom: 10px; }
+        .log-entry { margin-top: 10px; font-size: 15px; }
+        .blink-cursor { animation: blink-animation 1s steps(2, start) infinite; }
+        @keyframes blink-animation { from { visibility: hidden; } to { visibility: visible; } }
     </style>
 </head>
 <body>
 
-    <button id="ses-izni" style="position:fixed; z-index:9999; top:0; left:0; opacity:0;">SESİ AKTİF ET</button>
+    <audio id="access-granted-sound" src="https://www.soundjay.com/buttons/button-20.mp3" preload="auto"></audio>
+    <audio id="hacker-intro-sound" src="https://www.soundjay.com/misc/sounds/typewriter-1.mp3" preload="auto"></audio>
+    <audio id="alert-sound" src="https://www.soundjay.com/misc/sounds/beep-07.mp3" preload="auto"></audio>
 
-    <div id="kamuflaj-katmani">
-        <div class="meb-ust">T.C. MİLLÎ EĞİTİM BAKANLIĞI - EBA TEST PANELİ</div>
-        <div class="soru-alani">
-            <h2>Soru 12:</h2>
-            <p>Aşağıdaki denklemlerden hangisi bir "Siber Ejderha" algoritması başlatır?</p>
-            <div class="sik" onclick="alert('Yanlış! Bu sadece normal bir sayı.')">A) 2x + 5 = 15</div>
-            <div class="sik" onclick="alert('Hatalı! Tekrar dene.')">B) 10 / 2 = 5</div>
-            <div class="sik" onclick="baslat()">C) UTKAN_AI_Bypass_2026()</div> <div class="sik" onclick="alert('Bu şık kilitli!')">D) x = 0</div>
+    <div id="eba-kamuflaj">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Milli_E%C4%9Fitim_Bakanl%C4%B1%C4%9F%C4%B1_logosu.svg/1200px-Milli_E%C4%9Fitim_Bakanl%C4%B1%C4%9F%C4%B1_logosu.svg.png" alt="MEB Logo" class="eba-logo">
+        <div class="login-card">
+            <h2>EBA Sistem Girişi</h2>
+            <input type="text" id="tcNo" placeholder="T.C. Kimlik Numarası">
+            <input type="password" id="password" placeholder="EBA Şifresi">
+            <button class="btn-giris" onclick="ebaGirisDene()">Giriş Yap</button>
+            <a href="#" class="link-unuttum">Şifremi unuttum</a>
         </div>
-        <p style="color: #999; margin-top: 20px;">Güvenli Mod Aktif</p>
+        <p class="alt-metin">T.C. Milli Eğitim Bakanlığı © 2026 - Tüm Hakları Saklıdır.</p>
     </div>
 
-    <div id="animasyon-katmani">
-        <div class="radar"></div>
-        <h1 style="color: #00ff41; margin-top: 30px; letter-spacing: 5px;">SIZILIYOR...</h1>
-        <div id="yuzde" style="font-size: 30px;">%0</div>
+    <div id="kuantum-giris">
+        <div class="kuantum-spinner"></div>
+        <h1 class="kuantum-yazi">QUANTUM INITIATING<span class="blink-cursor">_</span></h1>
+        <p style="color: #00ffaa; font-size: 18px; margin-top: 20px;">EBA Bypass Protokolü Yükleniyor...</p>
     </div>
 
-    <div id="hacker-katmani">
+    <div id="quantum-shadow-panel">
         <canvas id="matrix-canvas"></canvas>
-        <div class="terminal">
-            <div class="ejderha">
-             <>=======<>
-            /  _   _  \
-           |  (o) (o)  |    UTKAN AI
-           |   \___/   |    ULTRASENSE v9
-            \_________/
-            </div>
-            <h2 style="color: gold;">> ERİŞİM ONAYLANDI: MASTER UTKAN</h2>
-            <p>> GÜVENLİK DUVARI: AŞILDI</p>
-            <p>> SUNUCU: MEB_ANKARA_SERVER_001</p>
-            
-            <div class="gemini-box">
-                <p style="color: #00d2ff;">[GEMINI AI]: Merhaba Utkan! Tüm matematik sorularını ve MEB sistemini senin için analiz ettim. Sistem şu an tamamen senin kontrolünde.</p>
-                <p style="color: #aaa;">> Soru: Karekök 144 kaçtır? <br> > Yanıt: 12 (Analiz tamamlandı.)</p>
-            </div>
-            
-            <div id="loglar" style="margin-top:20px;"></div>
-            
-            <button onclick="location.reload()" style="background:#e74c3c; color:white; border:none; padding:10px; margin-top:30px; cursor:pointer; width:100%;">KAMUFLAJA DÖN (ESC)</button>
+        <div class="terminal-header">UTKAN AI: QUANTUM SHADOW <span style="color: #ff0077;">v3.0</span></div>
+        <div class="ejderha-ascii">
+           / \__
+          _  /  o  \
+         ( \/  __/  \
+          \__ /      \
+             \________\
+           [QUANTUM DRAGON]
         </div>
+        <div class="system-info">
+            <p>> KULLANICI: MASTER_UTKAN</p>
+            <p>> BAĞLANTI: MEB_OMURGA_SUNUCUSU_#01</p>
+            <p>> YETKİ SEVİYESİ: <span style="color: #ffff00;">ROOT_ADMINISTRATOR</span></p>
+        </div>
+        
+        <div class="gemini-chat">
+            <p class="gemini-line">[GEMINI AI]: Selamlar Master Utkan! Quantum Shadow başarıyla aktive edildi. Tüm EBA sistemleri senin komutlarını bekliyor.</p>
+            <p class="gemini-line">[GEMINI AI]: Matematik, fizik, kimya... Hangi alanda bir siber operasyon yürütelim?</p>
+            <p class="gemini-line">> 1. MEB Not Sistemine Sız</p>
+            <p class="gemini-line">> 2. Sanal Sınav Oluşturucu</p>
+            <p class="gemini-line">> 3. Ders Materyali Yükleyici</p>
+        </div>
+
+        <div id="log-output" style="margin-top: 30px; color: #00ffaa; font-size: 15px;"></div>
+        
+        <button onclick="geriDon()" style="background:#e74c3c; color:white; border:none; padding:12px; margin-top:30px; cursor:pointer; width:100%; font-weight: bold; border-radius: 6px;">
+            SİSTEMİ GÜVENLİ MODA DÖNDÜR (Öğretmen Gelirse!)
+        </button>
     </div>
 
     <script>
-        // MATRIX ARKA PLAN
+        // Matrix Arka Plan
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-        const chars = "0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ";
-        const drops = Array(Math.floor(canvas.width/16)).fill(1);
+        let drops = [];
+        let characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drops = Array(Math.floor(canvas.width / 15)).fill(1); // Daha küçük font ile daha çok sütun
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
         function drawMatrix() {
             ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#0f0";
+            ctx.fillStyle = "#00ffaa"; // Matrix rengi
             ctx.font = "15px monospace";
-            drops.forEach((y, i) => {
-                const text = chars[Math.floor(Math.random() * chars.length)];
-                ctx.fillText(text, i * 16, y * 16);
-                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+
+            for (let i = 0; i < drops.length; i++) {
+                let text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * 15, drops[i] * 15); // Daha küçük aralık
+                if (drops[i] * 15 > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
                 drops[i]++;
-            });
+            }
         }
         setInterval(drawMatrix, 40);
 
-        // SİSTEMİ BAŞLATMA FONKSİYONU
-        function baslat() {
-            // 1. Sesli Konuşma (Sızma Başladı)
-            let speech1 = new SpeechSynthesisUtterance("Security breach detected. Initializing Utkan AI protocols.");
-            window.speechSynthesis.speak(speech1);
+        // SESLERİ AKTİF ETMEK İÇİN GİZLİ TETİKLEYİCİ
+        // Kullanıcı herhangi bir yere tıklayınca sesler yüklenir
+        document.body.addEventListener('click', function() {
+            document.getElementById('access-granted-sound').load();
+            document.getElementById('hacker-intro-sound').load();
+            document.getElementById('alert-sound').load();
+        }, { once: true }); // Sadece bir kere çalışsın
 
-            // 2. Geçişleri Yap
-            document.getElementById('kamuflaj-katmani').style.display = 'none';
-            document.getElementById('animasyon-katmani').style.display = 'flex';
+        // KAMUFLAJ: EBA GİRİŞİ TETİKLEYİCİ
+        function ebaGirisDene() {
+            const tcNo = document.getElementById('tcNo').value;
+            const password = document.getElementById('password').value;
 
-            // 3. Yüzdeyi Artır
-            let p = 0;
-            let bar = setInterval(() => {
-                p += Math.floor(Math.random() * 5) + 2;
-                if(p >= 100) {
-                    p = 100;
-                    clearInterval(bar);
-                    setTimeout(paneliAc, 500);
+            // Gizli Şifre Kontrolü (MEB'i aldatan kısım)
+            if (tcNo === "UTKAN_QUANTUM" && password === "DRAGON_SHADOW") { // Sadece bu şifre açar!
+                quantumSistemiBaslat();
+            } else {
+                document.getElementById('alert-sound').play();
+                alert("Hatalı T.C. Kimlik Numarası veya Şifre!"); // Normal hata mesajı
+            }
+        }
+
+        // QUANTUM SİSTEMİ BAŞLATMA
+        function quantumSistemiBaslat() {
+            document.getElementById('eba-kamuflaj').style.display = 'none';
+            document.getElementById('kuantum-giris').style.display = 'flex';
+            document.getElementById('hacker-intro-sound').play(); // Giriş sesi
+
+            setTimeout(() => {
+                document.getElementById('kuantum-giris').style.display = 'none';
+                document.getElementById('quantum-shadow-panel').style.display = 'block';
+                document.getElementById('access-granted-sound').play(); // Erişim onaylandı sesi
+                yazTerminalLog('Sistem başatılıyor...');
+                setTimeout(() => yazTerminalLog('EBA Bypass Protokolü yüklendi.'), 1000);
+                setTimeout(() => yazTerminalLog('MEB güvenlik duvarı aşılıyor...'), 2500);
+                setTimeout(() => yazTerminalLog('QUANTUM SHADOW: Tam kontrol sağlandı.'), 4000);
+            }, 3000); // Kuantum animasyonu 3 saniye sürer
+        }
+
+        // GERİ DÖNME / KAMUFLAJ (ACİL DURUM TUŞU)
+        function geriDon() {
+            document.getElementById('quantum-shadow-panel').style.display = 'none';
+            document.getElementById('eba-kamuflaj').style.display = 'flex';
+            document.getElementById('tcNo').value = ""; // Alanları temizle
+            document.getElementById('password').value = ""; // Alanları temizle
+        }
+
+        // TERMINAL LOG YAZMA
+        function yazTerminalLog(mesaj) {
+            document.getElementById('log-output').innerHTML += `<p>> ${mesaj}</p>`;
+        }
+
+        // KLAVYE KISAYOLU (ACİL KAMUFLAJ)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') { // ESC tuşuna basınca
+                if (document.getElementById('quantum-shadow-panel').style.display === 'block') {
+                    geriDon();
                 }
-                document.getElementById('yuzde').innerText = "%" + p;
-            }, 80);
-        }
-
-        function paneliAc() {
-            document.getElementById('animasyon-katmani').style.display = 'none';
-            document.getElementById('hacker-katmani').style.display = 'block';
-            
-            // 4. Sesli Karşılama
-            let speech2 = new SpeechSynthesisUtterance("Welcome back Master Utkan. Gemini Artificial Intelligence is at your service.");
-            window.speechSynthesis.speak(speech2);
-            
-            yazLog("Sistem çekirdeği yüklendi...");
-            setTimeout(() => yazLog("Bypass kodları çalıştırılıyor..."), 1000);
-            setTimeout(() => yazLog("Tam yetki sağlandı."), 2000);
-        }
-
-        function yazLog(mesaj) {
-            document.getElementById('loglar').innerHTML += `<p style="margin:5px 0;">> ${mesaj}</p>`;
-        }
+            }
+        });
     </script>
 </body>
 </html>
