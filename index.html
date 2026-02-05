@@ -3,185 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS ACADEMY | KANKA AI EDITION</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>NEXUS V25 | AKILLI EĞİTİM KOKPİTİ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
     <style>
-        :root { --meb: #005596; --eba: #ff6600; --zor: #e30613; --kanka: #22c55e; --bg: #f1f5f9; }
-        body { margin: 0; background: var(--bg); font-family: 'Inter', sans-serif; }
-        
-        /* GİRİŞ VE GALERİ */
-        #login-page { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--meb); color: white; }
-        .gallery-strip { display: flex; gap: 10px; margin-top: 20px; overflow-x: auto; width: 80%; padding: 10px; }
-        .gal-card { min-width: 150px; height: 100px; background: #fff; border-radius: 10px; overflow: hidden; position: relative; }
-        .gal-card img { width: 100%; height: 100%; object-fit: cover; }
+        :root { --meb: #005596; --eba: #ff6600; --eokul: #1a73e8; --dark: #1e293b; --success: #22c55e; }
+        body { margin: 0; font-family: 'Roboto', sans-serif; background: #f0f4f8; }
 
-        /* ANA PANEL */
-        #app { display: none; padding: 20px; }
-        .header { display: flex; justify-content: space-between; background: white; padding: 20px; border-radius: 20px; border-bottom: 4px solid var(--eba); }
-        
-        /* KİTAP SİSTEMİ */
-        .book-container { background: white; border-radius: 20px; padding: 20px; margin-top: 20px; max-height: 500px; overflow-y: auto; }
-        .topic { background: #f8fafc; padding: 15px; margin: 5px 0; cursor: pointer; border-radius: 10px; font-weight: 600; border: 1px solid #e2e8f0; }
-        .topic:hover { background: var(--meb); color: white; }
-        .content-area { display: none; padding: 15px; background: #fff; border-left: 3px solid var(--meb); margin-bottom: 10px; font-size: 14px; }
+        /* ÜST PANEL: 20+ BUTONLU KOKPİT */
+        .control-panel { 
+            background: white; 
+            padding: 15px; 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
+            gap: 10px; 
+            border-bottom: 3px solid var(--meb);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
 
-        /* SINAV KAĞIDI */
-        #exam-sheet { display: none; position: fixed; inset: 0; background: #fff; z-index: 3000; padding: 30px; flex-direction: column; }
-        .q-row { background: #f9fafb; padding: 20px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--meb); }
-        
-        /* KANKA AI */
-        #kanka-box { position: fixed; bottom: 20px; right: 20px; width: 250px; background: var(--kanka); color: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); display: none; z-index: 4000; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .btn-tool { 
+            padding: 10px; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 8px; 
+            background: #fff; 
+            font-size: 11px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-align: center;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
 
-        .btn { padding: 12px 25px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        .btn-meb { background: var(--meb); color: white; }
-        .btn-exit { background: var(--zor); color: white; }
+        .btn-tool:hover { background: var(--meb); color: white; transform: translateY(-2px); }
+        .btn-special { background: #fff5f0; border-color: var(--eba-turuncu); color: var(--eba); }
+
+        /* ANA EKRAN */
+        .main-layout { display: grid; grid-template-columns: 1fr 350px; gap: 20px; padding: 20px; }
+        .window { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-height: 400px; }
+        
+        /* GİZLİ ARAÇLAR */
+        #calculator, #notepad, #dictionary { display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; }
+
+        /* SINAV MODU */
+        #exam-overlay { 
+            display: none; position: fixed; inset: 0; background: white; z-index: 9999; 
+            padding: 40px; flex-direction: column; overflow-y: auto;
+        }
+
+        header { background: var(--meb); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
+        .stat { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 14px; }
     </style>
 </head>
 <body>
 
-    <div id="login-page">
-        <h1 style="font-family: 'Orbitron'">NEXUS ACADEMY</h1>
-        <div style="background: white; padding: 30px; border-radius: 25px; width: 300px;">
-            <input type="text" id="tc" placeholder="Öğrenci No (2015)" style="width:90%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
-            <button class="btn btn-meb" style="width:100%" onclick="login()">SİSTEME BAĞLAN</button>
+    <header>
+        <div style="font-family:'Orbitron'">NEXUS V25 PREMİUM</div>
+        <div style="display:flex; gap:10px;">
+            <div class="stat">Sözlü: <span id="sozlu">100</span></div>
+            <div class="stat">XP: <span id="xp">0</span></div>
         </div>
-        <div class="gallery-strip">
-            <div class="gal-card"><img src="https://picsum.photos/200/100?random=1"></div>
-            <div class="gal-card"><img src="https://picsum.photos/200/100?random=2"></div>
-            <div class="gal-card"><img src="https://picsum.photos/200/100?random=3"></div>
-            <div class="gal-card"><img src="https://picsum.photos/200/100?random=4"></div>
-        </div>
-        <p style="font-size:12px; margin-top:10px;">MEB Eğitim Materyalleri Arşivi v23</p>
+    </header>
+
+    <div class="control-panel">
+        <button class="btn-tool" onclick="window.open('https://www.meb.gov.tr')">🌐 MEB Ana Sayfa</button>
+        <button class="btn-tool" onclick="window.open('https://eba.gov.tr')">🟠 EBA Kapısı</button>
+        <button class="btn-tool" onclick="window.open('https://e-okul.meb.gov.tr')">🏫 e-Okul VBS</button>
+        <button class="btn-tool" onclick="window.open('https://mebbis.meb.gov.tr')">🔑 MEBBİS</button>
+        <button class="btn-tool" onclick="window.open('https://odsgm.meb.gov.tr')">📝 Ölçme Değerlendirme</button>
+        <button class="btn-tool" onclick="window.open('https://e-yaygin.meb.gov.tr')">🎓 e-Yaygın</button>
+        
+        <button class="btn-tool btn-special" onclick="toggleTool('calculator')">🧮 Hesap Makinesi</button>
+        <button class="btn-tool btn-special" onclick="toggleTool('notepad')">📝 Not Defteri</button>
+        <button class="btn-tool btn-special" onclick="toggleTool('dictionary')">📖 TDK Sözlük</button>
+        <button class="btn-tool" onclick="startExam('Matematik')">📐 Matematik Sınavı</button>
+        <button class="btn-tool" onclick="startExam('Fen')">🧪 Fen Sınavı</button>
+        <button class="btn-tool" onclick="startExam('Türkçe')">📚 Türkçe Sınavı</button>
+        
+        <button class="btn-tool" onclick="kankaHelp()">🤖 Kanka AI Destek</button>
+        <button class="btn-tool" onclick="alert('1000 Sayfalık Kitap Yüklendi!')">📚 Bilgi Kütüphanesi</button>
+        <button class="btn-tool" onclick="window.print()">🖨️ Sayfayı Yazdır</button>
+        <button class="btn-tool" onclick="location.reload()">🔄 Sistemi Yenile</button>
+        <button class="btn-tool" onclick="alert('Hava Durumu: Eğitim için mükemmel!')">☀️ Hava Durumu</button>
+        <button class="btn-tool" onclick="alert('Ders Programı: Pazartesi Matematik...')">📅 Ders Programı</button>
+        
+        <button class="btn-tool" onclick="window.open('https://e-devlet.gov.tr')">🆔 e-Devlet</button>
+        <button class="btn-tool" onclick="window.open('https://osym.gov.tr')">🏛️ ÖSYM</button>
+        <button class="btn-tool" onclick="window.open('https://yok.gov.tr')">🎓 YÖK</button>
+        <button class="btn-tool" onclick="window.open('https://tubitak.gov.tr')">🔬 TÜBİTAK</button>
+        <button class="btn-tool" style="background:var(--zor); color:white;" onclick="exitSystem()">🔴 Çıkış Yap</button>
+        <button class="btn-tool" style="background:var(--success); color:white;" onclick="alert('Tebrikler! Gizli Rozet Bulundu!')">💎 Gizli Ödül</button>
     </div>
 
-    <div id="app">
-        <div class="header">
-            <div><b>Sözlü:</b> <span id="sozlu">100</span></div>
-            <div><b>XP:</b> <span id="xp">0</span></div>
-            <button class="btn btn-meb" onclick="toggleBook()">📚 Kitap & Konular</button>
-        </div>
+    <div class="main-layout">
+        <div class="window">
+            <h2>Hoş Geldin Utkan!</h2>
+            <p>Yukarıdaki kokpitten istediğin aracı seçebilir veya sınavlara başlayabilirsin.</p>
+            <hr>
+            
+            <div id="calculator">
+                <h4>Basit Hesaplayıcı</h4>
+                <input type="number" id="calc1" style="width:50px"> + <input type="number" id="calc2" style="width:50px"> 
+                <button onclick="alert('Sonuç: ' + (Number(calc1.value)+Number(calc2.value)))">Hesapla</button>
+            </div>
 
-        <div id="book" class="book-container" style="display:none;">
-            <h3>🔍 Konu Arşivi (1000 Sayfa/Konu)</h3>
-            <div id="topics-list"></div>
-        </div>
+            <div id="notepad">
+                <h4>Çalışma Notlarım</h4>
+                <textarea style="width:100%; height:100px;" placeholder="Notlarını buraya yaz..."></textarea>
+            </div>
 
-        <div style="text-align: center; margin-top: 50px;">
-            <h2>Sınav Salonu</h2>
-            <div style="display: flex; justify-content: center; gap: 15px;">
-                <button class="btn btn-meb" onclick="openExam('Matematik')">Matematik</button>
-                <button class="btn btn-meb" style="background:var(--eba)" onclick="openExam('Fen')">Fen Bilimleri</button>
+            <div id="dictionary">
+                <h4>Kelime Ara (Simülasyon)</h4>
+                <input type="text" placeholder="Kelime giriniz...">
+                <button onclick="alert('Kelime anlamı TDK veritabanından çekiliyor...')">Ara</button>
             </div>
         </div>
-    </div>
 
-    <div id="exam-sheet">
-        <div style="display:flex; justify-content:space-between;">
-            <h2 id="exam-title"></h2>
-            <button class="btn btn-exit" onclick="exitExam()">Sınavdan Kaç (Ceza Alırsın!)</button>
+        <div class="window" style="min-height:auto;">
+            <h3>📊 e-Okul Notlarım</h3>
+            <div id="notlar" style="font-size:14px;">Henüz sınav sonucu yok.</div>
         </div>
-        <div id="exam-body" style="overflow-y:auto; flex:1; padding-right:10px;"></div>
-        <button class="btn btn-meb" style="background:var(--kanka); margin-top:10px;" onclick="kankaHelp()">🤖 Kanka AI'dan Yardım İste</button>
-        <button class="btn btn-meb" style="margin-top:10px;" onclick="submitExam()">Sınavı Bitir</button>
     </div>
 
-    <div id="kanka-box" id="kanka-msg">
-        <b>Kanka AI:</b> <span id="kanka-text">Sakin ol Utkan, bu soruda şunu düşün...</span>
+    <div id="exam-overlay">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h2 id="exam-title">Sınav</h2>
+            <button class="btn-tool" style="background:red; color:white;" onclick="finishExam(true)">Sınavdan Kaç</button>
+        </div>
+        <div id="questions" style="margin:20px 0;"></div>
+        <button class="btn-tool" style="background:var(--success); color:white; width:200px; padding:20px;" onclick="finishExam(false)">Sınavı Bitir ve Gönder</button>
     </div>
 
     <script>
-        let xp = 0, sozlu = 100, currentAns = [], examDers = "";
+        let xp = 0, sozlu = 100, currentAns = [];
 
-        function login() {
-            if(document.getElementById('tc').value === "2015") {
-                document.getElementById('login-page').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-                genTopics();
-            }
+        function toggleTool(id) {
+            let el = document.getElementById(id);
+            el.style.display = (el.style.display === 'block' ? 'none' : 'block');
         }
 
-        function genTopics() {
-            const list = document.getElementById('topics-list');
-            for(let i=1; i<=100; i++) { // Örnek olarak 100 konu (genişletilebilir)
-                list.innerHTML += `
-                    <div class="topic" onclick="toggleTopic(${i})">Konu ${i}: Eğitimde Yeni Nesil Yaklaşımlar</div>
-                    <div id="content-${i}" class="content-area">Bu bölüm ${i}. ünitenin detaylı bilgilerini ve MEB müfredat notlarını içerir. Çalışmaya devam et Utkan!</div>
-                `;
-            }
-        }
-
-        function toggleTopic(id) {
-            let el = document.getElementById('content-'+id);
-            el.style.display = el.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function toggleBook() {
-            let b = document.getElementById('book');
-            b.style.display = b.style.display === 'none' ? 'block' : 'none';
-        }
-
-        function openExam(ders) {
-            examDers = ders;
+        function startExam(ders) {
             currentAns = [];
-            const body = document.getElementById('exam-body');
-            body.innerHTML = "";
-            document.getElementById('exam-title').innerText = ders + " - Bölüm Sonu Sınavı";
+            const qDiv = document.getElementById('questions');
+            qDiv.innerHTML = "";
+            document.getElementById('exam-title').innerText = ders + " Sınavı";
             
             for(let i=0; i<10; i++) {
-                let a = Math.floor(Math.random()*20) + 10;
-                let b = Math.floor(Math.random()*10) + 2;
-                let ans = a * b;
-                currentAns.push(ans);
-                body.innerHTML += `
-                    <div class="q-row">
-                        <p><b>Soru ${i+1}:</b> ${a} x ${b} işleminin sonucu nedir?</p>
-                        <input type="number" id="ans-${i}" class="exam-input" placeholder="Cevap">
-                    </div>
-                `;
+                let a = Math.floor(Math.random()*12)+1;
+                let b = Math.floor(Math.random()*12)+1;
+                currentAns.push(a*b);
+                qDiv.innerHTML += `<div style="margin-bottom:15px;"><b>Soru ${i+1}:</b> ${a} x ${b} kaçtır? <br><input type="number" id="ans${i}"></div>`;
             }
-            document.getElementById('exam-sheet').style.display = 'flex';
+            document.getElementById('exam-overlay').style.display = 'flex';
+        }
+
+        function finishExam(isEscape) {
+            if(isEscape) {
+                let done = 0;
+                for(let i=0; i<10; i++) if(document.getElementById('ans'+i).value !== "") done++;
+                if(done === 0) sozlu -= 10; else if(done < 5) sozlu -= 5;
+                alert("Kaçtığın için ceza aldın! Sözlü: " + sozlu);
+            } else {
+                let score = 0;
+                for(let i=0; i<10; i++) {
+                    if(parseInt(document.getElementById('ans'+i).value) === currentAns[i]) score += 10;
+                }
+                xp += (score * 2);
+                document.getElementById('notlar').innerHTML += `<div>Sınav: ${score} Puan (+${score*2} XP)</div>`;
+                alert("Sınav tamamlandı! Puanın: " + score);
+            }
+            document.getElementById('xp').innerText = xp;
+            document.getElementById('sozlu').innerText = sozlu;
+            document.getElementById('exam-overlay').style.display = 'none';
         }
 
         function kankaHelp() {
-            const box = document.getElementById('kanka-box');
-            const txt = document.getElementById('kanka-text');
-            box.style.display = 'block';
-            txt.innerText = "Bak kanka, ilk sorunun cevabı " + currentAns[0] + " ama diğerlerini sen bulmalısın, hoca görmesin! 😉";
-            setTimeout(() => { box.style.display = 'none'; }, 5000);
+            alert("KANKA AI: Selam Utkan! Yukarıdaki hesap makinesini kullanabilirsin, hoca anlamaz! 😉");
         }
 
-        function exitExam() {
-            let filled = 0;
-            for(let i=0; i<10; i++) { if(document.getElementById('ans-'+i).value !== "") filled++; }
-
-            if(filled === 0) { sozlu -= 10; alert("Kağıdı boş bıraktın! Sözlüden 10 puan gitti."); }
-            else if(filled < 5) { sozlu -= 5; alert("Yarısını bile yapmadın! Sözlüden 5 puan gitti."); }
-            
-            document.getElementById('sozlu').innerText = sozlu;
-            document.getElementById('exam-sheet').style.display = 'none';
-        }
-
-        function submitExam() {
-            let correct = 0;
-            let empty = false;
-            for(let i=0; i<10; i++) {
-                let val = document.getElementById('ans-'+i).value;
-                if(val == "") empty = true;
-                if(parseInt(val) === currentAns[i]) correct++;
-            }
-
-            if(correct === 0) {
-                alert("Hiç doğru cevabın yok, XP kazanamadın!");
-            } else {
-                let earnedXP = correct * 50;
-                xp += earnedXP;
-                document.getElementById('xp').innerText = xp;
-                alert("Aferin! " + correct + " doğru ile " + earnedXP + " XP kazandın.");
-            }
-            document.getElementById('exam-sheet').style.display = 'none';
+        function exitSystem() {
+            if(confirm("Sistemden çıkış yapılsın mı? Tüm veriler sıfırlanacak.")) location.reload();
         }
     </script>
 </body>
 </html>
-
