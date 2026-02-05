@@ -6,138 +6,155 @@
     <title>MEB-TECH NEXUS | Official Prototype</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --meb: #005596; --eba: #ff6600; --zor: #e30613; --bg-dark: #0a0a0a; }
-        body { font-family: 'Inter', sans-serif; background: #000; margin: 0; overflow: hidden; color: white; }
+        :root { --meb: #005596; --eba: #ff6600; --basari: #22c55e; --zor: #e30613; --ai-kaos: #8a2be2; }
+        body { font-family: 'Inter', sans-serif; background: #000; margin: 0; overflow-x: hidden; color: white; }
         
-        /* 1. EBA_XXX GİRİŞ ANİMASYONU */
-        #intro-screen {
-            position: fixed; inset: 0; background: #000; z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
-            font-family: 'Orbitron', sans-serif; font-size: 8vw;
-        }
-        #intro-text { animation: introAnim 4s forwards ease-in-out; opacity: 0; text-shadow: 0 0 20px #00ffff; }
-        @keyframes introAnim {
-            0% { opacity: 0; transform: scale(0.1); }
-            50% { opacity: 1; transform: scale(1.1); }
-            100% { opacity: 0; transform: scale(2.5); }
-        }
+        /* GİRİŞ ANİMASYONU */
+        #intro-screen { position: fixed; inset: 0; background: #000; z-index: 10000; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron'; font-size: 8vw; }
+        #intro-text { animation: introAnim 4s forwards; opacity: 0; text-shadow: 0 0 20px #00ffff; }
+        @keyframes introAnim { 0% { opacity: 0; transform: scale(0.1); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
 
-        /* 2. UZATILMIŞ YASAL BİLGİLENDİRME (15 SANİYE) */
-        #legal-screen {
-            position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999;
-            display: none; flex-direction: column; align-items: center; justify-content: center;
-            padding: 50px; text-align: center;
-        }
-        .warning-container {
-            max-width: 800px; border: 1px solid #333; background: #111;
-            padding: 40px; border-top: 6px solid var(--zor); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-        }
-        .legal-header { font-family: 'Orbitron'; color: var(--zor); font-size: 24px; margin-bottom: 20px; letter-spacing: 2px; }
-        .legal-body { font-size: 16px; line-height: 1.8; color: #ccc; text-align: justify; margin-bottom: 30px; }
-        
-        /* YÜKLENME ÇUBUĞU */
-        .loader-wrapper { width: 100%; height: 6px; background: #222; border-radius: 10px; overflow: hidden; }
-        .loader-fill { 
-            width: 0%; height: 100%; background: linear-gradient(90deg, var(--zor), #ff4d4d); 
-            animation: loadProgress 15s linear forwards; 
-        }
-        @keyframes loadProgress { from { width: 0%; } to { width: 100%; } }
+        /* YASAL UYARI (15 SN) */
+        #legal-screen { position: fixed; inset: 0; background: #0a0a0a; z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 40px; text-align: center; }
+        .warning-box { max-width: 600px; border-top: 6px solid var(--zor); background: #111; padding: 30px; box-shadow: 0 20px 50px rgba(0,0,0,1); }
+        .loader-bar { width: 100%; height: 6px; background: #222; margin-top: 20px; overflow: hidden; }
+        .loader-fill { width: 0%; height: 100%; background: var(--zor); animation: load 15s linear forwards; }
+        @keyframes load { from { width: 0%; } to { width: 100%; } }
 
-        /* SİSTEM TASARIMI (Öncekiyle aynı ama stabilize edildi) */
+        /* GİRİŞ PANELİ */
         #setup { display: none; position: fixed; inset: 0; background: var(--meb); z-index: 9998; align-items: center; justify-content: center; }
-        .setup-card { background: white; padding: 40px; border-radius: 30px; width: 380px; text-align: center; color: #333; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-        #app { display: none; background: #f1f5f9; color: #333; height: 100vh; overflow-y: auto; }
-        .btn-check { width: 100%; padding: 15px; border: none; border-radius: 12px; cursor: pointer; background: var(--meb); color: white; font-weight: 800; margin-top: 15px; }
+        .setup-card { background: white; padding: 40px; border-radius: 30px; width: 350px; text-align: center; color: #333; }
+
+        /* ANA SİSTEM */
+        #app { display: none; background: #f1f5f9; color: #333; min-height: 100vh; }
+        header { background: white; padding: 15px 5%; display: flex; justify-content: space-between; border-bottom: 2px solid #ddd; position: sticky; top: 0; }
+        .main-grid { display: grid; grid-template-columns: 280px 1fr 300px; gap: 20px; max-width: 1400px; margin: 20px auto; padding: 0 20px; }
+        .card { background: white; border-radius: 20px; padding: 20px; border: 1px solid #e2e8f0; margin-bottom: 20px; }
+        
+        /* BUTONLAR */
+        .z-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 10px; }
+        .z-k { background: var(--basari); } .z-o { background: var(--eba); } .z-z { background: var(--zor); } .z-ai { background: var(--ai-kaos); animation: glow 1s infinite alternate; }
+        @keyframes glow { from { box-shadow: 0 0 5px #8a2be2; } to { box-shadow: 0 0 20px #ff00ff; } }
+        .btn-check { width: 100%; padding: 15px; border: none; border-radius: 12px; background: var(--meb); color: white; font-weight: 800; cursor: pointer; }
+
+        /* MOBİL UYUM */
+        @media (max-width: 900px) { .main-grid { grid-template-columns: 1fr; } .side { display: none; } }
+
+        /* MODALLAR */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 10001; }
+        .modal-box { background: white; padding: 30px; border-radius: 25px; width: 90%; max-width: 400px; text-align: center; }
     </style>
 </head>
 <body>
 
-    <div id="intro-screen">
-        <span id="intro-text">EBA_XXX</span>
-        <audio id="intro-music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
-    </div>
+    <div id="intro-screen"><span id="intro-text">EBA_XXX</span><audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio></div>
 
     <div id="legal-screen">
-        <div class="warning-container">
-            <div class="legal-header">GÜVENLİK VE YASAL PROTOKOL</div>
-            <div class="legal-body">
-                <b>DİKKAT:</b> Bu dijital platform (NEXUS V13), tamamen bağımsız bir proje olarak geliştirilmiştir. 
-                Sistem içerisinde yer alan görseller, isimler ve modüller test amaçlı olup <b>Milli Eğitim Bakanlığı (MEB)</b> 
-                veya herhangi bir resmi devlet kurumu ile doğrudan bağlantısı bulunmamaktadır. <br><br>
-                Bu yazılım, öğrenci gelişimini takip etmek ve yapay zeka algoritmalarını denemek amacıyla 
-                <b>Utkan</b> tarafından kodlanmıştır. Sisteme giriş yaptığınızda bu şartları kabul etmiş sayılırsınız. 
-                Veri tabanı bağlantısı ve şifreleme protokolleri başlatılıyor...
-            </div>
-            <div class="loader-wrapper"><div class="loader-fill"></div></div>
-            <p id="countdown-text" style="color: #666; font-size: 13px; margin-top: 15px; font-family: monospace;">SİSTEM ANALİZİ YAPILIYOR: 15s</p>
+        <div class="warning-box">
+            <h2 style="color:var(--zor); font-family:'Orbitron';">GÜVENLİK PROTOKOLÜ</h2>
+            <p>Bu platform UTKAN tarafından geliştirilmiş bir prototiptir. MEB ile resmi bir bağı yoktur. Yapay zeka modülleri yükleniyor...</p>
+            <div class="loader-bar"><div class="loader-fill"></div></div>
+            <p id="cd" style="margin-top:10px; font-family:monospace; color:#666">BAĞLANTI: 15s</p>
         </div>
     </div>
 
     <div id="setup">
         <div class="setup-card">
             <h2 style="font-family:'Orbitron'; color:var(--meb)">NEXUS LOGIN</h2>
-            <p style="font-size:12px; color:#888;">Protokol Onaylandı. Kimlik Giriniz.</p>
-            <input type="text" id="tc-in" placeholder="TC No" style="width:90%; padding:12px; margin:5px 0; border-radius:8px; border:1px solid #ddd;">
-            <input type="password" id="ps-in" placeholder="Şifre" style="width:90%; padding:12px; margin:5px 0; border-radius:8px; border:1px solid #ddd;">
-            <button class="btn-check" onclick="launch()" style="background:var(--eba)">ERİŞİM SAĞLA</button>
+            <input type="text" id="tc" placeholder="TC: 2015" style="width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd;">
+            <input type="password" id="ps" placeholder="Şifre: utkan9393" style="width:100%; padding:12px; margin:10px 0; border-radius:8px; border:1px solid #ddd;">
+            <button class="btn-check" onclick="launch()">SİSTEME GİRİŞ</button>
         </div>
     </div>
 
     <div id="app">
-        <header style="background:white; padding:15px 5%; display:flex; justify-content:space-between; border-bottom: 2px solid #ddd;">
-            <b style="font-family:'Orbitron'; color:var(--meb)">🏛️ NEXUS_SUPREME_V13</b>
-            <span id="clock" style="font-weight:bold; font-family:monospace;">00:00</span>
-        </header>
-        <div style="padding: 50px; text-align: center;">
-            <h1>Sistem Aktif</h1>
-            <p>Utkan, yapay zeka seni bekliyor. Görevlere başla!</p>
-            <button class="btn-check" style="width: 200px;" onclick="location.reload()">Sistemi Yeniden Başlat</button>
+        <header><b style="font-family:'Orbitron'; color:var(--meb)">🏛️ NEXUS_SUPREME_V13</b> <span id="timer" style="font-weight:bold">00:00</span></header>
+        <div class="main-grid">
+            <div class="side">
+                <div class="card" style="background:var(--meb); color:white">
+                    <small>TOPLAM XP</small>
+                    <div id="xp-val" style="font-size:32px; font-weight:900">0</div>
+                </div>
+                <div class="card">
+                    <h3>🎖️ Madalyalar</h3>
+                    <div id="m-list" style="display:flex; gap:5px; flex-wrap:wrap"></div>
+                </div>
+            </div>
+            <main>
+                <div class="card">
+                    <h3>🎯 Görev Merkezi</h3>
+                    <div style="display:flex; gap:5px; margin-bottom:15px">
+                        <button class="z-btn z-k" onclick="diff='k'">KOLAY</button>
+                        <button class="z-btn z-o" onclick="diff='o'">ORTA</button>
+                        <button class="z-btn z-z" onclick="diff='z'">ZOR</button>
+                        <button class="z-btn z-ai" onclick="diff='ai'">AI KAOS</button>
+                    </div>
+                    <button class="btn-check" onclick="openQ()">YENİ GÖREV ÜRET</button>
+                </div>
+                <div class="card" id="logs" style="height:120px; overflow-y:auto; font-size:12px; color:#666">Sistem hazır...</div>
+            </main>
+            <div class="side">
+                <div class="card" style="border-top:5px solid var(--basari)">
+                    <h3>📊 e-Okul Notu</h3>
+                    <div id="karne" style="font-size:45px; font-weight:900; color:var(--basari)">0</div>
+                    <p style="font-size:11px">Öğretmen: Utkan'ın performansı inceleniyor.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="q-modal" class="modal">
+        <div class="modal-box">
+            <h3 id="q-h" style="font-family:'Orbitron'">GÖREV</h3>
+            <p id="q-t" style="font-size:24px; font-weight:800; margin:20px 0"></p>
+            <input type="number" id="q-a" placeholder="Cevap" style="width:100%; padding:15px; font-size:20px; text-align:center; margin-bottom:15px">
+            <button class="btn-check" onclick="check()">ANALİZ ET</button>
         </div>
     </div>
 
     <script>
-        let timeLeft = 15;
-
+        let xp=0, diff='k', curA=0, sec=0, timeLeft=15;
+        
         window.onload = () => {
-            const intro = document.getElementById('intro-screen');
-            const legal = document.getElementById('legal-screen');
-            const music = document.getElementById('intro-music');
-            const countText = document.getElementById('countdown-text');
-            
+            const music = document.getElementById('music');
             music.play();
-
-            // 4 saniye sonra intro biter
             setTimeout(() => {
-                intro.style.display = 'none';
+                document.getElementById('intro-screen').style.display='none';
                 music.pause();
-                legal.style.display = 'flex';
-                speak("Yasal protokoller kontrol ediliyor. Lütfen bekleyiniz.");
-
-                // 15 saniyelik geri sayım sayacı
-                const timer = setInterval(() => {
+                document.getElementById('legal-screen').style.display='flex';
+                let itv = setInterval(() => {
                     timeLeft--;
-                    countText.innerText = `SİSTEM ANALİZİ YAPILIYOR: ${timeLeft}s`;
-                    if(timeLeft <= 0) {
-                        clearInterval(timer);
-                        legal.style.display = 'none';
-                        document.getElementById('setup').style.display = 'flex';
-                    }
+                    document.getElementById('cd').innerText = `BAĞLANTI: ${timeLeft}s`;
+                    if(timeLeft<=0) { clearInterval(itv); document.getElementById('legal-screen').style.display='none'; document.getElementById('setup').style.display='flex'; }
                 }, 1000);
-
             }, 4000);
         };
 
         function launch() {
-            if(document.getElementById('tc-in').value === "2015") {
-                document.getElementById('setup').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-            } else { alert("Geçersiz Kimlik!"); }
+            if(document.getElementById('tc').value==="2015") {
+                document.getElementById('setup').style.display='none';
+                document.getElementById('app').style.display='block';
+                setInterval(() => { sec++; let m=Math.floor(sec/60), s=sec%60; document.getElementById('timer').innerText=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }, 1000);
+            }
         }
 
-        function speak(t) {
-            window.speechSynthesis.cancel();
-            let s = new SpeechSynthesisUtterance(t); s.lang='tr-TR';
-            window.speechSynthesis.speak(s);
+        function openQ() {
+            document.getElementById('q-modal').style.display='flex';
+            let n1=Math.floor(Math.random()*100), n2=Math.floor(Math.random()*50);
+            if(diff==='ai') { curA=(n1*2)+n2; q=`AI KAOS: (${n1}x2)+${n2}?`; }
+            else { curA=n1+n2; q=`${n1}+${n2}?`; }
+            document.getElementById('q-t').innerText=q;
+        }
+
+        function check() {
+            if(parseInt(document.getElementById('q-a').value)===curA) {
+                xp += (diff==='ai'?5000:100);
+                document.getElementById('xp-val').innerText=xp;
+                document.getElementById('karne').innerText=Math.min(100, Math.floor(xp/500));
+                document.getElementById('q-modal').style.display='none';
+                document.getElementById('logs').innerHTML += `<div>> Doğru! XP eklendi.</div>`;
+            }
+            document.getElementById('q-a').value="";
         }
     </script>
 </body>
