@@ -3,188 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEB-TECH ANALIZ SISTEMI</title>NEXUS V25 | AKILLI EĞİTİM KOKPİTİ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Orbitron:wght@600&display=swap" rel="stylesheet">
+    <title>NEXUS - Matematik Projesi</title>
     <style>
-        :root { --meb: #005596; --eba: #ff6600; --eokul: #1a73e8; --dark: #1e293b; --success: #22c55e; }
-        body { margin: 0; font-family: 'Roboto', sans-serif; background: #f0f4f8; }
-
-        /* ÜST PANEL: 20+ BUTONLU KOKPİT */
-        .control-panel { 
-            background: white; 
-            padding: 15px; 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); 
-            gap: 10px; 
-            border-bottom: 3px solid var(--meb);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        :root {
+            --primary: #2563eb;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
         }
-
-        .btn-tool { 
-            padding: 10px; 
-            border: 1px solid #e2e8f0; 
-            border-radius: 8px; 
-            background: #fff; 
-            font-size: 11px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            text-align: center;
-            transition: 0.2s;
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        /* Yan Menü */
+        .sidebar {
+            width: 250px;
+            background: var(--card);
+            border-right: 1px solid #334155;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 5px;
+            padding: 20px;
         }
-
-        .btn-tool:hover { background: var(--meb); color: white; transform: translateY(-2px); }
-        .btn-special { background: #fff5f0; border-color: var(--eba-turuncu); color: var(--eba); }
-
-        /* ANA EKRAN */
-        .main-layout { display: grid; grid-template-columns: 1fr 350px; gap: 20px; padding: 20px; }
-        .window { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); min-height: 400px; }
+        .sidebar h2 { color: var(--primary); text-align: center; margin-bottom: 30px; }
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            padding: 12px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background: var(--primary); }
         
-        /* GİZLİ ARAÇLAR */
-        #calculator, #notepad, #dictionary { display: none; margin-top: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 10px; background: #f9f9f9; }
-
-        /* SINAV MODU */
-        #exam-overlay { 
-            display: none; position: fixed; inset: 0; background: white; z-index: 9999; 
-            padding: 40px; flex-direction: column; overflow-y: auto;
+        /* Ana İçerik Alanı */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
-
-        header { background: var(--meb); color: white; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; }
-        .stat { background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-size: 14px; }
+        .header {
+            padding: 15px 30px;
+            background: var(--card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        /* Sitenin içinde açılacak pencere */
+        #content-frame {
+            width: 100%;
+            flex: 1;
+            border: none;
+            background: white;
+        }
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <div style="font-family:'Orbitron'">NEXUS V25 PREMİUM</div>
-        <div style="display:flex; gap:10px;">
-            <div class="stat">Sözlü: <span id="sozlu">100</span></div>
-            <div class="stat">XP: <span id="xp">0</span></div>
-        </div>
-    </header>
+<div class="sidebar">
+    <h2>NEXUS V26</h2>
+    <button class="nav-btn" onclick="openPage('https://www.eba.gov.tr')">EBA Akademik Destek</button>
+    <button class="nav-btn" onclick="openPage('https://www.matematik.io')">Matematik Konu Anlatımı</button>
+    <button class="nav-btn" onclick="openPage('https://www.geogebra.org/calculator')">GeoGebra Hesap Makinesi</button>
+    <button class="nav-btn" onclick="openPage('https://www.desmos.com/calculator')">Grafik Çizici</button>
+    <hr style="width:100%; border: 0.5px solid #334155; margin: 20px 0;">
+    <button class="nav-btn" onclick="showLocal('test')">Matematik Testi (Yerel)</button>
+    <button class="nav-btn" onclick="showLocal('kanka')">Kanka AI (Asistan)</button>
+</div>
 
-    <div class="control-panel">
-        <button class="btn-tool" onclick="window.open('https://www.meb.gov.tr')">🌐 MEB Ana Sayfa</button>
-        <button class="btn-tool" onclick="window.open('https://eba.gov.tr')">🟠 EBA Kapısı</button>
-        <button class="btn-tool" onclick="window.open('https://e-okul.meb.gov.tr')">🏫 e-Okul VBS</button>
-        <button class="btn-tool" onclick="window.open('https://mebbis.meb.gov.tr')">🔑 MEBBİS</button>
-        <button class="btn-tool" onclick="window.open('https://odsgm.meb.gov.tr')">📝 Ölçme Değerlendirme</button>
-        <button class="btn-tool" onclick="window.open('https://e-yaygin.meb.gov.tr')">🎓 e-Yaygın</button>
-        
-        <button class="btn-tool btn-special" onclick="toggleTool('calculator')">🧮 Hesap Makinesi</button>
-        <button class="btn-tool btn-special" onclick="toggleTool('notepad')">📝 Not Defteri</button>
-        <button class="btn-tool btn-special" onclick="toggleTool('dictionary')">📖 TDK Sözlük</button>
-        <button class="btn-tool" onclick="startExam('Matematik')">📐 Matematik Sınavı</button>
-        <button class="btn-tool" onclick="startExam('Fen')">🧪 Fen Sınavı</button>
-        <button class="btn-tool" onclick="startExam('Türkçe')">📚 Türkçe Sınavı</button>
-        
-        <button class="btn-tool" onclick="kankaHelp()">🤖 Kanka AI Destek</button>
-        <button class="btn-tool" onclick="alert('1000 Sayfalık Kitap Yüklendi!')">📚 Bilgi Kütüphanesi</button>
-        <button class="btn-tool" onclick="window.print()">🖨️ Sayfayı Yazdır</button>
-        <button class="btn-tool" onclick="location.reload()">🔄 Sistemi Yenile</button>
-        <button class="btn-tool" onclick="alert('Hava Durumu: Eğitim için mükemmel!')">☀️ Hava Durumu</button>
-        <button class="btn-tool" onclick="alert('Ders Programı: Pazartesi Matematik...')">📅 Ders Programı</button>
-        
-        <button class="btn-tool" onclick="window.open('https://e-devlet.gov.tr')">🆔 e-Devlet</button>
-        <button class="btn-tool" onclick="window.open('https://osym.gov.tr')">🏛️ ÖSYM</button>
-        <button class="btn-tool" onclick="window.open('https://yok.gov.tr')">🎓 YÖK</button>
-        <button class="btn-tool" onclick="window.open('https://tubitak.gov.tr')">🔬 TÜBİTAK</button>
-        <button class="btn-tool" style="background:var(--zor); color:white;" onclick="exitSystem()">🔴 Çıkış Yap</button>
-        <button class="btn-tool" style="background:var(--success); color:white;" onclick="alert('Tebrikler! Gizli Rozet Bulundu!')">💎 Gizli Ödül</button>
+<div class="main-content">
+    <div class="header">
+        <span id="status">Hoş geldin Utkan</span>
+        <button onclick="location.reload()" style="background:#ef4444; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;">Sıfırla</button>
     </div>
-
-    <div class="main-layout">
-        <div class="window">
-            <h2>Hoş Geldin Utkan!</h2>
-            <p>Yukarıdaki kokpitten istediğin aracı seçebilir veya sınavlara başlayabilirsin.</p>
-            <hr>
-            
-            <div id="calculator">
-                <h4>Basit Hesaplayıcı</h4>
-                <input type="number" id="calc1" style="width:50px"> + <input type="number" id="calc2" style="width:50px"> 
-                <button onclick="alert('Sonuç: ' + (Number(calc1.value)+Number(calc2.value)))">Hesapla</button>
-            </div>
-
-            <div id="notepad">
-                <h4>Çalışma Notlarım</h4>
-                <textarea style="width:100%; height:100px;" placeholder="Notlarını buraya yaz..."></textarea>
-            </div>
-
-            <div id="dictionary">
-                <h4>Kelime Ara (Simülasyon)</h4>
-                <input type="text" placeholder="Kelime giriniz...">
-                <button onclick="alert('Kelime anlamı TDK veritabanından çekiliyor...')">Ara</button>
-            </div>
+    
+    <div id="view-area" style="height: 100%;">
+        <div id="welcome" class="welcome-screen">
+            <h1>Matematik Portalı'na Hoş Geldiniz</h1>
+            <p>Soldaki menüden bir araç seçerek başlayabilirsiniz.</p>
         </div>
-
-        <div class="window" style="min-height:auto;">
-            <h3>📊 e-Okul Notlarım</h3>
-            <div id="notlar" style="font-size:14px;">Henüz sınav sonucu yok.</div>
-        </div>
+        <iframe id="content-frame" style="display:none;"></iframe>
+        <div id="local-content" style="display:none; padding: 30px;"></div>
     </div>
+</div>
 
-    <div id="exam-overlay">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h2 id="exam-title">Sınav</h2>
-            <button class="btn-tool" style="background:red; color:white;" onclick="finishExam(true)">Sınavdan Kaç</button>
-        </div>
-        <div id="questions" style="margin:20px 0;"></div>
-        <button class="btn-tool" style="background:var(--success); color:white; width:200px; padding:20px;" onclick="finishExam(false)">Sınavı Bitir ve Gönder</button>
-    </div>
+<script>
+    const frame = document.getElementById('content-frame');
+    const welcome = document.getElementById('welcome');
+    const local = document.getElementById('local-content');
 
-    <script>
-        let xp = 0, sozlu = 100, currentAns = [];
+    function openPage(url) {
+        welcome.style.display = 'none';
+        local.style.display = 'none';
+        frame.style.display = 'block';
+        frame.src = url;
+        document.getElementById('status').innerText = "Şu an açılan: " + url;
+    }
 
-        function toggleTool(id) {
-            let el = document.getElementById(id);
-            el.style.display = (el.style.display === 'block' ? 'none' : 'block');
+    function showLocal(type) {
+        welcome.style.display = 'none';
+        frame.style.display = 'none';
+        local.style.display = 'block';
+        
+        if(type === 'test') {
+            local.innerHTML = "<h2>Matematik Testi</h2><p>1. 2x + 5 = 15 ise x kaçtır?</p><input type='number'><button onclick='alert(\"Aferin!\")'>Kontrol Et</button>";
+        } else if(type === 'kanka') {
+            local.innerHTML = "<h2>Kanka AI</h2><p>Selam Utkan! Bugün hangi konuyu hallediyoruz?</p><input type='text' placeholder='Mesaj yaz...'>";
         }
+    }
+</script>
 
-        function startExam(ders) {
-            currentAns = [];
-            const qDiv = document.getElementById('questions');
-            qDiv.innerHTML = "";
-            document.getElementById('exam-title').innerText = ders + " Sınavı";
-            
-            for(let i=0; i<10; i++) {
-                let a = Math.floor(Math.random()*12)+1;
-                let b = Math.floor(Math.random()*12)+1;
-                currentAns.push(a*b);
-                qDiv.innerHTML += `<div style="margin-bottom:15px;"><b>Soru ${i+1}:</b> ${a} x ${b} kaçtır? <br><input type="number" id="ans${i}"></div>`;
-            }
-            document.getElementById('exam-overlay').style.display = 'flex';
-        }
-
-        function finishExam(isEscape) {
-            if(isEscape) {
-                let done = 0;
-                for(let i=0; i<10; i++) if(document.getElementById('ans'+i).value !== "") done++;
-                if(done === 0) sozlu -= 10; else if(done < 5) sozlu -= 5;
-                alert("Kaçtığın için ceza aldın! Sözlü: " + sozlu);
-            } else {
-                let score = 0;
-                for(let i=0; i<10; i++) {
-                    if(parseInt(document.getElementById('ans'+i).value) === currentAns[i]) score += 10;
-                }
-                xp += (score * 2);
-                document.getElementById('notlar').innerHTML += `<div>Sınav: ${score} Puan (+${score*2} XP)</div>`;
-                alert("Sınav tamamlandı! Puanın: " + score);
-            }
-            document.getElementById('xp').innerText = xp;
-            document.getElementById('sozlu').innerText = sozlu;
-            document.getElementById('exam-overlay').style.display = 'none';
-        }
-
-        function kankaHelp() {
-            alert("KANKA AI: Selam Utkan! Yukarıdaki hesap makinesini kullanabilirsin, hoca anlamaz! 😉");
-        }
-
-        function exitSystem() {
-            if(confirm("Sistemden çıkış yapılsın mı? Tüm veriler sıfırlanacak.")) location.reload();
-        }
-    </script>
 </body>
 </html>
