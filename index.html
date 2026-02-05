@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V35 - MATH ONLY</title>
+    <title>NEXUS V36 - INFINITE</title>
     <style>
         :root { --primary: #2563eb; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
         
@@ -12,51 +12,32 @@
             100% { opacity: 1; transform: scale(1); filter: blur(0px); }
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        /* Üst Menü */
         .navbar { 
-            height: 70px; 
-            background: var(--card); 
-            border-bottom: 1px solid #334155; 
-            display: flex; 
-            align-items: center; 
-            padding: 0 30px; 
-            justify-content: space-between;
-            animation: fadeInUp 0.8s ease-out;
+            height: 70px; background: var(--card); border-bottom: 1px solid #334155; 
+            display: flex; align-items: center; padding: 0 30px; justify-content: space-between;
         }
 
         .nav-brand { color: var(--primary); font-weight: 900; letter-spacing: 3px; font-size: 22px; cursor: pointer; }
         .nav-links { display: flex; gap: 20px; }
 
         .nav-btn { 
-            background: rgba(37, 99, 235, 0.1); 
-            border: 1px solid var(--primary); 
-            color: var(--text); 
-            padding: 12px 25px; 
-            cursor: pointer; 
-            border-radius: 10px; 
-            transition: 0.3s; 
-            font-size: 16px;
-            font-weight: bold;
+            background: rgba(37, 99, 235, 0.1); border: 1px solid var(--primary); 
+            color: var(--text); padding: 12px 25px; cursor: pointer; border-radius: 10px; 
+            transition: 0.3s; font-size: 16px; font-weight: bold;
         }
         .nav-btn:hover { background: var(--primary); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4); }
 
         .main-content { flex: 1; position: relative; }
         .overlay-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
         
-        #eba-logo { font-size: 100px; font-weight: 900; color: var(--primary); letter-spacing: 15px; animation: startup 1.2s ease-out; font-family: monospace; text-shadow: 0 0 30px rgba(37, 99, 235, 0.5); }
+        #eba-logo { font-size: 100px; font-weight: 900; color: var(--primary); letter-spacing: 15px; animation: startup 1.2s ease-out; font-family: monospace; }
         
-        .card { background: var(--card); padding: 40px; border-radius: 25px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); width: 450px; animation: fadeInUp 0.5s; }
+        .card { background: var(--card); padding: 40px; border-radius: 25px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); width: 500px; }
         .action-btn { background: var(--primary); color: white; padding: 15px 35px; border-radius: 12px; cursor: pointer; border: none; font-weight: bold; margin-top: 20px; transition: 0.3s; font-size: 18px; }
         
         input { padding: 15px; font-size: 32px; width: 180px; text-align: center; background: #0f172a; color: white; border: 2px solid #334155; border-radius: 15px; margin: 20px 0; outline: none; }
-        input:focus { border-color: var(--primary); }
     </style>
 </head>
 <body>
@@ -64,26 +45,26 @@
 <div class="navbar">
     <div class="nav-brand" onclick="location.reload()">NEXUS</div>
     <div class="nav-links">
-        <button class="nav-btn" onclick="startQuiz()">📝 SORU ÇÖZ</button>
-        <button class="nav-btn" onclick="startProblems()">🧠 PROBLEM ÇÖZ</button>
+        <button class="nav-btn" onclick="startMode('islem')">🔢 SONSUZ İŞLEM</button>
+        <button class="nav-btn" onclick="startMode('problem')">🧠 SONSUZ PROBLEM</button>
     </div>
-    <div style="color: #4ade80; font-size: 12px; font-weight: bold;">SİSTEM ÇEVRİMİÇİ</div>
+    <div id="counter" style="color: #4ade80; font-weight: bold;">ÇÖZÜLEN: 0</div>
 </div>
 
 <div class="main-content">
     <div id="welcome" class="overlay-screen">
         <div id="eba-logo">EBA_XXX</div>
-        <p style="letter-spacing: 10px; color: #94a3b8; font-weight: bold;">MATEMATİK MODÜLÜ AKTİF</p>
+        <p style="letter-spacing: 10px; color: #94a3b8; font-weight: bold;">SINIRSIZ MODÜL YÜKLENDİ</p>
     </div>
 
     <div id="quiz-area" class="overlay-screen" style="display:none;">
         <div class="card">
-            <h2 id="mode-title" style="color: #60a5fa; margin-bottom: 5px; font-size: 18px;">Modül</h2>
-            <div id="question-text" style="font-size: 38px; font-weight: bold; margin: 25px 0; min-height: 100px; display: flex; align-items: center; justify-content: center;">...</div>
+            <h2 id="mode-title" style="color: #60a5fa; font-size: 14px; text-transform: uppercase;">Modül</h2>
+            <div id="question-text" style="font-size: 30px; font-weight: bold; margin: 25px 0; min-height: 120px; display: flex; align-items: center; justify-content: center; line-height: 1.4;">...</div>
             <input type="number" id="user-answer" placeholder="?">
             <br>
-            <button class="action-btn" onclick="checkAnswer()">KONTROL ET</button>
-            <p id="feedback" style="margin-top: 25px; font-weight: bold; font-size: 22px; min-height: 30px;"></p>
+            <button class="action-btn" onclick="checkAnswer()">SİSTEME GÖNDER</button>
+            <p id="feedback" style="margin-top: 25px; font-weight: bold; font-size: 20px; min-height: 30px;"></p>
         </div>
     </div>
 </div>
@@ -91,51 +72,54 @@
 <script>
     let currentAnswer = 0;
     let currentMode = "";
+    let solvedCount = 0;
 
-    function hideWelcome() { document.getElementById('welcome').style.display = 'none'; document.getElementById('quiz-area').style.display = 'flex'; }
-
-    function startQuiz() {
-        currentMode = "soru";
-        document.getElementById('mode-title').innerText = "HIZLI İŞLEM";
-        hideWelcome();
-        generateSoru();
+    function startMode(mode) {
+        currentMode = mode;
+        document.getElementById('welcome').style.display = 'none';
+        document.getElementById('quiz-area').style.display = 'flex';
+        document.getElementById('mode-title').innerText = mode === 'islem' ? "HIZLI İŞLEM" : "MANTIK PROBLEMİ";
+        generateNext();
     }
 
-    function startProblems() {
-        currentMode = "problem";
-        document.getElementById('mode-title').innerText = "MANTIK PROBLEMİ";
-        hideWelcome();
-        generateProblem();
+    function generateNext() {
+        if(currentMode === 'islem') {
+            const n1 = Math.floor(Math.random() * 50) + 10;
+            const n2 = Math.floor(Math.random() * 40) + 5;
+            const ops = ['+', '-', '*'];
+            const op = ops[Math.floor(Math.random() * ops.length)];
+            
+            if(op === '*') {
+                const s1 = Math.floor(Math.random() * 12) + 2;
+                const s2 = Math.floor(Math.random() * 12) + 2;
+                document.getElementById('question-text').innerText = `${s1} × ${s2} kaçtır?`;
+                currentAnswer = s1 * s2;
+            } else if(op === '+') {
+                document.getElementById('question-text').innerText = `${n1} + ${n2} işleminin sonucu nedir?`;
+                currentAnswer = n1 + n2;
+            } else {
+                document.getElementById('question-text').innerText = `${n1 + n2} - ${n1} işleminin sonucu nedir?`;
+                currentAnswer = n2;
+            }
+        } else {
+            // Problem Üretici (Sonsuz varyasyon için kalıplar)
+            const templates = [
+                { q: (a,b) => `Bir manavda ${a} kg elma, elmalardan ${b} kg fazla armut vardır. Toplam kaç kg meyve vardır?`, a: (a,b) => a + (a + b) },
+                { q: (a,b) => `Bir sınıfta ${a} sıra vardır. Her sırada ${b} öğrenci oturduğuna göre sınıfta toplam kaç öğrenci vardır?`, a: (a,b) => a * b },
+                { q: (a,b) => `${a} sayısının 2 katının ${b} fazlası kaçtır?`, a: (a,b) => (a * 2) + b },
+                { q: (a,b) => `Cebimdeki ${a * b} TL parayı ${a} arkadaşıma eşit bölersem her birine kaç TL düşer?`, a: (a,b) => b },
+                { q: (a,b) => `Bir otoparkta ${a} araba vardır. Her arabada 4 tekerlek olduğuna göre toplam kaç tekerlek vardır?`, a: (a,b) => a * 4 }
+            ];
+            const temp = templates[Math.floor(Math.random() * templates.length)];
+            const r1 = Math.floor(Math.random() * 15) + 5;
+            const r2 = Math.floor(Math.random() * 10) + 2;
+            document.getElementById('question-text').innerText = temp.q(r1, r2);
+            currentAnswer = temp.a(r1, r2);
+        }
+        resetField();
     }
 
-    function generateSoru() {
-        const n1 = Math.floor(Math.random() * 20) + 5;
-        const n2 = Math.floor(Math.random() * 20) + 5;
-        const ops = ['+', '-', 'x'];
-        const op = ops[Math.floor(Math.random() * ops.length)];
-        
-        if(op === 'x') { currentAnswer = n1 * Math.floor(Math.random() * 10); document.getElementById('question-text').innerText = `${n1} × ${currentAnswer/n1} = ?`; }
-        else if(op === '+') { currentAnswer = n1 + n2; document.getElementById('question-text').innerText = `${n1} + ${n2} = ?`; }
-        else { currentAnswer = n1; document.getElementById('question-text').innerText = `${n1 + n2} - ${n2} = ?`; }
-        
-        resetInput();
-    }
-
-    function generateProblem() {
-        const problems = [
-            { q: "Bir çiftlikte 5 tavuk, 2 inek vardır. Toplam ayak sayısı kaçtır?", a: 18 },
-            { q: "Hangi sayının 3 katının 5 fazlası 20 eder?", a: 5 },
-            { q: "Tanesi 4 TL olan kalemlerden 6 tane alırsam kaç TL öderim?", a: 24 },
-            { q: "12 elmayı 3 arkadaşa eşit bölersek kişi başı kaç elma düşer?", a: 4 },
-            { q: "20 sayısının yarısının 4 eksiği kaçtır?", a: 6 }
-        ];
-        const p = problems[Math.floor(Math.random() * problems.length)];
-        document.getElementById('question-text').innerText = p.q;
-        currentAnswer = p.a;
-        resetInput();
-    }
-
-    function resetInput() {
+    function resetField() {
         document.getElementById('user-answer').value = "";
         document.getElementById('feedback').innerText = "";
         document.getElementById('user-answer').focus();
@@ -147,10 +131,12 @@
         if(val === "") return;
 
         if(parseInt(val) === currentAnswer) {
+            solvedCount++;
+            document.getElementById('counter').innerText = `ÇÖZÜLEN: ${solvedCount}`;
             fb.innerText = "SİSTEM ONAYI: DOĞRU ✅"; fb.style.color = "#4ade80";
-            setTimeout(currentMode === "soru" ? generateSoru : generateProblem, 1500);
+            setTimeout(generateNext, 1200);
         } else {
-            fb.innerText = "HATA: TEKRAR DENE ❌"; fb.style.color = "#f87171";
+            fb.innerText = "ERİŞİM REDDEDİLDİ: HATALI ❌"; fb.style.color = "#f87171";
         }
     }
 </script>
