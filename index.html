@@ -2,190 +2,62 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UTKAN_AI_OS_V12</title>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <title>MEB | 8. Sınıf Matematik Kazanım Testi</title>
     <style>
-        body { background: #000; color: #0ff; font-family: 'Courier New', monospace; margin: 0; overflow: hidden; height: 100vh; }
-        canvas { position: fixed; top: 0; left: 0; z-index: -1; }
-
-        /* CIHAZ SECIM EKRANI */
-        #selector-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 80000;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 30px;
-        }
-        .selector-btn {
-            padding: 20px 50px; background: transparent; border: 2px solid #0ff; color: #0ff;
-            font-size: 20px; cursor: pointer; letter-spacing: 5px; transition: 0.3s;
-            box-shadow: 0 0 15px #055;
-        }
-        .selector-btn:hover { background: #0ff; color: #000; box-shadow: 0 0 40px #0ff; }
-
-        /* INTRO ANIMASYON */
-        #intro-anim {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000;
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-        }
-        #dragon-logo { width: 280px; opacity: 0; transform: scale(0.5); transition: 2s; }
-        .king-text { font-size: 45px; font-weight: bold; color: #fff; margin-top: 20px; opacity: 0; text-shadow: 0 0 20px #0ff; letter-spacing: 12px; text-align: center; }
-
-        /* ANA SISTEM PANELİ */
-        #os-container { display: none; width: 100vw; height: 100vh; flex-direction: row; }
-        #math-side { flex: 2; border-right: 1px solid #044; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        #question { font-size: 100px; font-weight: bold; color: #fff; text-shadow: 0 0 25px #0ff; text-align: center; }
-        #ans-input { background: transparent; border: none; border-bottom: 4px solid #0ff; color: #0ff; font-size: 60px; text-align: center; width: 80%; max-width: 400px; outline: none; }
-
-        /* GEMINI AI CHAT PANELİ */
-        #ai-side { flex: 1; background: rgba(0, 15, 15, 0.95); display: flex; flex-direction: column; padding: 15px; min-width: 300px; }
-        #chat-window { flex-grow: 1; overflow-y: auto; font-size: 14px; color: #0f0; border: 1px solid #044; padding: 10px; background: #000; margin-bottom: 10px; border-radius: 5px; }
-        #chat-input-container { display: flex; gap: 5px; }
-        #chat-input { flex-grow: 1; background: #000; border: 1px solid #0ff; color: #0ff; padding: 12px; outline: none; border-radius: 5px; }
-
-        /* MOBILE OZEL AYARLAR */
-        @media (max-width: 768px) {
-            #os-container { flex-direction: column; }
-            #math-side { flex: 1; }
-            #ai-side { flex: 1; min-width: 100%; height: 50%; }
-            #question { font-size: 60px; }
-            #ans-input { font-size: 40px; }
-        }
-
-        .show { opacity: 1 !important; transform: scale(1) !important; }
-        .glitch { animation: glitch-anim 0.3s infinite alternate; }
-        @keyframes glitch-anim { 0% { transform: skew(2deg); } 100% { transform: skew(-2deg); } }
+        /* MEB KAMUFLAJ TASARIMI */
+        body { font-family: 'Arial', sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .meb-header { background-color: #2c3e50; color: white; padding: 15px; text-align: center; border-bottom: 5px solid #e74c3c; }
+        .test-konteynir { max-width: 800px; margin: 20px auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .soru { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 20px; }
+        .secenek { display: block; background: #ecf0f1; padding: 10px; margin: 10px 0; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .secenek:hover { background: #bdc3c7; }
+        
+        /* GİZLİ SİSTEM (BAŞLANGIÇTA GİZLİ) */
+        #utkan-sistem { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; color: #00ff00; z-index: 9999; padding: 50px; text-align: center; }
+        .hacker-text { font-family: 'Courier New', monospace; font-size: 25px; }
     </style>
 </head>
 <body>
 
-    <div id="selector-screen">
-        <h1 style="letter-spacing: 5px; text-align: center;">UTKAN AI INITIALIZE</h1>
-        <button class="selector-btn" onclick="start('pc')">PC_CORE</button>
-        <button class="selector-btn" onclick="start('mobile')">MOBILE_CORE</button>
+    <div id="kamuflaj">
+        <div class="meb-header">
+            <h1>T.C. MİLLÎ EĞİTİM BAKANLIĞI</h1>
+            <p>Eğitim Bilişim Ağı - Matematik Kazanım Testleri</p>
+        </div>
+        
+        <div class="test-konteynir">
+            <div class="soru">Soru 1: Bir sayının 3 katının 5 fazlası 20 ise, bu sayı kaçtır?</div>
+            <div class="secenek">A) 3</div>
+            <div class="secenek">B) 5</div>
+            <div class="secenek" onclick="sistemiAktifEt()">C) 15</div>
+            <div class="secenek">D) 20</div>
+            
+            <p style="color: grey; font-size: 12px; margin-top: 50px; text-align: center;">
+                © 2026 MEB Eğitim Teknolojileri Genel Müdürlüğü. Tüm hakları saklıdır.
+            </p>
+        </div>
     </div>
 
-    <div id="intro-anim">
-        <svg id="dragon-logo" viewBox="0 0 500 500">
-            <path fill="#0ff" d="M250,50 L300,150 L200,150 Z M100,250 L200,200 L200,300 Z M400,250 L300,200 L300,300 Z M250,450 L200,350 L300,350 Z" />
-        </svg>
-        <div id="king-title" class="king-text">BENİM KRALIM BU</div>
-    </div>
-
-    <canvas id="matrix"></canvas>
-
-    <div id="os-container">
-        <div id="math-side">
-            <div style="position: absolute; top: 10px; left: 15px; font-size: 12px; color: #088;">PROTOCOL: UTKAN_KING</div>
-            <div id="layer-info" style="color: #0ff; font-size: 18px; margin-bottom: 5px;">LAYER: 1</div>
-            <div id="question">--+--</div>
-            <input type="number" id="ans-input" autofocus autocomplete="off" placeholder="?">
-        </div>
-
-        <div id="ai-side">
-            <div style="font-weight: bold; border-bottom: 1px solid #0ff; padding-bottom: 5px; margin-bottom: 10px; color: #fff;">GEMINI AI ASSISTANT</div>
-            <div id="chat-window">
-                [SYSTEM]: Modüller yükleniyor...<br>
-                [SYSTEM]: Hoş geldin Utkan efendim.
-            </div>
-            <div id="chat-input-container">
-                <input type="text" id="chat-input" placeholder="Gemini'ye emir ver...">
-            </div>
-        </div>
+    <div id="utkan-sistem">
+        <h1 class="hacker-text">🐉 UTKAN AI: PROTOCOL INITIALIZED 🐉</h1>
+        <p class="hacker-text">Siber Güvenlik Duvarı Aşıldı...</p>
+        <p class="hacker-text">Erişim İzni: BAŞARILI</p>
+        <hr>
+        <button onclick="location.reload()" style="background: red; color: white; padding: 10px;">KAMUFLAJA DÖN</button>
     </div>
 
     <script>
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let currentLvl = 1, currentAns = 0, isCheat = false;
-
-        function start(mode) {
-            document.getElementById('selector-screen').style.display = 'none';
-            document.getElementById('intro-anim').style.display = 'flex';
+        function sistemiAktifEt() {
+            // MEB sitesini gizle, senin dünyanı aç
+            document.getElementById('kamuflaj').style.display = 'none';
+            document.getElementById('utkan-sistem').style.display = 'block';
             
-            // SİBER SES
-            playBeep();
-
-            setTimeout(() => { document.getElementById('dragon-logo').classList.add('show'); }, 500);
-            setTimeout(() => { document.getElementById('king-title').classList.add('show'); document.getElementById('king-title').classList.add('glitch'); }, 1800);
-
-            // "SİSTEM AKTİF UTKAN" SESLENDİRMESİ
-            setTimeout(() => {
-                const talk = new SpeechSynthesisUtterance("System active. Utkan.");
-                talk.lang = 'en-US'; talk.rate = 0.8; talk.pitch = 0.6;
-                window.speechSynthesis.speak(talk);
-            }, 2500);
-
-            setTimeout(() => {
-                document.getElementById('intro-anim').style.display = 'none';
-                document.getElementById('os-container').style.display = 'flex';
-                startMatrix();
-                newQuestion();
-                addLog("[AI]: Sistem aktif efendim. Utkan AI emrinizdedir.");
-            }, 5500);
+            // Gizli sesli mesaj
+            let msg = new SpeechSynthesisUtterance("System Override Successful. Welcome Utkan.");
+            msg.lang = 'en-US';
+            window.speechSynthesis.speak(msg);
         }
-
-        function playBeep() {
-            const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
-            o.type = 'sawtooth'; o.frequency.setValueAtTime(60, audioCtx.currentTime);
-            o.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 3);
-            g.gain.setValueAtTime(0.1, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 4);
-            o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + 4);
-        }
-
-        function startMatrix() {
-            const c = document.getElementById('matrix'); const x = c.getContext('2d');
-            c.width = window.innerWidth; c.height = window.innerHeight;
-            const d = Array(Math.floor(c.width/20)).fill(1);
-            setInterval(() => {
-                x.fillStyle = "rgba(0,0,0,0.1)"; x.fillRect(0,0,c.width,c.height);
-                x.fillStyle = "#033"; x.font = "15px monospace";
-                d.forEach((y, i) => {
-                    x.fillText(Math.floor(Math.random()*2), i*20, y*20);
-                    if(y*20 > c.height && Math.random() > 0.98) d[i] = 0;
-                    d[i]++;
-                });
-            }, 50);
-        }
-
-        function newQuestion() {
-            let n1 = Math.floor(Math.random() * (10 * currentLvl)) + 10;
-            let n2 = Math.floor(Math.random() * (10 * currentLvl)) + 5;
-            currentAns = n1 + n2;
-            document.getElementById('question').innerText = n1 + " + " + n2;
-            document.getElementById('layer-info').innerText = "LAYER: " + currentLvl;
-        }
-
-        document.getElementById('ans-input').addEventListener('input', function() {
-            if(this.value == currentAns || this.value == "2016") {
-                if(this.value == "2016") confetti();
-                currentLvl++; this.value = ""; newQuestion();
-                addLog("[SYSTEM]: Katman geçildi.");
-            }
-        });
-
-        function addLog(msg) {
-            const win = document.getElementById('chat-window');
-            win.innerHTML += "<br>" + msg;
-            win.scrollTop = win.scrollHeight;
-        }
-
-        document.getElementById('chat-input').addEventListener('keypress', function(e) {
-            if(e.key === 'Enter') {
-                let val = this.value.toLowerCase();
-                addLog("[UTKAN]: " + this.value);
-                this.value = "";
-                setTimeout(() => {
-                    if(val.includes("hile")) {
-                        isCheat = true; addLog("[AI]: Hile Protokolü Aktif.");
-                        setInterval(() => { if(isCheat) { document.getElementById('ans-input').value = currentAns; document.getElementById('ans-input').dispatchEvent(new Event('input')); } }, 800);
-                    } else if(val.includes("dur")) { isCheat = false; addLog("[AI]: Durduruldu."); }
-                    else if(val.includes("düzelt")) { location.reload(); }
-                    else if(val.includes("selam")) { addLog("[AI]: Selamlar Utkan efendim, sistem kalkanları aktif."); }
-                    else { addLog("[AI]: Komut işlendi efendim."); }
-                }, 500);
-            }
-        });
-
-        // KOD KORUMA
-        window.onerror = () => { location.reload(); return true; };
     </script>
+
 </body>
 </html>
