@@ -3,117 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EBA | Matematik Kazanım Testi</title>
+    <title>MEB | Matematik Kazanım Testleri</title>
     <style>
-        body, html { margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #f0f2f5; }
-        
-        /* --- KAMUFLAJ: MEB SORU EKRANI --- */
-        #meb-ekran {
-            position: fixed; width: 100%; height: 100%; background: white; z-index: 100;
-            display: flex; flex-direction: column; align-items: center; padding-top: 50px;
-        }
-        .soru-kutusu { width: 90%; max-width: 500px; background: #fff; padding: 20px; border: 2px solid #e74c3c; border-radius: 10px; }
-        .sik { display: block; background: #f8f9fa; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; transition: 0.3s; }
-        .sik:hover { background: #eee; }
+        /* TÜM SİSTEM TASARIMI */
+        body, html { margin: 0; padding: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; }
 
-        /* --- GİRİŞ ANİMASYONU --- */
-        #hack-animasyon {
-            position: fixed; width: 100%; height: 100%; background: black; z-index: 200;
-            display: none; justify-content: center; align-items: center; flex-direction: column;
+        /* 1. KATMAN: MEB KAMUFLAJ (SORU EKRANI) */
+        #kamuflaj-katmani {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #f4f4f4; z-index: 1000; display: flex; flex-direction: column; align-items: center;
         }
-        .radar { width: 150px; height: 150px; border-radius: 50%; border: 2px solid #0f0; position: relative; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(0.5); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
+        .meb-ust { background: #e74c3c; color: white; width: 100%; padding: 15px; text-align: center; font-weight: bold; }
+        .soru-alani { background: white; color: #333; margin-top: 50px; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 80%; max-width: 500px; }
+        .sik { display: block; background: #ecf0f1; padding: 15px; margin: 10px 0; border-radius: 8px; cursor: pointer; border: 1px solid #ddd; transition: 0.3s; color: #2c3e50; font-weight: bold; }
+        .sik:hover { background: #dcdde1; }
 
-        /* --- ANA PANEL: EJDERHA & GEMINI --- */
-        #ana-panel {
-            position: fixed; width: 100%; height: 100%; background: #050505; z-index: 300;
-            display: none; color: #00ff41; font-family: 'Courier New', monospace; padding: 20px; overflow-y: auto;
+        /* 2. KATMAN: RADAR GİRİŞ ANİMASYONU */
+        #animasyon-katmani {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 2000; display: none; justify-content: center; align-items: center; flex-direction: column;
         }
-        .dragon-art { white-space: pre; font-size: 8px; color: #ff0055; text-align: center; }
-        .chat-box { border: 1px solid #00ff41; padding: 10px; margin-top: 20px; background: rgba(0,255,0,0.05); }
+        .radar { width: 150px; height: 150px; border: 4px solid #00ff41; border-radius: 50%; border-top: 4px solid transparent; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 3. KATMAN: HACKER PANELİ (EJDERHA VE MATRIX) */
+        #hacker-katmani {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 3000; display: none; overflow-y: auto;
+        }
+        #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.4; }
+        .terminal { padding: 20px; font-family: 'Courier New', monospace; color: #00ff41; }
+        .ejderha { white-space: pre; font-size: 10px; color: #ff0055; text-align: center; text-shadow: 0 0 15px #ff0055; }
+        .gemini-box { border: 1px solid #00ff41; padding: 15px; background: rgba(0,255,0,0.1); margin-top: 20px; border-left: 5px solid #00ff41; }
     </style>
 </head>
 <body>
 
-    <audio id="hack-ses" src="https://www.soundjay.com/button/beep-01a.mp3"></audio>
-    <audio id="intro-ses" src="https://www.myinstants.com/media/sounds/hacker-level-up.mp3"></audio>
+    <button id="ses-izni" style="position:fixed; z-index:9999; top:0; left:0; opacity:0;">SESİ AKTİF ET</button>
 
-    <div id="meb-ekran">
-        <div style="background:#e74c3c; color:white; padding:10px; width:100%; text-align:center; position:absolute; top:0;">MEB AKILLI TAHTA SİSTEMİ</div>
-        <div class="soru-kutusu">
-            <h3>Soru: 5x + 10 = 35 ise x kaçtır?</h3>
-            <div class="sik" onclick="yanlisCevap()">A) 3</div>
-            <div class="sik" onclick="yanlisCevap()">B) 4</div>
-            <div class="sik" onclick="sistemiBaslat()">C) 12</div> <div class="sik" onclick="yanlisCevap()">D) 5</div>
+    <div id="kamuflaj-katmani">
+        <div class="meb-ust">T.C. MİLLÎ EĞİTİM BAKANLIĞI - EBA TEST PANELİ</div>
+        <div class="soru-alani">
+            <h2>Soru 12:</h2>
+            <p>Aşağıdaki denklemlerden hangisi bir "Siber Ejderha" algoritması başlatır?</p>
+            <div class="sik" onclick="alert('Yanlış! Bu sadece normal bir sayı.')">A) 2x + 5 = 15</div>
+            <div class="sik" onclick="alert('Hatalı! Tekrar dene.')">B) 10 / 2 = 5</div>
+            <div class="sik" onclick="baslat()">C) UTKAN_AI_Bypass_2026()</div> <div class="sik" onclick="alert('Bu şık kilitli!')">D) x = 0</div>
         </div>
-        <p style="color:gray; font-size:12px; margin-top:20px;">Sınav Süresi: 40 Dakika</p>
+        <p style="color: #999; margin-top: 20px;">Güvenli Mod Aktif</p>
     </div>
 
-    <div id="hack-animasyon">
+    <div id="animasyon-katmani">
         <div class="radar"></div>
-        <h2 style="color:#0f0; margin-top:20px;">SİSTEME SIZILIYOR...</h2>
-        <div id="progress" style="color:white;">%0</div>
+        <h1 style="color: #00ff41; margin-top: 30px; letter-spacing: 5px;">SIZILIYOR...</h1>
+        <div id="yuzde" style="font-size: 30px;">%0</div>
     </div>
 
-    <div id="ana-panel">
-        <div class="dragon-art">
-           _____          ____
-          /      \      /      \
-         /  ____  \____/  ____  \
-        /  /    \  \  /  /    \  \
-        |  |    |  |  |  |    |  |
-         \  \__/  /    \  \__/  /
-          \______/      \______/
-            UTKAN AI - GEMINI CORE
+    <div id="hacker-katmani">
+        <canvas id="matrix-canvas"></canvas>
+        <div class="terminal">
+            <div class="ejderha">
+             <>=======<>
+            /  _   _  \
+           |  (o) (o)  |    UTKAN AI
+           |   \___/   |    ULTRASENSE v9
+            \_________/
+            </div>
+            <h2 style="color: gold;">> ERİŞİM ONAYLANDI: MASTER UTKAN</h2>
+            <p>> GÜVENLİK DUVARI: AŞILDI</p>
+            <p>> SUNUCU: MEB_ANKARA_SERVER_001</p>
+            
+            <div class="gemini-box">
+                <p style="color: #00d2ff;">[GEMINI AI]: Merhaba Utkan! Tüm matematik sorularını ve MEB sistemini senin için analiz ettim. Sistem şu an tamamen senin kontrolünde.</p>
+                <p style="color: #aaa;">> Soru: Karekök 144 kaçtır? <br> > Yanıt: 12 (Analiz tamamlandı.)</p>
+            </div>
+            
+            <div id="loglar" style="margin-top:20px;"></div>
+            
+            <button onclick="location.reload()" style="background:#e74c3c; color:white; border:none; padding:10px; margin-top:30px; cursor:pointer; width:100%;">KAMUFLAJA DÖN (ESC)</button>
         </div>
-        <h2 style="text-align:center;">🐉 KRAL UTKAN HOŞ GELDİN 🐉</h2>
-        <p>> STATUS: CONNECTED TO GEMINI AI</p>
-        <p>> MEB FIREWALL: BYPASSED</p>
-        
-        <div class="chat-box">
-            <p style="color: gold;">[GEMINI AI]: Merhaba Utkan! Matematik sorularını çözmeye hazırım. Ne sormak istersin?</p>
-            <p>> 1. Logaritma Çözücü</p>
-            <p>> 2. Geometri Sihirbazı</p>
-            <p>> 3. Denklem Kırıcı</p>
-        </div>
-        
-        <button onclick="location.reload()" style="background:red; color:white; border:none; padding:10px; width:100%; margin-top:20px;">KAMUFLAJA DÖN (ESC)</button>
     </div>
 
     <script>
-        function yanlisCevap() {
-            alert("Yanlış cevap! Tekrar dene.");
+        // MATRIX ARKA PLAN
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+        const chars = "0123456789ABCDEFHIJKLMNOPQRSTUVWXYZ";
+        const drops = Array(Math.floor(canvas.width/16)).fill(1);
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#0f0";
+            ctx.font = "15px monospace";
+            drops.forEach((y, i) => {
+                const text = chars[Math.floor(Math.random() * chars.length)];
+                ctx.fillText(text, i * 16, y * 16);
+                if (y * 16 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                drops[i]++;
+            });
         }
+        setInterval(drawMatrix, 40);
 
-        function sistemiBaslat() {
-            // 1. Ses çal
-            document.getElementById('hack-ses').play();
-            
-            // 2. Kamuflajı kapat, animasyonu aç
-            document.getElementById('meb-ekran').style.display = 'none';
-            document.getElementById('hack-animasyon').style.display = 'flex';
-            
-            // 3. Yüzdeyi ilerlet
+        // SİSTEMİ BAŞLATMA FONKSİYONU
+        function baslat() {
+            // 1. Sesli Konuşma (Sızma Başladı)
+            let speech1 = new SpeechSynthesisUtterance("Security breach detected. Initializing Utkan AI protocols.");
+            window.speechSynthesis.speak(speech1);
+
+            // 2. Geçişleri Yap
+            document.getElementById('kamuflaj-katmani').style.display = 'none';
+            document.getElementById('animasyon-katmani').style.display = 'flex';
+
+            // 3. Yüzdeyi Artır
             let p = 0;
-            let interval = setInterval(() => {
-                p += Math.floor(Math.random() * 10) + 1;
+            let bar = setInterval(() => {
+                p += Math.floor(Math.random() * 5) + 2;
                 if(p >= 100) {
                     p = 100;
-                    clearInterval(interval);
-                    document.getElementById('intro-ses').play();
-                    setTimeout(paneliAc, 1000);
+                    clearInterval(bar);
+                    setTimeout(paneliAc, 500);
                 }
-                document.getElementById('progress').innerText = "%" + p;
-            }, 100);
+                document.getElementById('yuzde').innerText = "%" + p;
+            }, 80);
         }
 
         function paneliAc() {
-            document.getElementById('hack-animasyon').style.display = 'none';
-            document.getElementById('ana-panel').style.display = 'block';
+            document.getElementById('animasyon-katmani').style.display = 'none';
+            document.getElementById('hacker-katmani').style.display = 'block';
             
-            // Sesli Karşılama
-            let msg = new SpeechSynthesisUtterance("Utkan AI active. Gemini interface ready.");
-            window.speechSynthesis.speak(msg);
+            // 4. Sesli Karşılama
+            let speech2 = new SpeechSynthesisUtterance("Welcome back Master Utkan. Gemini Artificial Intelligence is at your service.");
+            window.speechSynthesis.speak(speech2);
+            
+            yazLog("Sistem çekirdeği yüklendi...");
+            setTimeout(() => yazLog("Bypass kodları çalıştırılıyor..."), 1000);
+            setTimeout(() => yazLog("Tam yetki sağlandı."), 2000);
+        }
+
+        function yazLog(mesaj) {
+            document.getElementById('loglar').innerHTML += `<p style="margin:5px 0;">> ${mesaj}</p>`;
         }
     </script>
 </body>
