@@ -1,156 +1,102 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox - Home</title>
+    <title>ROBLOX MULTIPLAYER REAL-TIME</title>
+    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.29.9.min.js"></script>
     <style>
-        body { background-color: #1b1d1f; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; margin: 0; overflow-x: hidden; }
-        
-        /* HEADER */
-        header {
-            background-color: #2b2e2f; height: 60px; display: flex; align-items: center; 
-            justify-content: space-between; padding: 0 20px; position: fixed; width: 100%; top: 0; z-index: 1000; border-bottom: 1px solid #3e4142;
+        body { margin: 0; background: #1b1d1f; overflow: hidden; color: white; font-family: sans-serif; }
+        #game-world { width: 100vw; height: 100vh; position: relative; background: #333; }
+        .player { 
+            position: absolute; width: 40px; height: 40px; 
+            background: #00b2ff; border-radius: 8px; text-align: center;
+            font-size: 10px; font-weight: bold; transition: all 0.1s linear;
         }
-        .logo { font-weight: 900; font-size: 24px; cursor: pointer; letter-spacing: -1px; }
-        .robux-display { background: rgba(0,0,0,0.3); padding: 6px 15px; border-radius: 20px; color: #00e676; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 5px; }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 180px; height: 100vh; background: #1b1d1f; position: fixed; top: 60px; left: 0; 
-            padding: 20px; border-right: 1px solid #222; font-size: 14px;
-        }
-        .side-item { padding: 10px; cursor: pointer; border-radius: 5px; margin-bottom: 5px; font-weight: 600; color: #adb5bd; }
-        .side-item:hover { background: #393b3d; color: #fff; }
-
-        /* MAIN */
-        main { margin-left: 220px; margin-top: 80px; padding: 20px; }
-        .game-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        
-        .game-card { cursor: pointer; transition: 0.2s; }
-        .game-card:hover { transform: translateY(-5px); }
-        .thumb { width: 100%; aspect-ratio: 1/1; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 50px; border: 1px solid #333; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .g-name { margin-top: 8px; font-weight: bold; font-size: 14px; }
-
-        /* OYUN EKRANI (FULLSCREEN) */
-        #game-engine {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #000; z-index: 2000; flex-direction: column; align-items: center; justify-content: center;
-        }
-        #timer-display { position: absolute; top: 20px; background: rgba(0,0,0,0.7); padding: 10px 20px; border-radius: 10px; border: 1px solid #00e676; color: #00e676; font-weight: bold; }
-        .exit-btn { position: absolute; bottom: 50px; background: #ff5252; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-
-        .reward-popup {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #2b2e2f; padding: 30px; border-radius: 15px; border: 2px solid #00e676;
-            text-align: center; display: none; z-index: 3000; box-shadow: 0 0 50px #00e676;
-        }
+        .my-player { background: #00e676; box-shadow: 0 0 20px #00e676; z-index: 10; }
+        #ui { position: fixed; top: 10px; left: 10px; z-index: 100; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">ROBLOX</div>
-    <div class="robux-display">💰 <span id="robux-count">20,000</span> ROBUX</div>
-</header>
-
-<div class="sidebar">
-    <div class="side-item">🏠 Home</div>
-    <div class="side-item">👤 Profile</div>
-    <div class="side-item">📩 Messages</div>
-    <div class="side-item">🎮 Discover</div>
-    <div class="side-item">🎁 Rewards</div>
+<div id="ui">
+    <b>ROBLOX REAL ONLINE</b><br>
+    Durum: <span id="status" style="color:#00e676">Bağlanıyor...</span><br>
+    Robux: <span id="r-val">20,000</span>
 </div>
 
-<main>
-    <h2>Oynamaya Devam Et</h2>
-    <div class="game-grid" id="games"></div>
-    <p style="color: #00e676; font-weight: bold;">⚡ ETKİNLİK: Bir oyunda 1 saat kal, 5.000 ROBUX KAZAN!</p>
-</main>
-
-<div id="game-engine">
-    <div id="timer-display">SÜRE: <span id="minutes">00</span>:<span id="seconds">00</span></div>
-    <div id="game-view" style="font-size: 100px;">🎮</div>
-    <h1 id="playing-title">Oyun Yükleniyor...</h1>
-    <p>Robux kazanmak için oyunda kalmaya devam et!</p>
-    <button class="exit-btn" onclick="exitGame()">OYUNDAN ÇIK</button>
-</div>
-
-<div class="reward-popup" id="reward-box">
-    <h1>TEBRİKLER! 🎉</h1>
-    <p>1 saatlik süreyi doldurdun ve</p>
-    <h2 style="color: #00e676;">+5.000 ROBUX</h2>
-    <p>kazandın!</p>
-    <button onclick="closeReward()" style="padding: 10px 20px; cursor: pointer;">KAPAT</button>
-</div>
+<div id="game-world"></div>
 
 <script>
+    const myID = "User_" + Math.floor(Math.random() * 9999);
     let robux = 20000;
-    let secondsSpent = 0;
-    let timerInterval;
-
-    const games = [
-        { name: "Adopt Me!", emoji: "🐶", color: "#ffb6c1" },
-        { name: "Blox Fruits", emoji: "⚔️", color: "#87ceeb" },
-        { name: "Brookhaven 🏠", emoji: "🏡", color: "#90ee90" },
-        { name: "Pet Simulator 99", emoji: "🐱", color: "#ffd700" },
-        { name: "Doors 👁️", emoji: "👁️", color: "#555" },
-        { name: "BedWars", emoji: "🛌", color: "#ff4500" }
-    ];
-
-    // Oyunları Listele
-    const grid = document.getElementById('games');
-    games.forEach(game => {
-        const div = document.createElement('div');
-        div.className = 'game-card';
-        div.onclick = () => enterGame(game);
-        div.innerHTML = `
-            <div class="thumb" style="background-color: ${game.color}">${game.emoji}</div>
-            <div class="g-name">${game.name}</div>
-        `;
-        grid.appendChild(div);
+    
+    // MULTIPLAYER KURULUMU (PubNub Ücretsiz Anahtarları)
+    const pubnub = new PubNub({
+        publishKey: 'demo', // Test için demo anahtarı
+        subscribeKey: 'demo',
+        uuid: myID
     });
 
-    function enterGame(game) {
-        document.getElementById('game-engine').style.display = 'flex';
-        document.getElementById('playing-title').innerText = game.name + " Oynanıyor...";
-        document.getElementById('game-view').innerText = game.emoji;
-        
-        // Zamanlayıcıyı başlat
-        secondsSpent = 0;
-        timerInterval = setInterval(() => {
-            secondsSpent++;
-            updateTimer();
-            
-            // 3600 saniye = 1 saat. TEST İÇİN 10 yapabilirsin.
-            if(secondsSpent === 3600) { 
-                giveReward();
+    pubnub.subscribe({ channels: ['roblox_utkan'] });
+
+    const world = document.getElementById('game-world');
+    const players = {};
+
+    // 1. KENDİ KARAKTERİMİ OLUŞTUR
+    function createPlayer(id, isMe) {
+        const div = document.createElement('div');
+        div.id = id;
+        div.className = 'player' + (isMe ? ' my-player' : '');
+        div.innerText = isMe ? "SEN" : id;
+        world.appendChild(div);
+        players[id] = div;
+    }
+
+    createPlayer(myID, true);
+    document.getElementById('status').innerText = "ÇEVRİMİÇİ";
+
+    // 2. HAREKET ET VE DİĞERLERİNE GÖNDER
+    window.addEventListener('keydown', (e) => {
+        const p = players[myID];
+        let top = p.offsetTop;
+        let left = p.offsetLeft;
+
+        if(e.key === 'w') top -= 20;
+        if(e.key === 's') top += 20;
+        if(e.key === 'a') left -= 20;
+        if(e.key === 'd') left += 20;
+
+        // Pozisyonu güncelle
+        p.style.top = top + "px";
+        p.style.left = left + "px";
+
+        // DİĞER OYUNCULARA MESAJ AT (Ben buradayım!)
+        pubnub.publish({
+            channel: 'roblox_utkan',
+            message: { id: myID, x: left, y: top }
+        });
+    });
+
+    // 3. DİĞER OYUNCULARI GÖR
+    pubnub.addListener({
+        message: function(event) {
+            const data = event.message;
+            if(data.id !== myID) {
+                if(!players[data.id]) {
+                    createPlayer(data.id, false);
+                }
+                players[data.id].style.left = data.x + "px";
+                players[data.id].style.top = data.y + "px";
             }
-        }, 1000);
-    }
+        }
+    });
 
-    function updateTimer() {
-        let mins = Math.floor(secondsSpent / 60);
-        let secs = secondsSpent % 60;
-        document.getElementById('minutes').innerText = mins.toString().padStart(2, '0');
-        document.getElementById('seconds').innerText = secs.toString().padStart(2, '0');
-    }
+    // ROBUX KAZANMA
+    setInterval(() => {
+        robux += 10;
+        document.getElementById('r-val').innerText = robux.toLocaleString();
+    }, 2000);
 
-    function giveReward() {
-        robux += 5000;
-        document.getElementById('robux-count').innerText = robux.toLocaleString();
-        document.getElementById('reward-box').style.display = 'block';
-    }
-
-    function exitGame() {
-        clearInterval(timerInterval);
-        document.getElementById('game-engine').style.display = 'none';
-    }
-
-    function closeReward() {
-        document.getElementById('reward-box').style.display = 'none';
-    }
 </script>
-
 </body>
 </html>
