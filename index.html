@@ -4,129 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        /* ZORUNLU TAM EKRAN AYARI */
-        html, body { 
-            margin: 0 !important; 
-            padding: 0 !important; 
-            width: 100vw !important; 
-            height: 100vh !important; 
-            overflow: hidden !important;
-            background-color: #0f172a;
-        }
-
-        :root { --primary: #2563eb; --bg: #0f172a; --card: #1e293b; --text: #f8fafc; }
-        
-        @keyframes startup {
-            0% { opacity: 0; transform: scale(0.5); filter: blur(20px); }
-            100% { opacity: 1; transform: scale(1); filter: blur(0px); }
-        }
-
-        body { font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; }
-        
-        .navbar { 
-            height: 70px; background: var(--card); border-bottom: 1px solid #334155; 
-            display: flex; align-items: center; padding: 0 20px; justify-content: space-between;
-            width: 100%; box-sizing: border-box;
-        }
-
-        .nav-brand { color: var(--primary); font-weight: 900; letter-spacing: 3px; font-size: 22px; cursor: pointer; }
-        .nav-links { display: flex; gap: 10px; }
-
-        .nav-btn { 
-            background: rgba(37, 99, 235, 0.1); border: 1px solid var(--primary); 
-            color: var(--text); padding: 10px 15px; cursor: pointer; border-radius: 8px; 
-            transition: 0.3s; font-size: 14px; font-weight: bold; white-space: nowrap;
-        }
-
-        .main-content { flex: 1; position: relative; width: 100%; }
-        .overlay-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        
-        #eba-logo { font-size: clamp(40px, 10vw, 100px); font-weight: 900; color: var(--primary); letter-spacing: 10px; animation: startup 1.2s ease-out; font-family: monospace; }
-        
-        .card { background: var(--card); padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); width: 80%; max-width: 500px; }
-        .action-btn { background: var(--primary); color: white; padding: 15px 30px; border-radius: 12px; cursor: pointer; border: none; font-weight: bold; margin-top: 20px; font-size: 16px; }
-        
-        input { padding: 12px; font-size: 24px; width: 140px; text-align: center; background: #0f172a; color: white; border: 2px solid #334155; border-radius: 12px; margin: 15px 0; outline: none; }
+        body { margin: 0; background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        .nav { background: #1e293b; padding: 15px; display: flex; justify-content: space-around; border-bottom: 3px solid #2563eb; }
+        .btn { background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #1d4ed8; transform: scale(1.05); }
+        .container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        #eba-logo { font-size: 80px; font-weight: 900; color: #2563eb; letter-spacing: 10px; margin-bottom: 10px; }
+        .card { background: #1e293b; padding: 30px; border-radius: 20px; border: 1px solid #334155; text-align: center; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input { width: 120px; padding: 10px; font-size: 30px; text-align: center; border-radius: 10px; border: 2px solid #334155; background: #0f172a; color: white; margin: 20px 0; outline: none; }
+        input:focus { border-color: #2563eb; }
+        .check-btn { background: #10b981; color: white; border: none; padding: 15px 40px; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; width: 100%; }
+        #feedback { margin-top: 20px; font-weight: bold; font-size: 20px; height: 30px; }
     </style>
 </head>
 <body>
-
-<div class="navbar">
-    <div class="nav-brand" onclick="location.reload()">NEXUS</div>
-    <div class="nav-links">
-        <button class="nav-btn" onclick="startMode('islem')">🔢 İŞLEM</button>
-        <button class="nav-btn" onclick="startMode('problem')">🧠 PROBLEM</button>
+    <div class="nav">
+        <button class="btn" onclick="start('islem')">🔢 SONSUZ İŞLEM</button>
+        <button class="btn" onclick="start('problem')">🧠 SONSUZ PROBLEM</button>
     </div>
-    <div id="counter" style="color: #4ade80; font-weight: bold; font-size: 12px;">Puan: 0</div>
-</div>
-
-<div class="main-content">
-    <div id="welcome" class="overlay-screen">
-        <div id="eba-logo">EBA_XXX</div>
-        <p style="letter-spacing: 5px; color: #94a3b8; font-weight: bold; font-size: 12px;">SİSTEM HAZIR</p>
-    </div>
-
-    <div id="quiz-area" class="overlay-screen" style="display:none;">
-        <div class="card">
-            <h2 id="mode-title" style="color: #60a5fa; font-size: 12px; text-transform: uppercase;">Modül</h2>
-            <div id="question-text" style="font-size: 24px; font-weight: bold; margin: 20px 0; min-height: 100px; display: flex; align-items: center; justify-content: center;">...</div>
-            <input type="number" id="user-answer" placeholder="?">
-            <br>
-            <button class="action-btn" onclick="checkAnswer()">GÖNDER</button>
-            <p id="feedback" style="margin-top: 20px; font-weight: bold; font-size: 18px;"></p>
+    <div class="container">
+        <div id="welcome">
+            <div id="eba-logo">EBA_XXX</div>
+            <p style="color: #94a3b8; letter-spacing: 5px;">MATEMATİK MODÜLÜ AKTİF</p>
+        </div>
+        <div id="game" style="display:none; width: 100%; display: flex; justify-content: center;">
+            <div class="card">
+                <div id="q-text" style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">...</div>
+                <input type="number" id="ans" placeholder="?">
+                <button class="check-btn" onclick="check()">KONTROL ET</button>
+                <div id="feedback"></div>
+            </div>
         </div>
     </div>
-</div>
-
 <script>
-    let currentAnswer = 0;
-    let currentMode = "";
-    let solvedCount = 0;
-
-    function startMode(mode) {
-        currentMode = mode;
-        document.getElementById('welcome').style.display = 'none';
-        document.getElementById('quiz-area').style.display = 'flex';
-        document.getElementById('mode-title').innerText = mode === 'islem' ? "HIZLI İŞLEM" : "MANTIK PROBLEMİ";
-        generateNext();
+    let curA = 0, curM = "";
+    function start(m) {
+        curM = m; document.getElementById('welcome').style.display = 'none';
+        document.getElementById('game').style.display = 'flex'; next();
     }
-
-    function generateNext() {
-        if(currentMode === 'islem') {
-            const s1 = Math.floor(Math.random() * 12) + 2;
-            const s2 = Math.floor(Math.random() * 12) + 2;
-            document.getElementById('question-text').innerText = `${s1} × ${s2} kaçtır?`;
-            currentAnswer = s1 * s2;
+    function next() {
+        if(curM == 'islem') {
+            let n1 = Math.floor(Math.random()*15)+2, n2 = Math.floor(Math.random()*15)+2;
+            document.getElementById('q-text').innerText = `${n1} x ${n2} = ?`; curA = n1 * n2;
         } else {
-            const templates = [
-                { q: (a,b) => `${a} sayısının 2 katının ${b} fazlası kaçtır?`, a: (a,b) => (a * 2) + b },
-                { q: (a,b) => `Tanesi ${a} TL olan kalemden ${b} tane alırsam kaç TL öderim?`, a: (a,b) => a * b },
-                { q: (a,b) => `Cebimdeki ${a*b} TL'yi ${a} kişiye bölersem kişi başı kaç TL düşer?`, a: (a,b) => b }
-            ];
-            const temp = templates[Math.floor(Math.random() * templates.length)];
-            const r1 = Math.floor(Math.random() * 10) + 5;
-            const r2 = Math.floor(Math.random() * 10) + 2;
-            document.getElementById('question-text').innerText = temp.q(r1, r2);
-            currentAnswer = temp.a(r1, r2);
+            let n = Math.floor(Math.random()*20)+5;
+            document.getElementById('q-text').innerText = `${n} sayısının 3 katının 10 eksiği kaçtır?`; curA = (n*3)-10;
         }
-        document.getElementById('user-answer').value = "";
-        document.getElementById('feedback').innerText = "";
-        document.getElementById('user-answer').focus();
+        document.getElementById('ans').value = ""; document.getElementById('feedback').innerText = "";
     }
-
-    function checkAnswer() {
-        const val = document.getElementById('user-answer').value;
-        const fb = document.getElementById('feedback');
-        if(val === "" || isNaN(val)) return;
-
-        if(parseInt(val) === currentAnswer) {
-            solvedCount++;
-            document.getElementById('counter').innerText = `Puan: ${solvedCount * 10}`;
-            fb.innerText = "DOĞRU ✅"; fb.style.color = "#4ade80";
-            setTimeout(generateNext, 1000);
-        } else {
-            fb.innerText = "HATALI ❌"; fb.style.color = "#f87171";
-        }
+    function check() {
+        let v = document.getElementById('ans').value;
+        let f = document.getElementById('feedback');
+        if(parseInt(v) === curA) {
+            f.innerText = "DOĞRU! ✅"; f.style.color = "#4ade80"; setTimeout(next, 1200);
+        } else { f.innerText = "TEKRAR DENE! ❌"; f.style.color = "#f87171"; }
     }
 </script>
 </body>
