@@ -3,62 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pro_xxx_tysd</title>
     <style>
-        body { margin: 0; background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-        .nav { background: #1e293b; padding: 15px; display: flex; justify-content: space-around; border-bottom: 3px solid #2563eb; }
-        .btn { background: #2563eb; color: white; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: #1d4ed8; transform: scale(1.05); }
-        .container { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        #eba-logo { font-size: 80px; font-weight: 900; color: #2563eb; letter-spacing: 10px; margin-bottom: 10px; }
-        .card { background: #1e293b; padding: 30px; border-radius: 20px; border: 1px solid #334155; text-align: center; width: 90%; max-width: 500px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        input { width: 120px; padding: 10px; font-size: 30px; text-align: center; border-radius: 10px; border: 2px solid #334155; background: #0f172a; color: white; margin: 20px 0; outline: none; }
-        input:focus { border-color: #2563eb; }
-        .check-btn { background: #10b981; color: white; border: none; padding: 15px 40px; border-radius: 12px; font-weight: bold; font-size: 18px; cursor: pointer; width: 100%; }
-        #feedback { margin-top: 20px; font-weight: bold; font-size: 20px; height: 30px; }
+        body { font-family: 'Courier New', Courier, monospace; background: #0a0a0a; color: #00ff00; min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
+        .ai-container { background: #1a1a1a; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px #00ff00; width: 90%; max-width: 500px; text-align: center; border: 2px solid #00ff00; }
+        h1 { color: #00ff00; text-shadow: 0 0 10px #00ff00; font-size: 26px; letter-spacing: 2px; }
+        .ai-robot { font-size: 50px; margin-bottom: 10px; }
+        #question-box { background: #000; padding: 25px; border-radius: 5px; margin: 20px 0; font-size: 20px; min-height: 80px; border: 1px dashed #00ff00; }
+        input { width: 80%; padding: 12px; border-radius: 5px; border: 1px solid #00ff00; font-size: 18px; text-align: center; margin-bottom: 15px; background: #000; color: #00ff00; outline: none; }
+        .btn-group { display: flex; gap: 10px; justify-content: center; }
+        button { background: #00ff00; color: #000; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        button:hover:not(:disabled) { background: #fff; box-shadow: 0 0 15px #fff; }
+        button:disabled { background: #333; cursor: not-allowed; color: #666; }
+        #feedback { margin-top: 20px; font-weight: bold; font-size: 18px; }
+        .version { font-size: 10px; color: #008800; margin-top: 15px; }
     </style>
 </head>
 <body>
-    <div class="nav">
-        <button class="btn" onclick="start('islem')">🔢 SONSUZ İŞLEM</button>
-        <button class="btn" onclick="start('problem')">🧠 SONSUZ PROBLEM</button>
+
+<div class="ai-container">
+    <div class="ai-robot">👽</div>
+    <h1>[ pro_xxx_tysd ]</h1>
+    <p>Matematik Analiz Modülü v3.0</p>
+    
+    <div id="question-box">Veri girişi bekleniyor...</div>
+    
+    <input type="number" id="answer-input" placeholder="DEĞER GİRİN" autocomplete="off">
+    <div class="btn-group">
+        <button id="send-btn" onclick="checkAnswer()">SİSTEME GÖNDER</button>
+        <button id="next-btn" onclick="generateQuestion()" style="background: #008800; color: #fff;">YENİ VERİ</button>
     </div>
-    <div class="container">
-        <div id="welcome">
-            <div id="eba-logo">EBA_XXX</div>
-            <p style="color: #94a3b8; letter-spacing: 5px;">MATEMATİK MODÜLÜ AKTİF</p>
-        </div>
-        <div id="game" style="display:none; width: 100%; display: flex; justify-content: center;">
-            <div class="card">
-                <div id="q-text" style="font-size: 28px; font-weight: bold; margin-bottom: 10px;">...</div>
-                <input type="number" id="ans" placeholder="?">
-                <button class="check-btn" onclick="check()">KONTROL ET</button>
-                <div id="feedback"></div>
-            </div>
-        </div>
-    </div>
+
+    <div id="feedback"></div>
+    <div style="margin-top:20px;">BAŞARI SKORU: <span id="correct-count" style="color:#00ff00; font-size:24px;">0</span></div>
+    <div class="version">SECURE_MODE: ACTIVE // ANTI_SPAM: ON</div>
+</div>
+
 <script>
-    let curA = 0, curM = "";
-    function start(m) {
-        curM = m; document.getElementById('welcome').style.display = 'none';
-        document.getElementById('game').style.display = 'flex'; next();
-    }
-    function next() {
-        if(curM == 'islem') {
-            let n1 = Math.floor(Math.random()*15)+2, n2 = Math.floor(Math.random()*15)+2;
-            document.getElementById('q-text').innerText = `${n1} x ${n2} = ?`; curA = n1 * n2;
+    let currentAnswer = 0;
+    let score = 0;
+    const sendBtn = document.getElementById('send-btn');
+
+    function generateQuestion() {
+        sendBtn.disabled = false;
+        document.getElementById('answer-input').value = "";
+        document.getElementById('feedback').innerText = "";
+        
+        const types = ['priority', 'math', 'logic'];
+        const choice = types[Math.floor(Math.random() * types.length)];
+        let qText = "";
+
+        if (choice === 'priority') {
+            let a = Math.floor(Math.random() * 25) + 5;
+            let b = Math.floor(Math.random() * 4) + 2;
+            let c = Math.floor(Math.random() * 5) + 5;
+            qText = `HESAPLA: ${a} + ${b} × ${c}`;
+            currentAnswer = a + (b * c);
+        } else if (choice === 'math') {
+            let n1 = Math.floor(Math.random() * 800) + 100;
+            let n2 = Math.floor(Math.random() * 300) + 50;
+            qText = `ANALİZ: ${n1} + ${n2} toplamı?`;
+            currentAnswer = n1 + n2;
         } else {
-            let n = Math.floor(Math.random()*20)+5;
-            document.getElementById('q-text').innerText = `${n} sayısının 3 katının 10 eksiği kaçtır?`; curA = (n*3)-10;
+            let n1 = Math.floor(Math.random() * 50) + 50;
+            let n2 = Math.floor(Math.random() * 20) + 10;
+            qText = `LOG: ${n1} parça veriden ${n2} tanesi silindi. Kalan?`;
+            currentAnswer = n1 - n2;
         }
-        document.getElementById('ans').value = ""; document.getElementById('feedback').innerText = "";
+
+        document.getElementById('question-box').innerText = qText;
     }
-    function check() {
-        let v = document.getElementById('ans').value;
-        let f = document.getElementById('feedback');
-        if(parseInt(v) === curA) {
-            f.innerText = "DOĞRU! ✅"; f.style.color = "#4ade80"; setTimeout(next, 1200);
-        } else { f.innerText = "TEKRAR DENE! ❌"; f.style.color = "#f87171"; }
+
+    function checkAnswer() {
+        const userAnswer = document.getElementById('answer-input').value;
+        const feedback = document.getElementById('feedback');
+        
+        if (!userAnswer) return;
+
+        sendBtn.disabled = true;
+
+        if (userAnswer == currentAnswer) {
+            feedback.innerText = ">> ERİŞİM ONAYLANDI. VERİ KAYDEDİLİYOR...";
+            feedback.style.color = "#00ff00";
+            score++;
+            document.getElementById('correct-count').innerText = score;
+            setTimeout(generateQuestion, 1500);
+        } else {
+            feedback.innerText = ">> ERİŞİM REDDEDİLDİ. DOĞRU VERİ: " + currentAnswer;
+            feedback.style.color = "#ff0000";
+            setTimeout(() => { sendBtn.disabled = false; }, 1000);
+        }
     }
+
+    generateQuestion();
 </script>
+
 </body>
 </html>
