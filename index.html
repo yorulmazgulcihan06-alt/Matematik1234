@@ -5,38 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>pro_xxx_tysd</title>
     <style>
-        body { font-family: 'Courier New', Courier, monospace; background: #0a0a0a; color: #00ff00; min-height: 100vh; display: flex; justify-content: center; align-items: center; margin: 0; }
-        .ai-container { background: #1a1a1a; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px #00ff00; width: 90%; max-width: 500px; text-align: center; border: 2px solid #00ff00; }
-        h1 { color: #00ff00; text-shadow: 0 0 10px #00ff00; font-size: 26px; letter-spacing: 2px; }
-        .ai-robot { font-size: 50px; margin-bottom: 10px; }
-        #question-box { background: #000; padding: 25px; border-radius: 5px; margin: 20px 0; font-size: 20px; min-height: 80px; border: 1px dashed #00ff00; }
-        input { width: 80%; padding: 12px; border-radius: 5px; border: 1px solid #00ff00; font-size: 18px; text-align: center; margin-bottom: 15px; background: #000; color: #00ff00; outline: none; }
+        /* Resmi ve Sade Tasarım */
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f9; color: #2c3e50; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .main-card { background: white; width: 100%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-top: 6px solid #2980b9; padding: 30px; text-align: center; }
+        h1 { color: #2980b9; font-size: 22px; margin-bottom: 5px; text-transform: uppercase; }
+        .subtitle { color: #7f8c8d; font-size: 14px; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        #question-box { background-color: #fcfcfc; border: 1px solid #e0e0e0; padding: 25px; border-radius: 5px; font-size: 18px; margin-bottom: 20px; min-height: 60px; line-height: 1.6; }
+        input { width: 90%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 4px; font-size: 16px; margin-bottom: 20px; text-align: center; }
         .btn-group { display: flex; gap: 10px; justify-content: center; }
-        button { background: #00ff00; color: #000; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        button:hover:not(:disabled) { background: #fff; box-shadow: 0 0 15px #fff; }
-        button:disabled { background: #333; cursor: not-allowed; color: #666; }
-        #feedback { margin-top: 20px; font-weight: bold; font-size: 18px; }
-        .version { font-size: 10px; color: #008800; margin-top: 15px; }
+        button { padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 15px; transition: 0.2s; }
+        #send-btn { background-color: #27ae60; color: white; }
+        #send-btn:hover:not(:disabled) { background-color: #219150; }
+        #next-btn { background-color: #2980b9; color: white; }
+        #next-btn:hover { background-color: #1f6391; }
+        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
+        #feedback { margin-top: 20px; font-weight: bold; min-height: 24px; }
+        .footer { margin-top: 30px; font-size: 11px; color: #bdc3c7; }
     </style>
 </head>
 <body>
 
-<div class="ai-container">
-    <div class="ai-robot">👽</div>
-    <h1>[ pro_xxx_tysd ]</h1>
-    <p>Matematik Analiz Modülü v3.0</p>
+<div class="main-card">
+    <h1>pro_xxx_tysd</h1>
+    <div class="subtitle">Matematik Yeterlilik ve Analiz Modülü</div>
     
-    <div id="question-box">Veri girişi bekleniyor...</div>
+    <div id="question-box">Sistem hazırlanıyor...</div>
     
-    <input type="number" id="answer-input" placeholder="DEĞER GİRİN" autocomplete="off">
+    <input type="number" id="answer-input" placeholder="Cevabınızı giriniz" autocomplete="off">
+    
     <div class="btn-group">
-        <button id="send-btn" onclick="checkAnswer()">SİSTEME GÖNDER</button>
-        <button id="next-btn" onclick="generateQuestion()" style="background: #008800; color: #fff;">YENİ VERİ</button>
+        <button id="send-btn" onclick="checkAnswer()">Sisteme Gönder</button>
+        <button id="next-btn" onclick="generateQuestion()">Sonraki Soru</button>
     </div>
 
     <div id="feedback"></div>
-    <div style="margin-top:20px;">BAŞARI SKORU: <span id="correct-count" style="color:#00ff00; font-size:24px;">0</span></div>
-    <div class="version">SECURE_MODE: ACTIVE // ANTI_SPAM: ON</div>
+    
+    <div style="margin-top:20px; font-size: 14px;">
+        Başarı Puanı: <span id="correct-count" style="color:#2980b9; font-weight:bold;">0</span>
+    </div>
+
+    <div class="footer">
+        BU MODÜL 5. SINIF DÜZEYİNDE TEST EDİLMİŞTİR. <br>
+        GÜVENLİK KİPLERİ AKTİFTİR.
+    </div>
 </div>
 
 <script>
@@ -54,24 +65,24 @@
         let qText = "";
 
         if (choice === 'priority') {
-            let a = Math.floor(Math.random() * 25) + 5;
-            let b = Math.floor(Math.random() * 4) + 2;
-            let c = Math.floor(Math.random() * 5) + 5;
-            qText = `HESAPLA: ${a} + ${b} × ${c}`;
+            let a = Math.floor(Math.random() * 20) + 10;
+            let b = Math.floor(Math.random() * 5) + 2;
+            let c = Math.floor(Math.random() * 6) + 3;
+            qText = `İşlem sonucunu bulunuz: <br> <b>${a} + ${b} × ${c}</b>`;
             currentAnswer = a + (b * c);
         } else if (choice === 'math') {
-            let n1 = Math.floor(Math.random() * 800) + 100;
-            let n2 = Math.floor(Math.random() * 300) + 50;
-            qText = `ANALİZ: ${n1} + ${n2} toplamı?`;
+            let n1 = Math.floor(Math.random() * 450) + 150;
+            let n2 = Math.floor(Math.random() * 250) + 50;
+            qText = `Aşağıdaki toplama işleminin sonucunu bulunuz: <br> <b>${n1} + ${n2}</b>`;
             currentAnswer = n1 + n2;
         } else {
-            let n1 = Math.floor(Math.random() * 50) + 50;
-            let n2 = Math.floor(Math.random() * 20) + 10;
-            qText = `LOG: ${n1} parça veriden ${n2} tanesi silindi. Kalan?`;
+            let n1 = Math.floor(Math.random() * 70) + 30;
+            let n2 = Math.floor(Math.random() * 25) + 5;
+            qText = `Problem: Bir depoda ${n1} ürün bulunmaktadır. ${n2} ürün sevk edilirse depoda kaç ürün kalır?`;
             currentAnswer = n1 - n2;
         }
 
-        document.getElementById('question-box').innerText = qText;
+        document.getElementById('question-box').innerHTML = qText;
     }
 
     function checkAnswer() {
@@ -80,17 +91,18 @@
         
         if (!userAnswer) return;
 
+        // SPAM KORUMASI
         sendBtn.disabled = true;
 
         if (userAnswer == currentAnswer) {
-            feedback.innerText = ">> ERİŞİM ONAYLANDI. VERİ KAYDEDİLİYOR...";
-            feedback.style.color = "#00ff00";
+            feedback.innerText = "✓ Doğrulandı. Puan eklendi.";
+            feedback.style.color = "#27ae60";
             score++;
             document.getElementById('correct-count').innerText = score;
             setTimeout(generateQuestion, 1500);
         } else {
-            feedback.innerText = ">> ERİŞİM REDDEDİLDİ. DOĞRU VERİ: " + currentAnswer;
-            feedback.style.color = "#ff0000";
+            feedback.innerText = "✕ Hatalı giriş. Doğru sonuç: " + currentAnswer;
+            feedback.style.color = "#c0392b";
             setTimeout(() => { sendBtn.disabled = false; }, 1000);
         }
     }
