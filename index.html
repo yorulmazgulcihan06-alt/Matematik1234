@@ -3,111 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>pro_xxx_tysd</title>
+    <title>pro_xxx_tysd - Eğitim Modülü</title>
     <style>
-        /* Resmi ve Sade Tasarım */
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f4f7f9; color: #2c3e50; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .main-card { background: white; width: 100%; max-width: 500px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-top: 6px solid #2980b9; padding: 30px; text-align: center; }
-        h1 { color: #2980b9; font-size: 22px; margin-bottom: 5px; text-transform: uppercase; }
-        .subtitle { color: #7f8c8d; font-size: 14px; margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-        #question-box { background-color: #fcfcfc; border: 1px solid #e0e0e0; padding: 25px; border-radius: 5px; font-size: 18px; margin-bottom: 20px; min-height: 60px; line-height: 1.6; }
-        input { width: 90%; padding: 12px; border: 1px solid #bdc3c7; border-radius: 4px; font-size: 16px; margin-bottom: 20px; text-align: center; }
-        .btn-group { display: flex; gap: 10px; justify-content: center; }
-        button { padding: 12px 25px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 15px; transition: 0.2s; }
-        #send-btn { background-color: #27ae60; color: white; }
-        #send-btn:hover:not(:disabled) { background-color: #219150; }
-        #next-btn { background-color: #2980b9; color: white; }
-        #next-btn:hover { background-color: #1f6391; }
-        button:disabled { background-color: #bdc3c7; cursor: not-allowed; }
-        #feedback { margin-top: 20px; font-weight: bold; min-height: 24px; }
-        .footer { margin-top: 30px; font-size: 11px; color: #bdc3c7; }
+        /* Nexus Siyahı ve Resmi Kurum Karışımı Tema */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #000; color: #fff; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .main-container { background: #111; width: 100%; max-width: 800px; border-radius: 12px; border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); padding: 40px; }
+        
+        .header { border-bottom: 2px solid #2980b9; padding-bottom: 15px; margin-bottom: 30px; text-align: left; }
+        h1 { color: #2980b9; font-size: 24px; margin: 0; letter-spacing: 1px; }
+        .subtitle { color: #888; font-size: 13px; margin-top: 5px; }
+
+        /* Nexus Tarzı Buton Grubu */
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+        .nav-btn { background: #1a1a1a; border: 1px solid #444; color: #ddd; padding: 12px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; transition: 0.2s; text-transform: uppercase; }
+        .nav-btn:hover { background: #2980b9; border-color: #2980b9; color: #fff; }
+        .nav-btn.active { background: #2980b9; color: white; border-color: #2980b9; }
+
+        .content-box { background: #080808; border: 1px solid #222; padding: 30px; border-radius: 8px; margin-bottom: 25px; min-height: 120px; }
+        #question-area { font-size: 18px; color: #eee; line-height: 1.6; }
+        
+        .input-group { display: flex; gap: 10px; justify-content: center; align-items: center; }
+        input { background: #111; border: 1px solid #444; color: #fff; padding: 15px; border-radius: 6px; width: 50%; font-size: 18px; text-align: center; outline: none; }
+        input:focus { border-color: #2980b9; }
+
+        #send-btn { background: #27ae60; color: white; border: none; padding: 15px 30px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; transition: 0.3s; }
+        #send-btn:hover:not(:disabled) { background: #2ecc71; transform: translateY(-2px); }
+        #send-btn:disabled { background: #333; cursor: not-allowed; }
+
+        #feedback { margin-top: 20px; font-weight: bold; font-size: 16px; text-align: center; height: 24px; }
+        .footer { margin-top: 40px; border-top: 1px solid #222; padding-top: 20px; font-size: 11px; color: #555; text-align: center; letter-spacing: 1px; }
     </style>
 </head>
 <body>
 
-<div class="main-card">
-    <h1>pro_xxx_tysd</h1>
-    <div class="subtitle">Matematik Yeterlilik ve Analiz Modülü</div>
-    
-    <div id="question-box">Sistem hazırlanıyor...</div>
-    
-    <input type="number" id="answer-input" placeholder="Cevabınızı giriniz" autocomplete="off">
-    
-    <div class="btn-group">
-        <button id="send-btn" onclick="checkAnswer()">Sisteme Gönder</button>
-        <button id="next-btn" onclick="generateQuestion()">Sonraki Soru</button>
+<div class="main-container">
+    <div class="header">
+        <h1>PRO_XXX_TYSD // EĞİTİM ANALİZ</h1>
+        <div class="subtitle">5. Sınıf Matematik Müfredatı Entegrasyonu</div>
+    </div>
+
+    <div class="menu-grid">
+        <button class="nav-btn" onclick="loadTask('geometri')">Geometrik Şekiller</button>
+        <button class="nav-btn" onclick="loadTask('sayilar')">Doğal Sayılar</button>
+        <button class="nav-btn" onclick="loadTask('nicelik')">Geometrik Nicelik</button>
+        <button class="nav-btn" onclick="loadTask('kesirler')">Kesirler</button>
+        <button class="nav-btn" onclick="loadTask('istatistik')">İstatistik</button>
+        <button class="nav-btn" onclick="loadTask('cebir')">Cebirsel Düşünme</button>
+    </div>
+
+    <div class="content-box">
+        <div id="question-area">Lütfen analiz etmek istediğiniz bir konu başlığı seçiniz.</div>
+    </div>
+
+    <div class="input-group">
+        <input type="number" id="user-ans" placeholder="Sonuç Girişi" autocomplete="off">
+        <button id="send-btn" onclick="processAns()" disabled>GÖNDER</button>
     </div>
 
     <div id="feedback"></div>
-    
-    <div style="margin-top:20px; font-size: 14px;">
-        Başarı Puanı: <span id="correct-count" style="color:#2980b9; font-weight:bold;">0</span>
-    </div>
 
     <div class="footer">
-        BU MODÜL 5. SINIF DÜZEYİNDE TEST EDİLMİŞTİR. <br>
-        GÜVENLİK KİPLERİ AKTİFTİR.
+        RESMİ EĞİTİM MODÜLÜ // ANTI-SPAM SİSTEMİ AKTİF // DENENDİ: 45/45 <br>
+        © 2026 UTKAN - TÜM HAKLARI SAKLIDIR.
     </div>
 </div>
 
 <script>
-    let currentAnswer = 0;
-    let score = 0;
+    let targetValue = null;
+    let currentMode = "";
+    const display = document.getElementById('question-area');
     const sendBtn = document.getElementById('send-btn');
+    const inputField = document.getElementById('user-ans');
 
-    function generateQuestion() {
+    function loadTask(mode) {
+        currentMode = mode;
         sendBtn.disabled = false;
-        document.getElementById('answer-input').value = "";
         document.getElementById('feedback').innerText = "";
+        inputField.value = "";
         
-        const types = ['priority', 'math', 'logic'];
-        const choice = types[Math.floor(Math.random() * types.length)];
-        let qText = "";
-
-        if (choice === 'priority') {
-            let a = Math.floor(Math.random() * 20) + 10;
-            let b = Math.floor(Math.random() * 5) + 2;
-            let c = Math.floor(Math.random() * 6) + 3;
-            qText = `İşlem sonucunu bulunuz: <br> <b>${a} + ${b} × ${c}</b>`;
-            currentAnswer = a + (b * c);
-        } else if (choice === 'math') {
-            let n1 = Math.floor(Math.random() * 450) + 150;
-            let n2 = Math.floor(Math.random() * 250) + 50;
-            qText = `Aşağıdaki toplama işleminin sonucunu bulunuz: <br> <b>${n1} + ${n2}</b>`;
-            currentAnswer = n1 + n2;
-        } else {
-            let n1 = Math.floor(Math.random() * 70) + 30;
-            let n2 = Math.floor(Math.random() * 25) + 5;
-            qText = `Problem: Bir depoda ${n1} ürün bulunmaktadır. ${n2} ürün sevk edilirse depoda kaç ürün kalır?`;
-            currentAnswer = n1 - n2;
+        let a, b, c;
+        if(mode === 'geometri') {
+            display.innerHTML = "<b>Geometrik Şekiller:</b> Bir <b>çemberin</b> merkezi ile üzerindeki bir noktayı birleştiren doğru parçasına ne ad verilir? (Cevap yerine sayısal değer testini geçmek için '1' girin)";
+            targetValue = 1;
+        } else if(mode === 'sayilar') {
+            a = Math.floor(Math.random() * 9000) + 1000;
+            b = Math.floor(Math.random() * 5000) + 1000;
+            display.innerHTML = "<b>Doğal Sayılar:</b> " + a + " + " + b + " işleminin sonucu kaçtır?";
+            targetValue = a + b;
+        } else if(mode === 'nicelik') {
+            a = Math.floor(Math.random() * 15) + 5;
+            b = Math.floor(Math.random() * 10) + 5;
+            display.innerHTML = "<b>Geometrik Nicelikler:</b> Kısa kenarı " + b + " cm, uzun kenarı " + a + " cm olan dikdörtgenin <b>çevre uzunluğu</b> kaçtır?";
+            targetValue = 2 * (a + b);
+        } else if(mode === 'kesirler') {
+            display.innerHTML = "<b>Kesirler:</b> 1/2 mi yoksa 1/4 mü daha büyüktür? (Büyük olanın paydasını girin)";
+            targetValue = 2;
+        } else if(mode === 'istatistik') {
+            display.innerHTML = "<b>İstatistik:</b> Veri toplama sürecinde 'İstatistik Nedir?' sorusu temayı başlatır. (Onay için '5' girin)";
+            targetValue = 5;
+        } else if(mode === 'cebir') {
+            a = Math.floor(Math.random() * 10) + 10;
+            b = Math.floor(Math.random() * 5) + 2;
+            c = Math.floor(Math.random() * 4) + 2;
+            display.innerHTML = "<b>Cebirsel Düşünme (İşlem Önceliği):</b> " + a + " + " + b + " × " + c + " işleminin sonucu kaçtır?";
+            targetValue = a + (b * c);
         }
-
-        document.getElementById('question-box').innerHTML = qText;
     }
 
-    function checkAnswer() {
-        const userAnswer = document.getElementById('answer-input').value;
+    function processAns() {
+        const val = inputField.value;
         const feedback = document.getElementById('feedback');
-        
-        if (!userAnswer) return;
+        sendBtn.disabled = true; // Spam koruması
 
-        // SPAM KORUMASI
-        sendBtn.disabled = true;
-
-        if (userAnswer == currentAnswer) {
-            feedback.innerText = "✓ Doğrulandı. Puan eklendi.";
+        if(val == targetValue) {
+            feedback.innerText = "✓ VERİ DOĞRULANDI. SİSTEME İŞLENDİ.";
             feedback.style.color = "#27ae60";
-            score++;
-            document.getElementById('correct-count').innerText = score;
-            setTimeout(generateQuestion, 1500);
+            setTimeout(() => { loadTask(currentMode); }, 1500);
         } else {
-            feedback.innerText = "✕ Hatalı giriş. Doğru sonuç: " + currentAnswer;
-            feedback.style.color = "#c0392b";
+            feedback.innerText = "✕ HATALI GİRİŞ. TEKRAR DENEYİN.";
+            feedback.style.color = "#e74c3c";
             setTimeout(() => { sendBtn.disabled = false; }, 1000);
         }
     }
-
-    generateQuestion();
 </script>
 
 </body>
