@@ -2,273 +2,152 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>NASA GEZEGENLERARASI MATEMATİK MODÜLÜ // ALPHA-5</title>
+    <title>NASA MATEMATİK OPERASYON MERKEZİ</title>
     <style>
-        /* NASA Uzay Teması */
-        body { 
-            background: linear-gradient(to bottom, #0a0a0c, #1a1a2e); /* Uzay atmosferi */
-            color: #e0e0e0; 
-            font-family: 'Space Mono', monospace; /* Fütüristik font */
-            margin: 0; padding: 20px; 
-            display: flex; justify-content: center; align-items: center; min-height: 100vh;
-            overflow: hidden; /* Scroll engelleme */
-        }
-        /* Google Fonts: Space Mono import */
-        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
-
-        .nasa-console { 
-            max-width: 1000px; width: 95%; background: rgba(18,18,20,0.9); /* Yarı şeffaf konsol */
-            border: 2px solid #00ffff; /* Siber mavi çerçeve */
-            border-radius: 15px; padding: 30px; 
-            box-shadow: 0 0 60px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1); /* Parlaklık efekti */
-            position: relative; z-index: 10;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@500&display=swap');
         
-        /* Uzayda Süzülen Yıldızlar/Animasyonlar */
-        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle linear infinite; }
-        .star-small { width: 2px; height: 2px; opacity: 0.8; animation-duration: 2s; }
-        .star-medium { width: 3px; height: 3px; opacity: 0.9; animation-duration: 3s; }
-        .star-large { width: 4px; height: 4px; opacity: 1; animation-duration: 4s; }
+        body { background: #020205; color: #00f2ff; font-family: 'Orbitron', sans-serif; margin: 0; padding: 15px; overflow-x: hidden; }
+        .bg-stars { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.2; }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 1; }
-        }
-        
-        .header { text-align: center; border-bottom: 2px dashed #00ffff; margin-bottom: 30px; padding-bottom: 20px; }
-        h1 { color: #00ffff; text-transform: uppercase; letter-spacing: 4px; font-size: 28px; }
-        .sub-mission { color: #aaa; font-size: 14px; margin-top: 5px; }
+        /* Ana Panel Düzeni */
+        .dashboard { display: grid; grid-template-columns: 320px 1fr 300px; gap: 15px; max-width: 1400px; margin: auto; }
 
-        /* Konu Seçim Modülleri */
-        .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-        .module-btn { 
-            background: #2a2a3a; border: 1px solid #00e0e0; color: #fff; padding: 25px; 
-            border-radius: 10px; cursor: pointer; text-align: left; transition: 0.3s;
-            font-size: 18px; position: relative; overflow: hidden;
-            box-shadow: 0 0 15px rgba(0,255,255,0.1);
-        }
-        .module-btn:hover { background: #3a3a4a; border-color: #00ffff; transform: translateY(-5px) scale(1.02); }
-        .module-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,255,255,0.2), transparent); transition: 0.5s; }
-        .module-btn:hover::before { left: 100%; }
+        /* PANEL STİLLERİ */
+        .panel { background: rgba(0, 15, 35, 0.9); border: 1px solid #00f2ff; border-radius: 12px; padding: 15px; box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
+        .panel-header { font-size: 12px; border-bottom: 1px solid #00f2ff; margin-bottom: 15px; padding-bottom: 5px; color: #ffcc00; text-transform: uppercase; }
 
-        /* Zorluk Seçimi */
-        #difficulty-select-module { display: none; margin-top: 30px; border-top: 1px dashed #00ffff; padding-top: 25px; text-align: center; }
-        .diff-label { color: #00ffff; font-size: 20px; margin-bottom: 15px; }
-        .diff-grid { display: flex; justify-content: center; gap: 15px; margin-top: 15px; flex-wrap: wrap; }
-        .diff-btn { 
-            padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; 
-            font-weight: bold; font-size: 16px; text-transform: uppercase;
-            transition: 0.2s;
-        }
-        .diff-btn.easy { background: #27ae60; color: white; } .diff-btn.medium { background: #f39c12; color: white; } 
-        .diff-btn.hard { background: #e74c3c; color: white; } .diff-btn.extreme { background: #8e44ad; color: gold; border: 2px solid gold; }
-        .diff-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
+        /* 1. SOL: PROBLEMLER SİSTEMİ */
+        .prob-btn { background: #001a33; border: 1px solid #00f2ff; color: #00f2ff; width: 100%; padding: 12px; margin-bottom: 8px; cursor: pointer; border-radius: 4px; font-family: 'Orbitron'; font-size: 11px; text-align: left; }
+        .prob-btn:hover { background: #00f2ff; color: #000; }
+        #task-box { display: none; margin-top: 15px; padding: 10px; border: 1px dashed #00ff88; background: #000; border-radius: 5px; }
+        #task-box input { background: #111; border: 1px solid #00ff88; color: white; padding: 8px; width: 80%; margin: 10px 0; outline: none; }
 
-        /* Görev Terminali (Soru Ekranı) */
-        #mission-terminal { 
-            display: none; margin-top: 40px; background: #000; padding: 40px; 
-            border-radius: 15px; border: 2px solid #00ffff; text-align: center;
-            box-shadow: 0 0 40px rgba(0,255,255,0.2) inset;
-        }
-        .terminal-header { color: #00ff00; font-size: 20px; margin-bottom: 15px; }
-        #question-display { color: #00e0e0; font-size: 24px; min-height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; }
-        .input-group { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;}
-        .terminal-input { 
-            background: #000; border: 1px solid #00ff00; color: #00ff00; 
-            padding: 15px; font-size: 20px; width: 150px; text-align: center; border-radius: 5px;
-            outline: none; caret-color: #00ff00;
-        }
-        .terminal-input::placeholder { color: #008800; }
-        .execute-btn { 
-            background: #00b2ff; border: none; color: white; padding: 15px 35px; 
-            border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 18px;
-            transition: 0.2s;
-        }
-        .execute-btn:hover { background: #00d9ff; transform: translateY(-2px); }
-        #mission-log { color: #f1c40f; margin-top: 20px; font-size: 18px; min-height: 30px; }
+        /* 2. ORTA: UZAY DÖNME HIZI VE YÖNLER (Matematiksel Veri) */
+        .rotation-display { height: 400px; position: relative; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #051937 0%, #000 80%); border-radius: 50%; border: 2px solid #111; }
+        .planet { border-radius: 50%; position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .sun { width: 70px; height: 70px; background: #ffaa00; box-shadow: 0 0 40px #ffaa00; }
+        .earth { width: 40px; height: 40px; background: #2277ff; top: 50px; left: 70%; box-shadow: 0 0 20px #2277ff; }
+        .jupiter { width: 55px; height: 55px; background: #ff7744; bottom: 40px; left: 20%; box-shadow: 0 0 20px #ff7744; }
+        .arrow-indicator { font-size: 24px; font-weight: bold; color: #00ff88; margin-top: -5px; }
+        .speed-tag { font-family: 'JetBrains Mono'; font-size: 10px; color: #fff; background: rgba(0,0,0,0.7); padding: 2px 5px; border-radius: 3px; }
+
+        /* 3. SAĞ: NASA DÖRT İŞLEM HESAP MAKİNESİ */
+        .calc-screen { background: #000; border: 1px solid #ff0055; color: #ff0055; padding: 15px; text-align: right; font-size: 22px; font-family: 'JetBrains Mono'; border-radius: 5px; margin-bottom: 10px; min-height: 25px; }
+        .calc-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .key { background: #111; border: 1px solid #444; color: #eee; padding: 15px 5px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron'; font-size: 14px; }
+        .key-op { border-color: #ff0055; color: #ff0055; }
+        .key-eq { background: #00ff88; color: #000; border: none; grid-column: span 2; }
     </style>
 </head>
 <body>
+    <div class="bg-stars"></div>
 
-<script>
-    function createStars() {
-        const body = document.body;
-        for (let i = 0; i < 100; i++) {
-            const star = document.createElement('div');
-            star.className = 'star ' + ['star-small', 'star-medium', 'star-large'][Math.floor(Math.random() * 3)];
-            star.style.top = Math.random() * 100 + 'vh';
-            star.style.left = Math.random() * 100 + 'vw';
-            body.appendChild(star);
-        }
-    }
-    createStars();
-</script>
+    <div class="dashboard">
+        <div class="panel">
+            <div class="panel-header">● MATEMATİKSEL MİSYONLAR</div>
+            <button class="prob-btn" onclick="openTask(1)">🛰️ UYDU YÖRÜNGE PROBLEMİ</button>
+            <button class="prob-btn" onclick="openTask(2)">⛽ YAKIT TÜKETİM ANALİZİ</button>
+            <button class="prob-btn" onclick="openTask(3)">📏 GEZEGEN YÜZEY ÖLÇÜMÜ</button>
+            
+            <div id="task-box">
+                <p id="q-text" style="font-size: 12px; line-height: 1.4; color:#00ff88;"></p>
+                <input type="number" id="user-input" placeholder="Sonuç girin...">
+                <button onclick="checkAnswer()" style="background:#00ff88; border:none; padding:8px 15px; font-weight:bold; cursor:pointer; width:100%;">ANALİZ ET</button>
+                <p id="feedback" style="font-size: 11px; margin-top: 10px;"></p>
+            </div>
+        </div>
 
-<div class="nasa-console">
-    <div class="header">
-        <h1>NASA MATEMATİK MODÜLÜ</h1>
-        <p class="sub-mission">[ ALPHA-5: GEZEGENLERARASI MATEMATİK KEŞİF SİSTEMİ ]</p>
-    </div>
+        <div class="panel">
+            <div class="panel-header">● UZAY CİSİMLERİ ROTASYON RADARI (MATEMATİKSEL VERİ)</div>
+            <div class="rotation-display">
+                <div class="planet sun">
+                    <span class="speed-tag">1.9 km/s</span>
+                    <span class="arrow-indicator">↻</span>
+                    <small style="font-size:8px; color:#000;">GÜNEŞ</small>
+                </div>
+                <div class="planet earth">
+                    <span class="speed-tag">1670 km/sa</span>
+                    <span class="arrow-indicator" style="transform: rotate(-45deg);">↺</span>
+                    <small style="font-size:8px;">DÜNYA</small>
+                </div>
+                <div class="planet jupiter">
+                    <span class="speed-tag">45,300 km/sa</span>
+                    <span class="arrow-indicator">↺</span>
+                    <small style="font-size:8px;">JÜPİTER</small>
+                </div>
+                <div style="width:250px; height:250px; border:1px dashed #222; border-radius:50%; position:absolute;"></div>
+                <div style="width:380px; height:380px; border:1px dashed #111; border-radius:50%; position:absolute;"></div>
+            </div>
+            <p style="font-size: 10px; color:#666; text-align:center; margin-top:10px;">* Oklar cisimlerin kendi ekseni etrafındaki matematiksel dönüş yönünü gösterir.</p>
+        </div>
 
-    <div class="module-grid">
-        <button class="module-btn" onclick="activateModule('GEOMETRİ VE KOORDİNATLAR')">
-            📐 GEO-MODÜLÜ <br><small>Gezegen Yörünge Hesapları</small>
-        </button>
-        <button class="module-btn" onclick="activateModule('SAYISAL İŞLEM ANALİZİ')">
-            🔢 DATA-MODÜLÜ <br><small>Yıldız Verisi İşleme</small>
-        </button>
-        <button class="module-btn" onclick="activateModule('CEBİRSEL ALGORİTMALAR')">
-            ⚡ CEBİR-MODÜLÜ <br><small>Uzay Aracı Rotası</small>
-        </button>
-        <button class="module-btn" onclick="activateModule('VERİ LOG ANALİZİ')">
-            📊 İSTATİSTİK-MODÜLÜ <br><small>Meteorit Yoğunlukları</small>
-        </button>
-        <button class="module-btn" onclick="activateModule('KESİRSEL FİZYON HESAPLARI')">
-            🍰 KESİR-MODÜLÜ <br><small>Yakıt Oranı Dağılımı</small>
-        </button>
-        <button class="module-btn" onclick="activateModule('UZAY BÖLGESİ ÖLÇÜMLERİ')">
-            📏 ÇEVRE-MODÜLÜ <br><small>Galaksi Genişlikleri</small>
-        </button>
-    </div>
-
-    <div id="difficulty-select-module">
-        <h3 class="diff-label">AKTİF MODÜL: <span id="active-module-name"></span></h3>
-        <p style="color: #aaa; font-size: 14px;">GÖREV ZORLUĞUNU AYARLA:</p>
-        <div class="diff-grid">
-            <button class="diff-btn easy" onclick="startMission('Kolay')">KOLAY (Başlangıç)</button>
-            <button class="diff-btn medium" onclick="startMission('Orta')">ORTA (Deneyimli)</button>
-            <button class="diff-btn hard" onclick="startMission('Zor')">ZOR (Uzman)</button>
-            <button class="diff-btn extreme" onclick="startMission('Aşırı Zor')">AŞIRI ZOR (Uzay Komutanı)</button>
+        <div class="panel">
+            <div class="panel-header" style="color:#ff0055;">● NASA HESAPLAMA ÜNİTESİ</div>
+            <div class="calc-screen" id="display">0</div>
+            <div class="calc-keys">
+                <button class="key key-op" onclick="clr()">AC</button>
+                <button class="key key-op" onclick="ins('/')">÷</button>
+                <button class="key key-op" onclick="ins('*')">×</button>
+                <button class="key key-op" onclick="del()">DEL</button>
+                
+                <button class="key" onclick="ins('7')">7</button>
+                <button class="key" onclick="ins('8')">8</button>
+                <button class="key" onclick="ins('9')">9</button>
+                <button class="key key-op" onclick="ins('-')">-</button>
+                
+                <button class="key" onclick="ins('4')">4</button>
+                <button class="key" onclick="ins('5')">5</button>
+                <button class="key" onclick="ins('6')">6</button>
+                <button class="key key-op" onclick="ins('+')">+</button>
+                
+                <button class="key" onclick="ins('1')">1</button>
+                <button class="key" onclick="ins('2')">2</button>
+                <button class="key" onclick="ins('3')">3</button>
+                <button class="key" onclick="exe()" style="background:#00ff88; color:#000; border:none; grid-row: span 2;">=</button>
+                
+                <button class="key" onclick="ins('0')" style="grid-column: span 2;">0</button>
+                <button class="key" onclick="ins('.')">.</button>
+            </div>
         </div>
     </div>
 
-    <div id="mission-terminal">
-        <div class="terminal-header">GÖREV TERMİNALİ AKTİF</div>
-        <p id="question-display">[ SİSTEM YÜKLENİYOR... HAZIR OLUN. ]</p>
-        <div class="input-group">
-            <input type="number" id="user-input" class="terminal-input" placeholder="Veri Girin...">
-            <button class="execute-btn" onclick="submitAnswer()">VERİ İŞLE</button>
-        </div>
-        <p id="mission-log">[ LOG: SİSTEM BEKLEMEDE ]</p>
-    </div>
-</div>
-
 <script>
-    let activeTopic = "";
-    let activeDifficulty = "";
-    let expectedAnswer = 0;
+    // --- HESAP MAKİNESİ SİSTEMİ ---
+    let disp = document.getElementById('display');
+    function ins(v) { if(disp.innerText==='0') disp.innerText=''; disp.innerText+=v; }
+    function clr() { disp.innerText='0'; }
+    function del() { disp.innerText=disp.innerText.slice(0,-1); if(!disp.innerText) disp.innerText='0'; }
+    function exe() { try { disp.innerText = eval(disp.innerText); } catch { disp.innerText = 'HATA'; } }
 
-    function activateModule(topicName) {
-        activeTopic = topicName;
-        document.getElementById('active-module-name').innerText = topicName;
-        document.getElementById('difficulty-select-module').style.display = 'block';
-        document.getElementById('mission-terminal').style.display = 'none';
-        document.getElementById('mission-log').innerText = "[ LOG: Yeni modül aktif edildi ]";
-    }
+    // --- MATEMATİK PROBLEMLERİ ---
+    let correctValue = 0;
+    function openTask(id) {
+        document.getElementById('task-box').style.display = 'block';
+        const txt = document.getElementById('q-text');
+        document.getElementById('feedback').innerText = "";
+        document.getElementById('user-input').value = "";
 
-    function startMission(difficultyLevel) {
-        activeDifficulty = difficultyLevel;
-        document.getElementById('mission-terminal').style.display = 'block';
-        document.getElementById('mission-log').innerText = `[ LOG: Görev zorluğu '${difficultyLevel}' olarak ayarlandı ]`;
-        generateSpaceQuestion();
-    }
-
-    function generateSpaceQuestion() {
-        const qDisplay = document.getElementById('question-display');
-        document.getElementById('user-input').value = ""; // Giriş kutusunu temizle
-
-        let a, b, c, r; // Değişkenler
-
-        if(activeTopic === 'GEOMETRİ VE KOORDİNATLAR') {
-            if(activeDifficulty === 'Aşırı Zor') {
-                qDisplay.innerText = "Bir gezegenin yörüngesi yarıçapı 3000 km olan bir çemberdir. Bu yörüngenin çapı ile yarıçapının toplamı kaç km'dir?";
-                expectedAnswer = 9000;
-            } else if (activeDifficulty === 'Zor') {
-                qDisplay.innerText = "Mars'ın ekvator çevresi 21344 km'dir. Bu dairenin çapı yaklaşık olarak kaç km'dir? (π=3 alınız)"; // Çevre = 2*π*r => Çevre = π*Çap
-                expectedAnswer = Math.round(21344 / 3); // Yaklaşık olarak 7114.6 -> 7115
-            } else { // Kolay ve Orta
-                r = Math.floor(Math.random() * 10) + 10; // 10-19 arası yarıçap
-                qDisplay.innerText = `Bir asteroidin yörüngesel çapı ${r * 2} birimdir. Yarıçapı kaç birimdir?`;
-                expectedAnswer = r;
-            }
-        }
-        else if(activeTopic === 'SAYISAL İŞLEM ANALİZİ') {
-            if(activeDifficulty === 'Aşırı Zor') {
-                a = Math.floor(Math.random() * 500) + 500; b = Math.floor(Math.random() * 10) + 5;
-                qDisplay.innerText = `${a} x ${b} + 150 işleminin sonucu kaçtır?`;
-                expectedAnswer = (a * b) + 150;
-            } else if (activeDifficulty === 'Zor') {
-                a = Math.floor(Math.random() * 800) + 200; b = Math.floor(Math.random() * 50) + 10;
-                qDisplay.innerText = `${a} - ${b} + 250 işleminin sonucu kaçtır?`;
-                expectedAnswer = a - b + 250;
-            } else { // Kolay ve Orta
-                a = Math.floor(Math.random() * 1000) + 100; b = Math.floor(Math.random() * 100) + 10;
-                qDisplay.innerText = `${a} + ${b} işleminin sonucu kaçtır?`;
-                expectedAnswer = a + b;
-            }
-        }
-        else if(activeTopic === 'CEBİRSEL ALGORİTMALAR') {
-            if(activeDifficulty === 'Aşırı Zor') {
-                qDisplay.innerText = "Bir uzay aracı 5 saniyede 1200 km yol alıyor. İlk saniyede 100 km, sonraki her saniyede bir öncekinden 20 km fazla gidiyorsa, 5. saniyede kaç km yol alır?";
-                expectedAnswer = 180; // 100, 120, 140, 160, 180
-            } else if (activeDifficulty === 'Zor') {
-                qDisplay.innerText = "20 + 3 * (5 + 2) işleminin sonucu kaçtır? (İşlem sırasına dikkat!)";
-                expectedAnswer = 41; // 20 + 3 * 7 = 20 + 21 = 41
-            } else { // Kolay ve Orta
-                qDisplay.innerText = "3 x 8 + 5 işleminin sonucu kaçtır?";
-                expectedAnswer = 29;
-            }
-        }
-        else if(activeTopic === 'VERİ LOG ANALİZİ') {
-            if(activeDifficulty === 'Aşırı Zor') {
-                qDisplay.innerText = "Bir gezegenin 5 günlük sıcaklık ortalaması 150 derecedir. İlk 4 gün 120, 140, 160, 170 derece ise 5. gün kaç derece olmuştur?";
-                expectedAnswer = (150 * 5) - (120 + 140 + 160 + 170); // 750 - 590 = 160
-            } else if (activeDifficulty === 'Zor') {
-                qDisplay.innerText = "Bir uzay istasyonunda 20 astronot var. Bunların %25'i kadın ise kaç kadın astronot vardır?";
-                expectedAnswer = 5; // 20 * 0.25 = 5
-            } else { // Kolay ve Orta
-                qDisplay.innerText = "Bir gezegene yapılan 5 gözlemin sonucu: 10, 15, 20, 25, 30. Bu verilerin aritmetik ortalaması kaçtır?";
-                expectedAnswer = 20; // (10+15+20+25+30)/5 = 100/5 = 20
-            }
-        }
-        else if(activeTopic === 'KESİRSEL FİZYON HESAPLARI') {
-            if(activeDifficulty === 'Aşırı Zor') {
-                qDisplay.innerText = "Bir roketin yakıtının 3/5'i kullanıldı. Geriye kalan yakıtın yarısı kadar daha yakıt eklenirse, roketin toplam yakıtının kaçta kaçı dolu olur?";
-                expectedAnswer = 3/5; // Geriye 2/5 kalır, yarısı 1/5 eklenirse 2/5 + 1/5 = 3/5
-            } else if (activeDifficulty === 'Zor') {
-                qDisplay.innerText = "Bir uzay aracı 1/4 oranında yakıt harcadı. Deponun kaçta kaçı kaldı?";
-                expectedAnswer = 3/4;
-            } else { // Kolay ve Orta
-                qDisplay.innerText = "1/3 mü büyüktür 1/5 mi? (Büyük olan kesrin paydasını yazınız)";
-                expectedAnswer = 3;
-            }
-        }
-        else if(activeTopic === 'UZAY BÖLGESİ ÖLÇÜMLERİ') {
-            if(activeDifficulty === 'Aşırı Zor') {
-                qDisplay.innerText = "Kenar uzunlukları 2500 km ve 1500 km olan dikdörtgen şeklindeki bir galaksi bölgesinin çevre uzunluğu kaç km'dir? (2 ile çarp)";
-                expectedAnswer = 8000; // 2 * (2500 + 1500) = 2 * 4000 = 8000
-            } else if (activeDifficulty === 'Zor') {
-                qDisplay.innerText = "Bir gezegen üssünün dikdörtgen şeklindeki alanı 4000 m²'dir. Kısa kenarı 50 m ise uzun kenarı kaç m'dir?";
-                expectedAnswer = 80; // 4000 / 50 = 80
-            } else { // Kolay ve Orta
-                qDisplay.innerText = "Bir uzay istasyonunun bir kenarı 200 metre olan kare şeklindeki alanının çevresi kaç metredir?";
-                expectedAnswer = 800; // 200 * 4 = 800
-            }
+        if(id === 1) {
+            txt.innerText = "BİR UYDU DÜNYA ETRAFINDA 1 SAATTE 28,000 KM YOL ALIYOR. BU UYDU 5 SAATTE TOPLAM KAÇ KM YOL ALIR?";
+            correctValue = 140000;
+        } else if(id === 2) {
+            txt.innerText = "BİR ROKET HER 100 KM İÇİN 450 LİTRE YAKIT TÜKETİYOR. 800 KM'LİK BİR MESAFE İÇİN KAÇ LİTRE YAKIT GEREKİR?";
+            correctValue = 3600;
+        } else if(id === 3) {
+            txt.innerText = "KARE ŞEKLİNDEKİ BİR UZAY İSTASYONUNUN BİR KENARI 125 METREDİR. BU İSTASYONUN TOPLAM ÇEVRE UZUNLUĞU KAÇ METREDİR?";
+            correctValue = 500;
         }
     }
 
-    function submitAnswer() {
-        const userInput = document.getElementById('user-input').value;
-        const missionLog = document.getElementById('mission-log');
-
-        if (parseFloat(userInput) === expectedAnswer) {
-            missionLog.style.color = "#00ff00";
-            missionLog.innerText = `[ LOG: SİSTEM ONAYI - VERİ DOĞRU. MİSYON BAŞARILI. ]`;
-            document.getElementById('user-input').value = "";
-            setTimeout(generateSpaceQuestion, 3000); // 3 saniye sonra yeni soru
+    function checkAnswer() {
+        const val = document.getElementById('user-input').value;
+        const feed = document.getElementById('feedback');
+        if(val == correctValue) {
+            feed.innerText = "✓ DOĞRULANDI: MATEMATİKSEL VERİ TUTARLI.";
+            feed.style.color = "#00ff88";
         } else {
-            missionLog.style.color = "#ff0000";
-            missionLog.innerText = `[ LOG: HATA KODU: E-01. VERİ UYUŞMUYOR. TEKRAR DENEYİN. ]`;
+            feed.innerText = "✕ HATA: HESAPLAMA HATASI TESPİT EDİLDİ.";
+            feed.style.color = "#ff0055";
         }
     }
 </script>
