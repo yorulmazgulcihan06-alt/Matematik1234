@@ -1,102 +1,276 @@
 <!DOCTYPE html>
-<html>
+<html lang="tr">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ROBLOX MULTIPLAYER REAL-TIME</title>
-    <script src="https://cdn.pubnub.com/sdk/javascript/pubnub.4.29.9.min.js"></script>
+    <meta charset="UTF-8">
+    <title>NASA GEZEGENLERARASI MATEMATİK MODÜLÜ // ALPHA-5</title>
     <style>
-        body { margin: 0; background: #1b1d1f; overflow: hidden; color: white; font-family: sans-serif; }
-        #game-world { width: 100vw; height: 100vh; position: relative; background: #333; }
-        .player { 
-            position: absolute; width: 40px; height: 40px; 
-            background: #00b2ff; border-radius: 8px; text-align: center;
-            font-size: 10px; font-weight: bold; transition: all 0.1s linear;
+        /* NASA Uzay Teması */
+        body { 
+            background: linear-gradient(to bottom, #0a0a0c, #1a1a2e); /* Uzay atmosferi */
+            color: #e0e0e0; 
+            font-family: 'Space Mono', monospace; /* Fütüristik font */
+            margin: 0; padding: 20px; 
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+            overflow: hidden; /* Scroll engelleme */
         }
-        .my-player { background: #00e676; box-shadow: 0 0 20px #00e676; z-index: 10; }
-        #ui { position: fixed; top: 10px; left: 10px; z-index: 100; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; }
+        /* Google Fonts: Space Mono import */
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+        .nasa-console { 
+            max-width: 1000px; width: 95%; background: rgba(18,18,20,0.9); /* Yarı şeffaf konsol */
+            border: 2px solid #00ffff; /* Siber mavi çerçeve */
+            border-radius: 15px; padding: 30px; 
+            box-shadow: 0 0 60px rgba(0,255,255,0.3), inset 0 0 20px rgba(0,255,255,0.1); /* Parlaklık efekti */
+            position: relative; z-index: 10;
+        }
+        
+        /* Uzayda Süzülen Yıldızlar/Animasyonlar */
+        .star { position: absolute; background: white; border-radius: 50%; animation: twinkle linear infinite; }
+        .star-small { width: 2px; height: 2px; opacity: 0.8; animation-duration: 2s; }
+        .star-medium { width: 3px; height: 3px; opacity: 0.9; animation-duration: 3s; }
+        .star-large { width: 4px; height: 4px; opacity: 1; animation-duration: 4s; }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        .header { text-align: center; border-bottom: 2px dashed #00ffff; margin-bottom: 30px; padding-bottom: 20px; }
+        h1 { color: #00ffff; text-transform: uppercase; letter-spacing: 4px; font-size: 28px; }
+        .sub-mission { color: #aaa; font-size: 14px; margin-top: 5px; }
+
+        /* Konu Seçim Modülleri */
+        .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .module-btn { 
+            background: #2a2a3a; border: 1px solid #00e0e0; color: #fff; padding: 25px; 
+            border-radius: 10px; cursor: pointer; text-align: left; transition: 0.3s;
+            font-size: 18px; position: relative; overflow: hidden;
+            box-shadow: 0 0 15px rgba(0,255,255,0.1);
+        }
+        .module-btn:hover { background: #3a3a4a; border-color: #00ffff; transform: translateY(-5px) scale(1.02); }
+        .module-btn::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,255,255,0.2), transparent); transition: 0.5s; }
+        .module-btn:hover::before { left: 100%; }
+
+        /* Zorluk Seçimi */
+        #difficulty-select-module { display: none; margin-top: 30px; border-top: 1px dashed #00ffff; padding-top: 25px; text-align: center; }
+        .diff-label { color: #00ffff; font-size: 20px; margin-bottom: 15px; }
+        .diff-grid { display: flex; justify-content: center; gap: 15px; margin-top: 15px; flex-wrap: wrap; }
+        .diff-btn { 
+            padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; 
+            font-weight: bold; font-size: 16px; text-transform: uppercase;
+            transition: 0.2s;
+        }
+        .diff-btn.easy { background: #27ae60; color: white; } .diff-btn.medium { background: #f39c12; color: white; } 
+        .diff-btn.hard { background: #e74c3c; color: white; } .diff-btn.extreme { background: #8e44ad; color: gold; border: 2px solid gold; }
+        .diff-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
+
+        /* Görev Terminali (Soru Ekranı) */
+        #mission-terminal { 
+            display: none; margin-top: 40px; background: #000; padding: 40px; 
+            border-radius: 15px; border: 2px solid #00ffff; text-align: center;
+            box-shadow: 0 0 40px rgba(0,255,255,0.2) inset;
+        }
+        .terminal-header { color: #00ff00; font-size: 20px; margin-bottom: 15px; }
+        #question-display { color: #00e0e0; font-size: 24px; min-height: 80px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; }
+        .input-group { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;}
+        .terminal-input { 
+            background: #000; border: 1px solid #00ff00; color: #00ff00; 
+            padding: 15px; font-size: 20px; width: 150px; text-align: center; border-radius: 5px;
+            outline: none; caret-color: #00ff00;
+        }
+        .terminal-input::placeholder { color: #008800; }
+        .execute-btn { 
+            background: #00b2ff; border: none; color: white; padding: 15px 35px; 
+            border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 18px;
+            transition: 0.2s;
+        }
+        .execute-btn:hover { background: #00d9ff; transform: translateY(-2px); }
+        #mission-log { color: #f1c40f; margin-top: 20px; font-size: 18px; min-height: 30px; }
     </style>
 </head>
 <body>
 
-<div id="ui">
-    <b>ROBLOX REAL ONLINE</b><br>
-    Durum: <span id="status" style="color:#00e676">Bağlanıyor...</span><br>
-    Robux: <span id="r-val">20,000</span>
+<script>
+    function createStars() {
+        const body = document.body;
+        for (let i = 0; i < 100; i++) {
+            const star = document.createElement('div');
+            star.className = 'star ' + ['star-small', 'star-medium', 'star-large'][Math.floor(Math.random() * 3)];
+            star.style.top = Math.random() * 100 + 'vh';
+            star.style.left = Math.random() * 100 + 'vw';
+            body.appendChild(star);
+        }
+    }
+    createStars();
+</script>
+
+<div class="nasa-console">
+    <div class="header">
+        <h1>NASA MATEMATİK MODÜLÜ</h1>
+        <p class="sub-mission">[ ALPHA-5: GEZEGENLERARASI MATEMATİK KEŞİF SİSTEMİ ]</p>
+    </div>
+
+    <div class="module-grid">
+        <button class="module-btn" onclick="activateModule('GEOMETRİ VE KOORDİNATLAR')">
+            📐 GEO-MODÜLÜ <br><small>Gezegen Yörünge Hesapları</small>
+        </button>
+        <button class="module-btn" onclick="activateModule('SAYISAL İŞLEM ANALİZİ')">
+            🔢 DATA-MODÜLÜ <br><small>Yıldız Verisi İşleme</small>
+        </button>
+        <button class="module-btn" onclick="activateModule('CEBİRSEL ALGORİTMALAR')">
+            ⚡ CEBİR-MODÜLÜ <br><small>Uzay Aracı Rotası</small>
+        </button>
+        <button class="module-btn" onclick="activateModule('VERİ LOG ANALİZİ')">
+            📊 İSTATİSTİK-MODÜLÜ <br><small>Meteorit Yoğunlukları</small>
+        </button>
+        <button class="module-btn" onclick="activateModule('KESİRSEL FİZYON HESAPLARI')">
+            🍰 KESİR-MODÜLÜ <br><small>Yakıt Oranı Dağılımı</small>
+        </button>
+        <button class="module-btn" onclick="activateModule('UZAY BÖLGESİ ÖLÇÜMLERİ')">
+            📏 ÇEVRE-MODÜLÜ <br><small>Galaksi Genişlikleri</small>
+        </button>
+    </div>
+
+    <div id="difficulty-select-module">
+        <h3 class="diff-label">AKTİF MODÜL: <span id="active-module-name"></span></h3>
+        <p style="color: #aaa; font-size: 14px;">GÖREV ZORLUĞUNU AYARLA:</p>
+        <div class="diff-grid">
+            <button class="diff-btn easy" onclick="startMission('Kolay')">KOLAY (Başlangıç)</button>
+            <button class="diff-btn medium" onclick="startMission('Orta')">ORTA (Deneyimli)</button>
+            <button class="diff-btn hard" onclick="startMission('Zor')">ZOR (Uzman)</button>
+            <button class="diff-btn extreme" onclick="startMission('Aşırı Zor')">AŞIRI ZOR (Uzay Komutanı)</button>
+        </div>
+    </div>
+
+    <div id="mission-terminal">
+        <div class="terminal-header">GÖREV TERMİNALİ AKTİF</div>
+        <p id="question-display">[ SİSTEM YÜKLENİYOR... HAZIR OLUN. ]</p>
+        <div class="input-group">
+            <input type="number" id="user-input" class="terminal-input" placeholder="Veri Girin...">
+            <button class="execute-btn" onclick="submitAnswer()">VERİ İŞLE</button>
+        </div>
+        <p id="mission-log">[ LOG: SİSTEM BEKLEMEDE ]</p>
+    </div>
 </div>
 
-<div id="game-world"></div>
-
 <script>
-    const myID = "User_" + Math.floor(Math.random() * 9999);
-    let robux = 20000;
-    
-    // MULTIPLAYER KURULUMU (PubNub Ücretsiz Anahtarları)
-    const pubnub = new PubNub({
-        publishKey: 'demo', // Test için demo anahtarı
-        subscribeKey: 'demo',
-        uuid: myID
-    });
+    let activeTopic = "";
+    let activeDifficulty = "";
+    let expectedAnswer = 0;
 
-    pubnub.subscribe({ channels: ['roblox_utkan'] });
-
-    const world = document.getElementById('game-world');
-    const players = {};
-
-    // 1. KENDİ KARAKTERİMİ OLUŞTUR
-    function createPlayer(id, isMe) {
-        const div = document.createElement('div');
-        div.id = id;
-        div.className = 'player' + (isMe ? ' my-player' : '');
-        div.innerText = isMe ? "SEN" : id;
-        world.appendChild(div);
-        players[id] = div;
+    function activateModule(topicName) {
+        activeTopic = topicName;
+        document.getElementById('active-module-name').innerText = topicName;
+        document.getElementById('difficulty-select-module').style.display = 'block';
+        document.getElementById('mission-terminal').style.display = 'none';
+        document.getElementById('mission-log').innerText = "[ LOG: Yeni modül aktif edildi ]";
     }
 
-    createPlayer(myID, true);
-    document.getElementById('status').innerText = "ÇEVRİMİÇİ";
+    function startMission(difficultyLevel) {
+        activeDifficulty = difficultyLevel;
+        document.getElementById('mission-terminal').style.display = 'block';
+        document.getElementById('mission-log').innerText = `[ LOG: Görev zorluğu '${difficultyLevel}' olarak ayarlandı ]`;
+        generateSpaceQuestion();
+    }
 
-    // 2. HAREKET ET VE DİĞERLERİNE GÖNDER
-    window.addEventListener('keydown', (e) => {
-        const p = players[myID];
-        let top = p.offsetTop;
-        let left = p.offsetLeft;
+    function generateSpaceQuestion() {
+        const qDisplay = document.getElementById('question-display');
+        document.getElementById('user-input').value = ""; // Giriş kutusunu temizle
 
-        if(e.key === 'w') top -= 20;
-        if(e.key === 's') top += 20;
-        if(e.key === 'a') left -= 20;
-        if(e.key === 'd') left += 20;
+        let a, b, c, r; // Değişkenler
 
-        // Pozisyonu güncelle
-        p.style.top = top + "px";
-        p.style.left = left + "px";
-
-        // DİĞER OYUNCULARA MESAJ AT (Ben buradayım!)
-        pubnub.publish({
-            channel: 'roblox_utkan',
-            message: { id: myID, x: left, y: top }
-        });
-    });
-
-    // 3. DİĞER OYUNCULARI GÖR
-    pubnub.addListener({
-        message: function(event) {
-            const data = event.message;
-            if(data.id !== myID) {
-                if(!players[data.id]) {
-                    createPlayer(data.id, false);
-                }
-                players[data.id].style.left = data.x + "px";
-                players[data.id].style.top = data.y + "px";
+        if(activeTopic === 'GEOMETRİ VE KOORDİNATLAR') {
+            if(activeDifficulty === 'Aşırı Zor') {
+                qDisplay.innerText = "Bir gezegenin yörüngesi yarıçapı 3000 km olan bir çemberdir. Bu yörüngenin çapı ile yarıçapının toplamı kaç km'dir?";
+                expectedAnswer = 9000;
+            } else if (activeDifficulty === 'Zor') {
+                qDisplay.innerText = "Mars'ın ekvator çevresi 21344 km'dir. Bu dairenin çapı yaklaşık olarak kaç km'dir? (π=3 alınız)"; // Çevre = 2*π*r => Çevre = π*Çap
+                expectedAnswer = Math.round(21344 / 3); // Yaklaşık olarak 7114.6 -> 7115
+            } else { // Kolay ve Orta
+                r = Math.floor(Math.random() * 10) + 10; // 10-19 arası yarıçap
+                qDisplay.innerText = `Bir asteroidin yörüngesel çapı ${r * 2} birimdir. Yarıçapı kaç birimdir?`;
+                expectedAnswer = r;
             }
         }
-    });
+        else if(activeTopic === 'SAYISAL İŞLEM ANALİZİ') {
+            if(activeDifficulty === 'Aşırı Zor') {
+                a = Math.floor(Math.random() * 500) + 500; b = Math.floor(Math.random() * 10) + 5;
+                qDisplay.innerText = `${a} x ${b} + 150 işleminin sonucu kaçtır?`;
+                expectedAnswer = (a * b) + 150;
+            } else if (activeDifficulty === 'Zor') {
+                a = Math.floor(Math.random() * 800) + 200; b = Math.floor(Math.random() * 50) + 10;
+                qDisplay.innerText = `${a} - ${b} + 250 işleminin sonucu kaçtır?`;
+                expectedAnswer = a - b + 250;
+            } else { // Kolay ve Orta
+                a = Math.floor(Math.random() * 1000) + 100; b = Math.floor(Math.random() * 100) + 10;
+                qDisplay.innerText = `${a} + ${b} işleminin sonucu kaçtır?`;
+                expectedAnswer = a + b;
+            }
+        }
+        else if(activeTopic === 'CEBİRSEL ALGORİTMALAR') {
+            if(activeDifficulty === 'Aşırı Zor') {
+                qDisplay.innerText = "Bir uzay aracı 5 saniyede 1200 km yol alıyor. İlk saniyede 100 km, sonraki her saniyede bir öncekinden 20 km fazla gidiyorsa, 5. saniyede kaç km yol alır?";
+                expectedAnswer = 180; // 100, 120, 140, 160, 180
+            } else if (activeDifficulty === 'Zor') {
+                qDisplay.innerText = "20 + 3 * (5 + 2) işleminin sonucu kaçtır? (İşlem sırasına dikkat!)";
+                expectedAnswer = 41; // 20 + 3 * 7 = 20 + 21 = 41
+            } else { // Kolay ve Orta
+                qDisplay.innerText = "3 x 8 + 5 işleminin sonucu kaçtır?";
+                expectedAnswer = 29;
+            }
+        }
+        else if(activeTopic === 'VERİ LOG ANALİZİ') {
+            if(activeDifficulty === 'Aşırı Zor') {
+                qDisplay.innerText = "Bir gezegenin 5 günlük sıcaklık ortalaması 150 derecedir. İlk 4 gün 120, 140, 160, 170 derece ise 5. gün kaç derece olmuştur?";
+                expectedAnswer = (150 * 5) - (120 + 140 + 160 + 170); // 750 - 590 = 160
+            } else if (activeDifficulty === 'Zor') {
+                qDisplay.innerText = "Bir uzay istasyonunda 20 astronot var. Bunların %25'i kadın ise kaç kadın astronot vardır?";
+                expectedAnswer = 5; // 20 * 0.25 = 5
+            } else { // Kolay ve Orta
+                qDisplay.innerText = "Bir gezegene yapılan 5 gözlemin sonucu: 10, 15, 20, 25, 30. Bu verilerin aritmetik ortalaması kaçtır?";
+                expectedAnswer = 20; // (10+15+20+25+30)/5 = 100/5 = 20
+            }
+        }
+        else if(activeTopic === 'KESİRSEL FİZYON HESAPLARI') {
+            if(activeDifficulty === 'Aşırı Zor') {
+                qDisplay.innerText = "Bir roketin yakıtının 3/5'i kullanıldı. Geriye kalan yakıtın yarısı kadar daha yakıt eklenirse, roketin toplam yakıtının kaçta kaçı dolu olur?";
+                expectedAnswer = 3/5; // Geriye 2/5 kalır, yarısı 1/5 eklenirse 2/5 + 1/5 = 3/5
+            } else if (activeDifficulty === 'Zor') {
+                qDisplay.innerText = "Bir uzay aracı 1/4 oranında yakıt harcadı. Deponun kaçta kaçı kaldı?";
+                expectedAnswer = 3/4;
+            } else { // Kolay ve Orta
+                qDisplay.innerText = "1/3 mü büyüktür 1/5 mi? (Büyük olan kesrin paydasını yazınız)";
+                expectedAnswer = 3;
+            }
+        }
+        else if(activeTopic === 'UZAY BÖLGESİ ÖLÇÜMLERİ') {
+            if(activeDifficulty === 'Aşırı Zor') {
+                qDisplay.innerText = "Kenar uzunlukları 2500 km ve 1500 km olan dikdörtgen şeklindeki bir galaksi bölgesinin çevre uzunluğu kaç km'dir? (2 ile çarp)";
+                expectedAnswer = 8000; // 2 * (2500 + 1500) = 2 * 4000 = 8000
+            } else if (activeDifficulty === 'Zor') {
+                qDisplay.innerText = "Bir gezegen üssünün dikdörtgen şeklindeki alanı 4000 m²'dir. Kısa kenarı 50 m ise uzun kenarı kaç m'dir?";
+                expectedAnswer = 80; // 4000 / 50 = 80
+            } else { // Kolay ve Orta
+                qDisplay.innerText = "Bir uzay istasyonunun bir kenarı 200 metre olan kare şeklindeki alanının çevresi kaç metredir?";
+                expectedAnswer = 800; // 200 * 4 = 800
+            }
+        }
+    }
 
-    // ROBUX KAZANMA
-    setInterval(() => {
-        robux += 10;
-        document.getElementById('r-val').innerText = robux.toLocaleString();
-    }, 2000);
+    function submitAnswer() {
+        const userInput = document.getElementById('user-input').value;
+        const missionLog = document.getElementById('mission-log');
 
+        if (parseFloat(userInput) === expectedAnswer) {
+            missionLog.style.color = "#00ff00";
+            missionLog.innerText = `[ LOG: SİSTEM ONAYI - VERİ DOĞRU. MİSYON BAŞARILI. ]`;
+            document.getElementById('user-input').value = "";
+            setTimeout(generateSpaceQuestion, 3000); // 3 saniye sonra yeni soru
+        } else {
+            missionLog.style.color = "#ff0000";
+            missionLog.innerText = `[ LOG: HATA KODU: E-01. VERİ UYUŞMUYOR. TEKRAR DENEYİN. ]`;
+        }
+    }
 </script>
 </body>
 </html>
