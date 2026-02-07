@@ -2,19 +2,19 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>NASA MATEMATİK & CANLI UZAY SİSTEMİ</title>
+    <title>NASA SONSUZ MATEMATİK MOTORU</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono&display=swap');
         
-        body { background: #020205; color: #00f2ff; font-family: 'Orbitron', sans-serif; margin: 0; padding: 15px; overflow: hidden; }
-        .bg { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background: radial-gradient(circle, #001 0%, #000 100%); }
+        body { background: #010103; color: #00f2ff; font-family: 'Orbitron', sans-serif; margin: 0; padding: 15px; overflow: hidden; }
+        .bg { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background: radial-gradient(circle, #001 0%, #000 100%); opacity: 0.5; }
 
         /* ANA BUTON: GÜNEŞ SİSTEMİ */
         .solar-toggle { 
             background: linear-gradient(45deg, #ffcc00, #ff8800); color: #000; border: none; 
             padding: 15px; width: 100%; font-size: 18px; font-weight: bold; border-radius: 10px; 
-            cursor: pointer; margin-bottom: 20px; box-shadow: 0 0 25px rgba(255, 204, 0, 0.5);
-            text-transform: uppercase; transition: 0.3s;
+            cursor: pointer; margin-bottom: 20px; box-shadow: 0 0 25px rgba(255, 204, 0, 0.4);
+            transition: 0.3s;
         }
         .solar-toggle:hover { transform: scale(1.02); box-shadow: 0 0 40px #ffcc00; }
 
@@ -23,25 +23,29 @@
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: #000; z-index: 9999; flex-direction: column; align-items: center; justify-content: center;
         }
-        .sun { width: 100px; height: 100px; background: orange; border-radius: 50%; box-shadow: 0 0 60px orange; position: relative; }
+        .sun { width: 80px; height: 80px; background: orange; border-radius: 50%; box-shadow: 0 0 60px orange; }
         .orbit { position: absolute; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; animation: rot linear infinite; }
         @keyframes rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .p-ball { position: absolute; border-radius: 50%; top: -10px; left: 50%; transform: translateX(-50%); }
 
         /* DASHBOARD */
         .grid-container { display: grid; grid-template-columns: 1fr 320px; gap: 20px; max-width: 1200px; margin: auto; }
-        .panel { background: rgba(0, 15, 30, 0.9); border: 2px solid #00f2ff; border-radius: 15px; padding: 20px; }
+        .panel { background: rgba(0, 15, 30, 0.9); border: 2px solid #00f2ff; border-radius: 15px; padding: 20px; box-shadow: 0 0 20px rgba(0,242,255,0.1); }
 
         /* ZORLUK SEÇİMİ */
-        .diff-box { display: flex; gap: 5px; margin-bottom: 15px; }
-        .d-btn { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 10px; color: #fff; }
-        .k { background: #27ae60; } .o { background: #f39c12; } .z { background: #e74c3c; } .az { background: #8e44ad; box-shadow: 0 0 10px #8e44ad; }
+        .diff-box { display: flex; gap: 8px; margin-bottom: 20px; }
+        .d-btn { flex: 1; padding: 12px; border: 1px solid #444; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 12px; color: #fff; background: #111; transition: 0.2s; }
+        .d-btn:hover { border-color: #00f2ff; }
+        .active-k { background: #27ae60 !important; border-color: #fff; }
+        .active-o { background: #f39c12 !important; border-color: #fff; }
+        .active-z { background: #e74c3c !important; border-color: #fff; }
+        .active-az { background: #8e44ad !important; border-color: gold; box-shadow: 0 0 15px #8e44ad; }
 
-        /* HESAP MAKİNESİ (TÜM İŞLEMLER) */
+        /* HESAP MAKİNESİ */
         .calc { background: #000; border: 2px solid #ff0055; border-radius: 12px; padding: 15px; }
-        .scr { background: #111; color: #ff0055; padding: 15px; text-align: right; font-size: 26px; font-family: 'JetBrains Mono'; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ff0055; min-height: 35px; }
+        .scr { background: #111; color: #ff0055; padding: 15px; text-align: right; font-size: 26px; font-family: 'JetBrains Mono'; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ff0055; min-height: 40px; }
         .btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
-        .b { background: #222; border: 1px solid #444; color: #fff; padding: 15px 5px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .b { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 15px 5px; border-radius: 5px; cursor: pointer; font-size: 16px; }
         .b-op { color: #ff0055; border-color: #ff0055; }
         .b-eq { background: #00ff88; color: #000; border: none; font-weight: bold; grid-column: span 2; }
     </style>
@@ -52,91 +56,109 @@
     <div id="space-sim">
         <button onclick="closeSpace()" style="position:fixed; top:20px; right:20px; background:red; color:#fff; border:none; padding:15px 30px; cursor:pointer; font-weight:bold; border-radius:5px; z-index:10000;">DÜNYA'YA DÖN</button>
         <div class="sun"></div>
-        <div class="orbit" style="width:300px; height:300px; animation-duration: 8s;"><div class="p-ball" style="width:20px; height:20px; background:#44ccff;"></div></div>
-        <div class="orbit" style="width:500px; height:500px; animation-duration: 15s;"><div class="p-ball" style="width:30px; height:30px; background:#ff6644;"></div></div>
-        <div class="orbit" style="width:700px; height:700px; animation-duration: 25s;"><div class="p-ball" style="width:45px; height:45px; background:#ffcc88;"></div></div>
-        <h2 style="position:absolute; bottom:50px; color:#ffcc00;">CANLI GÖZLEM MODU AKTİF</h2>
+        <div class="orbit" style="width:300px; height:300px; animation-duration: 10s;"><div class="p-ball" style="width:15px; height:15px; background:#44ccff;"></div></div>
+        <div class="orbit" style="width:500px; height:500px; animation-duration: 20s;"><div class="p-ball" style="width:25px; height:25px; background:#ff6644;"></div></div>
+        <h2 style="position:absolute; bottom:50px; color:#ffcc00;">CANLI GÖZLEM MODU</h2>
     </div>
 
     <div class="grid-container">
         <div class="panel">
-            <button class="solar-toggle" onclick="openSpace()">🔭 GÜNEŞ SİSTEMİNİ CANLI İZLE</button>
+            <button class="solar-toggle" onclick="openSpace()">🔭 GÜNEŞ SİSTEMİNE BAĞLAN</button>
             
             <div class="diff-box">
-                <button class="d-btn k" onclick="setDiff('Kolay')">KOLAY</button>
-                <button class="d-btn o" onclick="setDiff('Orta')">ORTA</button>
-                <button class="d-btn z" onclick="setDiff('Zor')">ZOR</button>
-                <button class="d-btn az" onclick="setDiff('Aşırı NASA')">NASA</button>
+                <button id="btn-Kolay" class="d-btn" onclick="generateQuestion('Kolay')">KOLAY</button>
+                <button id="btn-Orta" class="d-btn" onclick="generateQuestion('Orta')">ORTA</button>
+                <button id="btn-Zor" class="d-btn" onclick="generateQuestion('Zor')">ZOR</button>
+                <button id="btn-NASA" class="d-btn" onclick="generateQuestion('NASA')">NASA</button>
             </div>
 
-            <div id="quiz" style="background:#000; border:1px dashed #00f2ff; padding:20px; border-radius:10px;">
-                <p id="q-text" style="font-size: 18px; color:#00ff88;">Lütfen zorluk seçin...</p>
-                <input type="number" id="ans" style="background:#111; border:1px solid #00f2ff; color:#fff; padding:12px; font-size:20px; width:150px;" placeholder="Cevap?">
-                <button onclick="check()" style="background:#00f2ff; color:#000; border:none; padding:12px 25px; cursor:pointer; font-weight:bold;">ONAYLA</button>
-                <p id="feed" style="margin-top:15px; font-weight:bold;"></p>
+            <div id="quiz" style="background:#000; border:2px solid #00f2ff; padding:30px; border-radius:10px; text-align: center;">
+                <p id="q-text" style="font-size: 24px; color:#00ff88; min-height: 60px;">Zorluk Seçerek Başlayın</p>
+                <input type="number" id="ans" style="background:#111; border:1px solid #00f2ff; color:#fff; padding:15px; font-size:24px; width:200px; text-align: center;" placeholder="?">
+                <br><br>
+                <button onclick="check()" style="background:#00f2ff; color:#000; border:none; padding:15px 40px; cursor:pointer; font-weight:bold; font-size: 18px; border-radius: 5px;">VERİYİ ONAYLA</button>
+                <p id="feed" style="margin-top:20px; font-size: 18px; font-weight:bold;"></p>
             </div>
         </div>
 
         <div class="calc">
-            <div style="font-size:10px; margin-bottom:8px; color:#ff0055;">NASA HESAPLAMA ÜNİTESİ (+ - * /)</div>
+            <div style="font-size:10px; margin-bottom:8px; color:#ff0055;">NASA HESAPLAMA PANELİ</div>
             <div class="scr" id="scr">0</div>
             <div class="btns">
                 <button class="b b-op" onclick="cClr()">AC</button>
                 <button class="b b-op" onclick="cAdd('/')">÷</button>
                 <button class="b b-op" onclick="cAdd('*')">×</button>
                 <button class="b b-op" onclick="cAdd('-')">-</button>
-                
-                <button class="b" onclick="cAdd('7')">7</button>
-                <button class="b" onclick="cAdd('8')">8</button>
-                <button class="b" onclick="cAdd('9')">9</button>
-                <button class="b b-op" onclick="cAdd('+')">+</button>
-                
-                <button class="b" onclick="cAdd('4')">4</button>
-                <button class="b" onclick="cAdd('5')">5</button>
-                <button class="b" onclick="cAdd('6')">6</button>
-                <button class="b" onclick="cAdd('.')">.</button>
-                
-                <button class="b" onclick="cAdd('1')">1</button>
-                <button class="b" onclick="cAdd('2')">2</button>
-                <button class="b" onclick="cAdd('3')">3</button>
-                <button class="b b-eq" onclick="cExe()">=</button>
-                
-                <button class="b" onclick="cAdd('0')" style="grid-column: span 2;">0</button>
-                <button class="b" onclick="cDel()" style="grid-column: span 2;">DEL</button>
+                <button class="b" onclick="cAdd('7')">7</button><button class="b" onclick="cAdd('8')">8</button><button class="b" onclick="cAdd('9')">9</button><button class="b b-op" onclick="cAdd('+')">+</button>
+                <button class="b" onclick="cAdd('4')">4</button><button class="b" onclick="cAdd('5')">5</button><button class="b" onclick="cAdd('6')">6</button><button class="b" onclick="cAdd('.')">.</button>
+                <button class="b" onclick="cAdd('1')">1</button><button class="b" onclick="cAdd('2')">2</button><button class="b" onclick="cAdd('3')">3</button><button class="b b-eq" onclick="cExe()">=</button>
+                <button class="b" onclick="cAdd('0')" style="grid-column: span 2;">0</button><button class="b" onclick="cDel()" style="grid-column: span 2;">DEL</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Uzay Ekranı Kontrolleri
+        let currentTarget = null;
+        let currentDiff = "";
+
         function openSpace() { document.getElementById('space-sim').style.display = 'flex'; }
         function closeSpace() { document.getElementById('space-sim').style.display = 'none'; }
 
-        // Hesap Makinesi (Dört İşlem)
+        // Hesap Makinesi
         let s = document.getElementById('scr');
         function cAdd(v) { if(s.innerText==='0') s.innerText=''; s.innerText+=v; }
         function cClr() { s.innerText='0'; }
         function cDel() { s.innerText=s.innerText.slice(0,-1); if(!s.innerText) s.innerText='0'; }
         function cExe() { try { s.innerText = eval(s.innerText); } catch { s.innerText = 'HATA'; } }
 
-        // Matematik Soruları
-        let target = 0;
-        function setDiff(d) {
+        // SONSUZ SORU MOTORU
+        function generateQuestion(diff) {
+            currentDiff = diff;
             const txt = document.getElementById('q-text');
             document.getElementById('feed').innerText = "";
             document.getElementById('ans').value = "";
             
-            if(d === 'Kolay') { txt.innerText = "125 + 250 işleminin sonucu kaçtır?"; target = 375; }
-            else if(d === 'Orta') { txt.innerText = "12 x 15 işleminin sonucu kaçtır?"; target = 180; }
-            else if(d === 'Zor') { txt.innerText = "840 / 40 işleminin sonucu kaçtır?"; target = 21; }
-            else if(d === 'Aşırı NASA') { txt.innerText = "45 x 20 + (150 - 50) işleminin sonucu kaçtır?"; target = 1000; }
+            // Buton Renklerini Güncelle
+            document.querySelectorAll('.d-btn').forEach(b => b.className = 'd-btn');
+            const activeClass = diff === 'Kolay' ? 'active-k' : diff === 'Orta' ? 'active-o' : diff === 'Zor' ? 'active-z' : 'active-az';
+            document.getElementById('btn-' + diff).classList.add(activeClass);
+
+            let a, b, c;
+            if(diff === 'Kolay') {
+                a = Math.floor(Math.random() * 90) + 10;
+                b = Math.floor(Math.random() * 90) + 10;
+                txt.innerText = `${a} + ${b} sonucu nedir?`;
+                currentTarget = a + b;
+            } else if(diff === 'Orta') {
+                a = Math.floor(Math.random() * 20) + 5;
+                b = Math.floor(Math.random() * 15) + 2;
+                txt.innerText = `${a} x ${b} sonucu nedir?`;
+                currentTarget = a * b;
+            } else if(diff === 'Zor') {
+                a = Math.floor(Math.random() * 500) + 100;
+                b = Math.floor(Math.random() * 100) + 50;
+                txt.innerText = `${a} - ${b} sonucu nedir?`;
+                currentTarget = a - b;
+            } else if(diff === 'NASA') {
+                a = Math.floor(Math.random() * 10) + 2;
+                b = Math.floor(Math.random() * 10) + 2;
+                c = Math.floor(Math.random() * 50) + 10;
+                txt.innerText = `(${a} x ${b}) + ${c} sonucu nedir?`;
+                currentTarget = (a * b) + c;
+            }
         }
 
         function check() {
-            const v = document.getElementById('ans').value;
+            const val = document.getElementById('ans').value;
             const f = document.getElementById('feed');
-            if(v == target) { f.innerText = "✓ DOĞRU VERİ GİRİŞİ."; f.style.color = "#00ff88"; }
-            else { f.innerText = "✕ HATALI ANALİZ."; f.style.color = "#ff0055"; }
+            if(val == currentTarget) {
+                f.innerText = "✓ SİSTEM ONAYI: VERİ DOĞRU. YENİ GÖREV YÜKLENİYOR...";
+                f.style.color = "#00ff88";
+                setTimeout(() => { generateQuestion(currentDiff); }, 1500); // Doğruysa 1.5 sn sonra yeni soru
+            } else {
+                f.innerText = "✕ HATA: HATALI VERİ GİRİŞİ. TEKRAR HESAPLA!";
+                f.style.color = "#ff0055";
+            }
         }
     </script>
 </body>
