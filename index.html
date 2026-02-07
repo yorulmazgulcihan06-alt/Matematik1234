@@ -2,154 +2,142 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>NASA MATEMATİK OPERASYON MERKEZİ</title>
+    <title>NASA MATEMATİK & CANLI UZAY SİSTEMİ</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono:wght@500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=JetBrains+Mono&display=swap');
         
-        body { background: #020205; color: #00f2ff; font-family: 'Orbitron', sans-serif; margin: 0; padding: 15px; overflow-x: hidden; }
-        .bg-stars { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.2; }
+        body { background: #020205; color: #00f2ff; font-family: 'Orbitron', sans-serif; margin: 0; padding: 15px; overflow: hidden; }
+        .bg { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; background: radial-gradient(circle, #001 0%, #000 100%); }
 
-        /* Ana Panel Düzeni */
-        .dashboard { display: grid; grid-template-columns: 320px 1fr 300px; gap: 15px; max-width: 1400px; margin: auto; }
+        /* ANA BUTON: GÜNEŞ SİSTEMİ */
+        .solar-toggle { 
+            background: linear-gradient(45deg, #ffcc00, #ff8800); color: #000; border: none; 
+            padding: 15px; width: 100%; font-size: 18px; font-weight: bold; border-radius: 10px; 
+            cursor: pointer; margin-bottom: 20px; box-shadow: 0 0 25px rgba(255, 204, 0, 0.5);
+            text-transform: uppercase; transition: 0.3s;
+        }
+        .solar-toggle:hover { transform: scale(1.02); box-shadow: 0 0 40px #ffcc00; }
 
-        /* PANEL STİLLERİ */
-        .panel { background: rgba(0, 15, 35, 0.9); border: 1px solid #00f2ff; border-radius: 12px; padding: 15px; box-shadow: 0 0 15px rgba(0, 242, 255, 0.2); }
-        .panel-header { font-size: 12px; border-bottom: 1px solid #00f2ff; margin-bottom: 15px; padding-bottom: 5px; color: #ffcc00; text-transform: uppercase; }
+        /* CANLI UZAY EKRANI */
+        #space-sim { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #000; z-index: 9999; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .sun { width: 100px; height: 100px; background: orange; border-radius: 50%; box-shadow: 0 0 60px orange; position: relative; }
+        .orbit { position: absolute; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; animation: rot linear infinite; }
+        @keyframes rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .p-ball { position: absolute; border-radius: 50%; top: -10px; left: 50%; transform: translateX(-50%); }
 
-        /* 1. SOL: PROBLEMLER SİSTEMİ */
-        .prob-btn { background: #001a33; border: 1px solid #00f2ff; color: #00f2ff; width: 100%; padding: 12px; margin-bottom: 8px; cursor: pointer; border-radius: 4px; font-family: 'Orbitron'; font-size: 11px; text-align: left; }
-        .prob-btn:hover { background: #00f2ff; color: #000; }
-        #task-box { display: none; margin-top: 15px; padding: 10px; border: 1px dashed #00ff88; background: #000; border-radius: 5px; }
-        #task-box input { background: #111; border: 1px solid #00ff88; color: white; padding: 8px; width: 80%; margin: 10px 0; outline: none; }
+        /* DASHBOARD */
+        .grid-container { display: grid; grid-template-columns: 1fr 320px; gap: 20px; max-width: 1200px; margin: auto; }
+        .panel { background: rgba(0, 15, 30, 0.9); border: 2px solid #00f2ff; border-radius: 15px; padding: 20px; }
 
-        /* 2. ORTA: UZAY DÖNME HIZI VE YÖNLER (Matematiksel Veri) */
-        .rotation-display { height: 400px; position: relative; display: flex; align-items: center; justify-content: center; background: radial-gradient(circle, #051937 0%, #000 80%); border-radius: 50%; border: 2px solid #111; }
-        .planet { border-radius: 50%; position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .sun { width: 70px; height: 70px; background: #ffaa00; box-shadow: 0 0 40px #ffaa00; }
-        .earth { width: 40px; height: 40px; background: #2277ff; top: 50px; left: 70%; box-shadow: 0 0 20px #2277ff; }
-        .jupiter { width: 55px; height: 55px; background: #ff7744; bottom: 40px; left: 20%; box-shadow: 0 0 20px #ff7744; }
-        .arrow-indicator { font-size: 24px; font-weight: bold; color: #00ff88; margin-top: -5px; }
-        .speed-tag { font-family: 'JetBrains Mono'; font-size: 10px; color: #fff; background: rgba(0,0,0,0.7); padding: 2px 5px; border-radius: 3px; }
+        /* ZORLUK SEÇİMİ */
+        .diff-box { display: flex; gap: 5px; margin-bottom: 15px; }
+        .d-btn { flex: 1; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 10px; color: #fff; }
+        .k { background: #27ae60; } .o { background: #f39c12; } .z { background: #e74c3c; } .az { background: #8e44ad; box-shadow: 0 0 10px #8e44ad; }
 
-        /* 3. SAĞ: NASA DÖRT İŞLEM HESAP MAKİNESİ */
-        .calc-screen { background: #000; border: 1px solid #ff0055; color: #ff0055; padding: 15px; text-align: right; font-size: 22px; font-family: 'JetBrains Mono'; border-radius: 5px; margin-bottom: 10px; min-height: 25px; }
-        .calc-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-        .key { background: #111; border: 1px solid #444; color: #eee; padding: 15px 5px; border-radius: 4px; cursor: pointer; font-family: 'Orbitron'; font-size: 14px; }
-        .key-op { border-color: #ff0055; color: #ff0055; }
-        .key-eq { background: #00ff88; color: #000; border: none; grid-column: span 2; }
+        /* HESAP MAKİNESİ (TÜM İŞLEMLER) */
+        .calc { background: #000; border: 2px solid #ff0055; border-radius: 12px; padding: 15px; }
+        .scr { background: #111; color: #ff0055; padding: 15px; text-align: right; font-size: 26px; font-family: 'JetBrains Mono'; margin-bottom: 10px; border-radius: 5px; border: 1px solid #ff0055; min-height: 35px; }
+        .btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .b { background: #222; border: 1px solid #444; color: #fff; padding: 15px 5px; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .b-op { color: #ff0055; border-color: #ff0055; }
+        .b-eq { background: #00ff88; color: #000; border: none; font-weight: bold; grid-column: span 2; }
     </style>
 </head>
 <body>
-    <div class="bg-stars"></div>
+    <div class="bg"></div>
 
-    <div class="dashboard">
+    <div id="space-sim">
+        <button onclick="closeSpace()" style="position:fixed; top:20px; right:20px; background:red; color:#fff; border:none; padding:15px 30px; cursor:pointer; font-weight:bold; border-radius:5px; z-index:10000;">DÜNYA'YA DÖN</button>
+        <div class="sun"></div>
+        <div class="orbit" style="width:300px; height:300px; animation-duration: 8s;"><div class="p-ball" style="width:20px; height:20px; background:#44ccff;"></div></div>
+        <div class="orbit" style="width:500px; height:500px; animation-duration: 15s;"><div class="p-ball" style="width:30px; height:30px; background:#ff6644;"></div></div>
+        <div class="orbit" style="width:700px; height:700px; animation-duration: 25s;"><div class="p-ball" style="width:45px; height:45px; background:#ffcc88;"></div></div>
+        <h2 style="position:absolute; bottom:50px; color:#ffcc00;">CANLI GÖZLEM MODU AKTİF</h2>
+    </div>
+
+    <div class="grid-container">
         <div class="panel">
-            <div class="panel-header">● MATEMATİKSEL MİSYONLAR</div>
-            <button class="prob-btn" onclick="openTask(1)">🛰️ UYDU YÖRÜNGE PROBLEMİ</button>
-            <button class="prob-btn" onclick="openTask(2)">⛽ YAKIT TÜKETİM ANALİZİ</button>
-            <button class="prob-btn" onclick="openTask(3)">📏 GEZEGEN YÜZEY ÖLÇÜMÜ</button>
+            <button class="solar-toggle" onclick="openSpace()">🔭 GÜNEŞ SİSTEMİNİ CANLI İZLE</button>
             
-            <div id="task-box">
-                <p id="q-text" style="font-size: 12px; line-height: 1.4; color:#00ff88;"></p>
-                <input type="number" id="user-input" placeholder="Sonuç girin...">
-                <button onclick="checkAnswer()" style="background:#00ff88; border:none; padding:8px 15px; font-weight:bold; cursor:pointer; width:100%;">ANALİZ ET</button>
-                <p id="feedback" style="font-size: 11px; margin-top: 10px;"></p>
+            <div class="diff-box">
+                <button class="d-btn k" onclick="setDiff('Kolay')">KOLAY</button>
+                <button class="d-btn o" onclick="setDiff('Orta')">ORTA</button>
+                <button class="d-btn z" onclick="setDiff('Zor')">ZOR</button>
+                <button class="d-btn az" onclick="setDiff('Aşırı NASA')">NASA</button>
+            </div>
+
+            <div id="quiz" style="background:#000; border:1px dashed #00f2ff; padding:20px; border-radius:10px;">
+                <p id="q-text" style="font-size: 18px; color:#00ff88;">Lütfen zorluk seçin...</p>
+                <input type="number" id="ans" style="background:#111; border:1px solid #00f2ff; color:#fff; padding:12px; font-size:20px; width:150px;" placeholder="Cevap?">
+                <button onclick="check()" style="background:#00f2ff; color:#000; border:none; padding:12px 25px; cursor:pointer; font-weight:bold;">ONAYLA</button>
+                <p id="feed" style="margin-top:15px; font-weight:bold;"></p>
             </div>
         </div>
 
-        <div class="panel">
-            <div class="panel-header">● UZAY CİSİMLERİ ROTASYON RADARI (MATEMATİKSEL VERİ)</div>
-            <div class="rotation-display">
-                <div class="planet sun">
-                    <span class="speed-tag">1.9 km/s</span>
-                    <span class="arrow-indicator">↻</span>
-                    <small style="font-size:8px; color:#000;">GÜNEŞ</small>
-                </div>
-                <div class="planet earth">
-                    <span class="speed-tag">1670 km/sa</span>
-                    <span class="arrow-indicator" style="transform: rotate(-45deg);">↺</span>
-                    <small style="font-size:8px;">DÜNYA</small>
-                </div>
-                <div class="planet jupiter">
-                    <span class="speed-tag">45,300 km/sa</span>
-                    <span class="arrow-indicator">↺</span>
-                    <small style="font-size:8px;">JÜPİTER</small>
-                </div>
-                <div style="width:250px; height:250px; border:1px dashed #222; border-radius:50%; position:absolute;"></div>
-                <div style="width:380px; height:380px; border:1px dashed #111; border-radius:50%; position:absolute;"></div>
-            </div>
-            <p style="font-size: 10px; color:#666; text-align:center; margin-top:10px;">* Oklar cisimlerin kendi ekseni etrafındaki matematiksel dönüş yönünü gösterir.</p>
-        </div>
-
-        <div class="panel">
-            <div class="panel-header" style="color:#ff0055;">● NASA HESAPLAMA ÜNİTESİ</div>
-            <div class="calc-screen" id="display">0</div>
-            <div class="calc-keys">
-                <button class="key key-op" onclick="clr()">AC</button>
-                <button class="key key-op" onclick="ins('/')">÷</button>
-                <button class="key key-op" onclick="ins('*')">×</button>
-                <button class="key key-op" onclick="del()">DEL</button>
+        <div class="calc">
+            <div style="font-size:10px; margin-bottom:8px; color:#ff0055;">NASA HESAPLAMA ÜNİTESİ (+ - * /)</div>
+            <div class="scr" id="scr">0</div>
+            <div class="btns">
+                <button class="b b-op" onclick="cClr()">AC</button>
+                <button class="b b-op" onclick="cAdd('/')">÷</button>
+                <button class="b b-op" onclick="cAdd('*')">×</button>
+                <button class="b b-op" onclick="cAdd('-')">-</button>
                 
-                <button class="key" onclick="ins('7')">7</button>
-                <button class="key" onclick="ins('8')">8</button>
-                <button class="key" onclick="ins('9')">9</button>
-                <button class="key key-op" onclick="ins('-')">-</button>
+                <button class="b" onclick="cAdd('7')">7</button>
+                <button class="b" onclick="cAdd('8')">8</button>
+                <button class="b" onclick="cAdd('9')">9</button>
+                <button class="b b-op" onclick="cAdd('+')">+</button>
                 
-                <button class="key" onclick="ins('4')">4</button>
-                <button class="key" onclick="ins('5')">5</button>
-                <button class="key" onclick="ins('6')">6</button>
-                <button class="key key-op" onclick="ins('+')">+</button>
+                <button class="b" onclick="cAdd('4')">4</button>
+                <button class="b" onclick="cAdd('5')">5</button>
+                <button class="b" onclick="cAdd('6')">6</button>
+                <button class="b" onclick="cAdd('.')">.</button>
                 
-                <button class="key" onclick="ins('1')">1</button>
-                <button class="key" onclick="ins('2')">2</button>
-                <button class="key" onclick="ins('3')">3</button>
-                <button class="key" onclick="exe()" style="background:#00ff88; color:#000; border:none; grid-row: span 2;">=</button>
+                <button class="b" onclick="cAdd('1')">1</button>
+                <button class="b" onclick="cAdd('2')">2</button>
+                <button class="b" onclick="cAdd('3')">3</button>
+                <button class="b b-eq" onclick="cExe()">=</button>
                 
-                <button class="key" onclick="ins('0')" style="grid-column: span 2;">0</button>
-                <button class="key" onclick="ins('.')">.</button>
+                <button class="b" onclick="cAdd('0')" style="grid-column: span 2;">0</button>
+                <button class="b" onclick="cDel()" style="grid-column: span 2;">DEL</button>
             </div>
         </div>
     </div>
 
-<script>
-    // --- HESAP MAKİNESİ SİSTEMİ ---
-    let disp = document.getElementById('display');
-    function ins(v) { if(disp.innerText==='0') disp.innerText=''; disp.innerText+=v; }
-    function clr() { disp.innerText='0'; }
-    function del() { disp.innerText=disp.innerText.slice(0,-1); if(!disp.innerText) disp.innerText='0'; }
-    function exe() { try { disp.innerText = eval(disp.innerText); } catch { disp.innerText = 'HATA'; } }
+    <script>
+        // Uzay Ekranı Kontrolleri
+        function openSpace() { document.getElementById('space-sim').style.display = 'flex'; }
+        function closeSpace() { document.getElementById('space-sim').style.display = 'none'; }
 
-    // --- MATEMATİK PROBLEMLERİ ---
-    let correctValue = 0;
-    function openTask(id) {
-        document.getElementById('task-box').style.display = 'block';
-        const txt = document.getElementById('q-text');
-        document.getElementById('feedback').innerText = "";
-        document.getElementById('user-input').value = "";
+        // Hesap Makinesi (Dört İşlem)
+        let s = document.getElementById('scr');
+        function cAdd(v) { if(s.innerText==='0') s.innerText=''; s.innerText+=v; }
+        function cClr() { s.innerText='0'; }
+        function cDel() { s.innerText=s.innerText.slice(0,-1); if(!s.innerText) s.innerText='0'; }
+        function cExe() { try { s.innerText = eval(s.innerText); } catch { s.innerText = 'HATA'; } }
 
-        if(id === 1) {
-            txt.innerText = "BİR UYDU DÜNYA ETRAFINDA 1 SAATTE 28,000 KM YOL ALIYOR. BU UYDU 5 SAATTE TOPLAM KAÇ KM YOL ALIR?";
-            correctValue = 140000;
-        } else if(id === 2) {
-            txt.innerText = "BİR ROKET HER 100 KM İÇİN 450 LİTRE YAKIT TÜKETİYOR. 800 KM'LİK BİR MESAFE İÇİN KAÇ LİTRE YAKIT GEREKİR?";
-            correctValue = 3600;
-        } else if(id === 3) {
-            txt.innerText = "KARE ŞEKLİNDEKİ BİR UZAY İSTASYONUNUN BİR KENARI 125 METREDİR. BU İSTASYONUN TOPLAM ÇEVRE UZUNLUĞU KAÇ METREDİR?";
-            correctValue = 500;
+        // Matematik Soruları
+        let target = 0;
+        function setDiff(d) {
+            const txt = document.getElementById('q-text');
+            document.getElementById('feed').innerText = "";
+            document.getElementById('ans').value = "";
+            
+            if(d === 'Kolay') { txt.innerText = "125 + 250 işleminin sonucu kaçtır?"; target = 375; }
+            else if(d === 'Orta') { txt.innerText = "12 x 15 işleminin sonucu kaçtır?"; target = 180; }
+            else if(d === 'Zor') { txt.innerText = "840 / 40 işleminin sonucu kaçtır?"; target = 21; }
+            else if(d === 'Aşırı NASA') { txt.innerText = "45 x 20 + (150 - 50) işleminin sonucu kaçtır?"; target = 1000; }
         }
-    }
 
-    function checkAnswer() {
-        const val = document.getElementById('user-input').value;
-        const feed = document.getElementById('feedback');
-        if(val == correctValue) {
-            feed.innerText = "✓ DOĞRULANDI: MATEMATİKSEL VERİ TUTARLI.";
-            feed.style.color = "#00ff88";
-        } else {
-            feed.innerText = "✕ HATA: HESAPLAMA HATASI TESPİT EDİLDİ.";
-            feed.style.color = "#ff0055";
+        function check() {
+            const v = document.getElementById('ans').value;
+            const f = document.getElementById('feed');
+            if(v == target) { f.innerText = "✓ DOĞRU VERİ GİRİŞİ."; f.style.color = "#00ff88"; }
+            else { f.innerText = "✕ HATALI ANALİZ."; f.style.color = "#ff0055"; }
         }
-    }
-</script>
+    </script>
 </body>
 </html>
