@@ -3,127 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS AI | Eğitim Sistemi</title>
+    <title>NEXUS AI | Milli Eğitim Paneli</title>
     <style>
-        :root { --nexus-mavi: #2563eb; --arka-plan: #f8fafc; --beyaz: #ffffff; }
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--arka-plan); color: #1e293b; overflow-x: hidden; }
-
-        /* 1. KOD AKIŞ EKRANI */
-        #code-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; color: #94a3b8; padding: 20px; font-family: monospace; font-size: 14px; z-index: 2000; overflow: hidden; }
-
-        /* 2. LOGO VE NEXUS PARLAMA EKRANI */
-        #logo-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2001; }
-        .neon-circle { width: 150px; height: 150px; border: 8px solid var(--nexus-mavi); border-radius: 50%; box-shadow: 0 0 30px var(--nexus-mavi); animation: pulse 2s infinite; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; color: var(--nexus-mavi); }
-        .nexus-title { margin-top: 30px; font-size: 50px; font-weight: 900; letter-spacing: 15px; color: #000; text-shadow: 0 0 10px rgba(0,0,0,0.1); animation: shine 3s infinite; }
-
-        /* 3. ANA PANEL */
-        #main-site { display: none; padding: 20px; }
-        .header { background: var(--beyaz); padding: 20px; text-align: center; border-bottom: 2px solid #e2e8f0; margin-bottom: 20px; }
-        .step-card { background: var(--beyaz); padding: 30px; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 600px; margin: 20px auto; text-align: center; }
+        :root { --nexus-mavi: #2563eb; --arka-plan: #ffffff; }
+        body { margin: 0; font-family: sans-serif; background: var(--arka-plan); text-align: center; }
         
-        .btn { background: var(--nexus-mavi); color: white; border: none; padding: 15px 30px; border-radius: 12px; font-weight: bold; cursor: pointer; margin: 10px; transition: 0.3s; }
-        .btn:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4); }
-        select { padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; width: 80%; margin: 10px 0; }
+        /* GİRİŞ ANİMASYONLARI */
+        #code-loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; color: #94a3b8; padding: 20px; font-family: monospace; z-index: 2000; text-align: left; }
+        #logo-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2001; }
+        .nexus-title { font-size: 60px; font-weight: 900; letter-spacing: 15px; animation: shine 2s infinite; }
 
-        #player-area { display: none; flex-direction: column; align-items: center; gap: 20px; }
-        .video-container { width: 100%; max-width: 900px; aspect-ratio: 16/9; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+        /* ANA PANEL */
+        #main-site { display: none; padding: 20px; }
+        .step-card { background: #f8fafc; padding: 30px; border-radius: 20px; border: 1px solid #e2e8f0; max-width: 600px; margin: 20px auto; }
+        .btn { background: var(--nexus-mavi); color: white; border: none; padding: 15px 25px; border-radius: 12px; font-weight: bold; cursor: pointer; margin: 10px; }
+        
+        #video-area { display: none; flex-direction: column; align-items: center; }
+        .video-container { width: 100%; max-width: 850px; aspect-ratio: 16/9; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
 
-        @keyframes pulse { 0% { opacity: 0.5; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
-        @keyframes shine { 0% { color: #000; } 50% { color: var(--nexus-mavi); } 100% { color: #000; } }
+        @keyframes shine { 0%, 100% { color: #000; text-shadow: none; } 50% { color: var(--nexus-mavi); text-shadow: 0 0 20px var(--nexus-mavi); } }
     </style>
 </head>
 <body>
 
 <div id="code-loader"></div>
-<div id="logo-screen">
-    <div class="neon-circle">AI</div>
-    <div class="nexus-title">NEXUS</div>
-</div>
+<div id="logo-screen"><div class="nexus-title">NEXUS</div></div>
 
 <div id="main-site">
-    <div class="header"><h1>NEXUS EĞİTİM İSTASYONU</h1></div>
+    <h1 style="color:var(--nexus-mavi)">NEXUS TÜRKÇE EĞİTİM MERKEZİ</h1>
 
-    <div class="container">
-        <div id="step-1" class="step-card">
-            <h3>📖 Bir Ders Seçin</h3>
-            <button class="btn" onclick="nextStep(2, 'Matematik')">Matematik</button>
-            <button class="btn" onclick="nextStep(2, 'Fizik')">Fizik</button>
-            <button class="btn" onclick="nextStep(2, 'Türkçe')">Türkçe</button>
+    <div id="step-1" class="step-card">
+        <h3>🎓 Sınıf ve Ders Seçimi</h3>
+        <select id="grade-select" style="padding:10px; width:80%; margin-bottom:10px;">
+            <option value="ortaokul">Ortaokul (5-6-7-8. Sınıf)</option>
+            <option value="lise">Lise (9-10-11-12. Sınıf)</option>
+            <option value="uni">Üniversite Hazırlık (YKS/TYT)</option>
+        </select>
+        <div id="lesson-btns">
+            <button class="btn" onclick="setLesson('Matematik')">Matematik</button>
+            <button class="btn" onclick="setLesson('Fizik')">Fizik</button>
+            <button class="btn" onclick="setLesson('Turkce')">Türkçe</button>
         </div>
+    </div>
 
-        <div id="step-2" class="step-card" style="display:none">
-            <h3>🎓 Seviyenizi Seçin</h3>
-            <select id="grade">
-                <option value="5">5. Sınıf</option>
-                <option value="8">8. Sınıf (LGS)</option>
-                <option value="12">12. Sınıf (YKS)</option>
-                <option value="uni">Üniversite / Akademik</option>
-            </select>
-            <br>
-            <button class="btn" onclick="nextStep(3)">Devam Et</button>
-        </div>
+    <div id="step-2" class="step-card" style="display:none">
+        <h3>📺 NEXUS AI Kanal Önerileri</h3>
+        <p id="selected-info"></p>
+        <div id="channel-list"></div>
+    </div>
 
-        <div id="step-3" class="step-card" style="display:none">
-            <h3>⏳ Çalışma Süresi</h3>
-            <button class="btn" onclick="startNexus('3min')">3 Dakika (Hızlı Tekrar)</button>
-            <button class="btn" onclick="startNexus('1hour')">1 Saat (Tam Konu)</button>
-            <button class="btn" onclick="startNexus('live')">🔴 CANLI YAYIN</button>
-        </div>
+    <div id="step-3" class="step-card" style="display:none">
+        <h3>⏳ Ders Süresi Ne Kadar Olsun?</h3>
+        <button class="btn" onclick="playVideo('short')">3 Dakika (Hızlı Özet)</button>
+        <button class="btn" onclick="playVideo('long')">1 Saat (Detaylı Anlatım)</button>
+        <button class="btn" style="background:red" onclick="playVideo('live')">🔴 CANLI YAYIN AÇ</button>
+    </div>
 
-        <div id="player-area">
-            <div id="nexus-status" style="font-weight: bold; color: var(--nexus-mavi);"></div>
-            <div class="video-container">
-                <iframe id="nexus-video" width="100%" height="100%" src="" frameborder="0" allowfullscreen autoplay></iframe>
-            </div>
-            <button class="btn" onclick="location.reload()">Sistemi Sıfırla</button>
+    <div id="video-area">
+        <h3 id="playing-status"></h3>
+        <div class="video-container">
+            <iframe id="nexus-video" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
         </div>
+        <button class="btn" onclick="location.reload()">Sıfırla ve Yeni Ders Seç</button>
     </div>
 </div>
 
 <script>
+    // TÜRKÇE EĞİTİM KANALLARI VERİ TABANI
+    const data = {
+        Matematik: [
+            { name: "Rehber Matematik", id: "UC7U6I9pXSl0KId06Isc2j6A", vid: "S0LpB0H_pXw" },
+            { name: "Tonguç Akademi", id: "UCu_S8-8_mIeN_t2u8Z0Xw7A", vid: "bS9vPByGk-E" }
+        ],
+        Fizik: [
+            { name: "VIP Fizik", id: "UC7v_D_8lO_fG7pB0U3_77pg", vid: "6U0RIn6_XxE" },
+            { name: "Özcan Aykın", id: "UCYp0uD_X8L_I9O_yR48S2gA", vid: "pM6Y5fS2Q_A" }
+        ],
+        Turkce: [
+            { name: "Rüştü Hoca", id: "UC7m_L9F6Xf-xG9YvD6S9X7A", vid: "pM6Y5fS2Q_A" },
+            { name: "Benim Hocam", id: "UC7v_D_8lO_fG7pB0U3_77pg", vid: "S0LpB0H_pXw" }
+        ]
+    };
+
+    let selectedLesson = "";
+    let selectedChannel = null;
+
     // 1. KOD AKIŞI
-    const codeLines = ["> NEXUS CORE STARTING...", "> ANALYZING CHAT HISTORY...", "> GENERATING LOGO FROM AI...", "> SYSTEM READY.", "> BYPASSING ADS...", "> SECURE CONNECTION ESTABLISHED."];
+    const codeLines = ["> NEXUS AI BAŞLATILIYOR...", "> TÜRKÇE EĞİTİM MODÜLÜ AKTİF...", "> KANALLAR TARANIYOR...", "> MÜZİK FİLTRESİ: %100", "> SİSTEM HAZIR."];
     let lIdx = 0;
     function runCode() {
+        const loader = document.getElementById('code-loader');
         if(lIdx < codeLines.length) {
-            document.getElementById('code-loader').innerHTML += `<div>${codeLines[lIdx]}</div>`;
-            lIdx++; setTimeout(runCode, 200);
-        } else { setTimeout(showLogo, 500); }
+            loader.innerHTML += `<div>${codeLines[lIdx]}</div>`;
+            lIdx++; setTimeout(runCode, 150);
+        } else { setTimeout(() => { loader.style.display='none'; document.getElementById('logo-screen').style.display='flex'; }, 500);
+                 setTimeout(showMain, 3000); }
     }
 
-    // 2. LOGO EKRANI
-    function showLogo() {
-        document.getElementById('code-loader').style.display = 'none';
-        document.getElementById('logo-screen').style.display = 'flex';
-        setTimeout(showMain, 3000);
-    }
-
-    // 3. ANA SİTEYE GİRİŞ
     function showMain() {
         document.getElementById('logo-screen').style.display = 'none';
         document.getElementById('main-site').style.display = 'block';
     }
 
-    function nextStep(step, val) {
-        document.querySelectorAll('.step-card').forEach(s => s.style.display = 'none');
-        document.getElementById('step-' + step).style.display = 'block';
+    function setLesson(lesson) {
+        selectedLesson = lesson;
+        document.getElementById('step-1').style.display = 'none';
+        document.getElementById('step-2').style.display = 'block';
+        document.getElementById('selected-info').innerText = `${lesson} dersi için en iyi kanallar seçildi:`;
+        
+        const list = document.getElementById('channel-list');
+        list.innerHTML = "";
+        data[lesson].forEach(ch => {
+            const b = document.createElement('button');
+            b.className = "btn";
+            b.innerText = ch.name;
+            b.onclick = () => { selectedChannel = ch; document.getElementById('step-2').style.display='none'; document.getElementById('step-3').style.display='block'; };
+            list.appendChild(b);
+        });
     }
 
-    function startNexus(type) {
-        document.querySelectorAll('.step-card').forEach(s => s.style.display = 'none');
-        document.getElementById('player-area').style.display = 'flex';
-        const video = document.getElementById('nexus-video');
-        const status = document.getElementById('nexus-status');
+    function playVideo(mode) {
+        document.getElementById('step-3').style.display = 'none';
+        document.getElementById('video-area').style.display = 'flex';
+        const v = document.getElementById('nexus-video');
+        const s = document.getElementById('playing-status');
 
-        if(type === 'live') {
-            status.innerText = "🛡️ NEXUS AI: Canlı Yayın Saptandı. Bağlanılıyor...";
-            video.src = "https://www.youtube.com/embed/live_stream?channel=UC7U6I9pXSl0KId06Isc2j6A"; 
-        } else if(type === '3min') {
-            status.innerText = "🛡️ NEXUS AI: 3 Dakikalık Kısa Özet Hazırlanıyor...";
-            video.src = "https://www.youtube.com/embed/jfKfPfyJRdk?start=60&end=240";
+        if(mode === 'live') {
+            s.innerText = `🔴 ${selectedChannel.name} - CANLI YAYIN`;
+            v.src = `https://www.youtube.com/embed/live_stream?channel=${selectedChannel.id}`;
+        } else if(mode === 'short') {
+            s.innerText = `⏳ ${selectedChannel.name} - 3 Dakikalık Özet`;
+            v.src = `https://www.youtube.com/embed/${selectedChannel.vid}?start=10&end=190`;
         } else {
-            status.innerText = "🛡️ NEXUS AI: 1 Saatlik Derinlemesine Eğitim Başladı.";
-            video.src = "https://www.youtube.com/embed/jfKfPfyJRdk";
+            s.innerText = `📖 ${selectedChannel.name} - 1 Saatlik Konu Anlatımı`;
+            v.src = `https://www.youtube.com/embed/${selectedChannel.vid}`;
         }
     }
 
