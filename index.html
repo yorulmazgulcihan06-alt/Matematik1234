@@ -14,7 +14,7 @@
             z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column;
         }
         .login-card { background: #161b22; padding: 40px; border-radius: 25px; border: 1px solid #30363d; text-align: center; }
-        input { padding: 15px; border-radius: 12px; border: 1px solid #30363d; background: #0d1117; color: white; width: 280px; margin: 15px 0; outline: none; }
+        input { padding: 15px; border-radius: 12px; border: 1px solid #30363d; background: #0d1117; color: white; width: 280px; margin: 15px 0; outline: none; font-size: 16px; }
 
         /* 🏠 ANA SAYFA */
         .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; }
@@ -48,6 +48,8 @@
         .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #161b22; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
         .nav-item { cursor: pointer; text-align: center; font-size: 11px; color: #8b949e; }
         .nav-item.active { color: var(--p); }
+
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
     </style>
 </head>
 <body>
@@ -115,24 +117,47 @@
     </div>
 
     <script>
-        let user = { name: "", id: "", iq: 120, privacy: "NONE", firstProfile: true, solved: new Set() };
+        // Tüm kullanıcı verilerini saklayan obje
+        let user = { 
+            name: "", 
+            id: "", 
+            iq: 120, 
+            privacy: "NONE", 
+            firstProfile: true, 
+            solved: new Set(),
+            grade: "",
+            ans: null,
+            qKey: ""
+        };
 
+        // GİRİŞ FONKSİYONU (DÜZELTİLDİ)
         function login() {
-            const n = document.getElementById('user-in').value;
-            if(n) {
-                user.name = n;
-                user.id = "NXS-" + Math.floor(Math.random()*9000+1000);
+            const inputVal = document.getElementById('user-in').value;
+            if(inputVal.trim() !== "") {
+                user.name = inputVal;
+                user.id = "NXS-" + Math.floor(Math.random() * 9000 + 1000);
+                
+                // Profil verilerini güncelle
                 document.getElementById('p-name').innerText = user.name;
                 document.getElementById('p-id').innerText = user.id;
+                
+                // Giriş ekranını gizle ve ana sayfayı göster
                 document.getElementById('login-screen').style.display = 'none';
+                showPage('home-page');
+            } else {
+                alert("Lütfen bir isim giriniz!");
             }
         }
 
+        // SAYFA DEĞİŞTİRME FONKSİYONU
         function showPage(id) {
+            // Tüm sayfaları gizle
             document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            // İstenen sayfayı göster
             document.getElementById(id).style.display = 'block';
         }
 
+        // PROFİL TIKLAMA VE GİZLİLİK SEÇİMİ
         function handleProfileClick() {
             if(user.firstProfile) {
                 let choice = confirm("🛡️ GİZLİLİK AYARI\n\nProfilini herkes görebilsin mi?\nTamam: Evet, Herkes Görsün\nİptal: Hayır, Sadece Arkadaşlar");
@@ -145,27 +170,42 @@
 
         function closeProfile() { document.getElementById('profile-panel').style.bottom = "-100%"; }
 
+        // AI DERS ANLATIMI
         function openAI(konu) {
             document.getElementById('ai-window').style.display = 'flex';
             document.getElementById('ai-header').innerText = konu + " Anlatımı";
-            document.getElementById('robot-speech').innerText = `Merhaba ${user.name}, şimdi seninle ${konu} konusunu tüm detaylarıyla işleyeceğiz.`;
+            document.getElementById('robot-status').innerText = "Ders Başladı!";
+            document.getElementById('robot-speech').innerText = `Merhaba ${user.name}, şimdi seninle ${konu} konusunu işliyoruz.`;
+            
             const u = new SpeechSynthesisUtterance(`${konu} konusu anlatılıyor. Beni dikkatle dinle Utkan.`);
-            u.lang = 'tr-TR'; window.speechSynthesis.speak(u);
+            u.lang = 'tr-TR'; 
+            window.speechSynthesis.speak(u);
         }
 
-        function closeAI() { document.getElementById('ai-window').style.display = 'none'; window.speechSynthesis.cancel(); }
+        function closeAI() { 
+            document.getElementById('ai-window').style.display = 'none'; 
+            window.speechSynthesis.cancel(); 
+        }
 
+        // SORU SİSTEMİ
         function askGrade(type) {
-            user.grade = prompt("Kaçıncı sınıfsın? (5, 6, 7, 8, Lise, Üniversite)");
-            if(user.grade) generateQuestion(type);
+            let g = prompt("Kaçıncı sınıfsın? (5, 6, 7, 8, Lise, Üniversite)");
+            if(g) {
+                user.grade = g;
+                generateQuestion(type);
+            }
         }
 
         function generateQuestion(type) {
             document.getElementById('q-box').style.display = 'block';
-            let a = Math.floor(Math.random()*100), b = Math.floor(Math.random()*100);
+            let a = Math.floor(Math.random()*100);
+            let b = Math.floor(Math.random()*100);
             let qText = `${user.grade}. Sınıf ${type}: ${a} + ${b} kaçtır?`;
             
-            if(user.solved.has(qText)) return generateQuestion(type);
+            // Eğer soru daha önce çözüldüyse yenisini üret
+            if(user.solved.has(qText)) {
+                return generateQuestion(type);
+            }
             
             document.getElementById('q-text').innerText = qText;
             user.ans = a + b;
@@ -173,4 +213,39 @@
         }
 
         function checkAnswer() {
-            if(document.getElementById('q-ans').value == user
+            let inputAns = document.getElementById('q-ans').value;
+            if(inputAns == user.ans) {
+                alert("✅ Doğru! IQ Kazandın.");
+                user.iq += 5;
+                document.getElementById('p-iq').innerText = user.iq;
+                user.solved.add(user.qKey);
+                generateQuestion("İşlem");
+            } else { 
+                alert("❌ Yanlış! Tekrar dene."); 
+            }
+            document.getElementById('q-ans').value = "";
+        }
+
+        // YETKİ PANELİ
+        function adminAccess() {
+            let k = prompt("Erişim Kodu:");
+            if(k === "UtkanNexus2024") {
+                alert("👑 Yetki Onaylandı: Hoş geldin Kurucu Utkan Sancak!");
+            } else {
+                alert("Hatalı kod!");
+            }
+        }
+
+        // ARKADAŞ EKLEME
+        function addFriend() {
+            let fid = prompt("Arkadaş ID'si gir:");
+            if(fid) {
+                const list = document.getElementById('friends-list');
+                list.innerHTML += `<div style="background:#161b22; padding:20px; border-radius:15px; border:1px solid #334155; margin-top:10px;">👤 ${fid} (NXS-LIST)</div>`;
+                alert("İstek gönderildi!");
+            }
+        }
+    </script>
+</body>
+</html>
+
