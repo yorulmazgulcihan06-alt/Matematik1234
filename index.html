@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+              <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -144,41 +144,3 @@
             if(auth === "sahip2026") {
                 document.getElementById('loading-overlay').style.display = 'none';
                 document.getElementById('main-ui').style.display = 'grid';
-                document.getElementById('master-only').style.display = 'block';
-                document.getElementById('live-trigger').style.display = 'block';
-                alert("Hoş geldin Sahip Utkan. Evren emrinde.");
-            } else {
-                document.getElementById('loading-overlay').style.display = 'none';
-                document.getElementById('main-ui').style.display = 'grid';
-                alert("Öğrenci girişi onaylandı.");
-            }
-        }
-
-        function solve() {
-            const term = document.getElementById('term-out');
-            term.innerHTML += `<br>> ANALYZING PROBLEM WITH o3-MAX...`;
-            setTimeout(() => {
-                term.innerHTML += `<br><span style="color:var(--matrix)">> ÇÖZÜM TAMAM: Mantıksal veri seti hazırlandı.</span>`;
-            }, 1000);
-        }
-
-        function runAI() {
-            const input = document.getElementById('cmd-input');
-            const term = document.getElementById('term-out');
-            term.innerHTML += `<br><span style="color:white">> USER: ${input.value}</span>`;
-            setTimeout(() => {
-                term.innerHTML += `<br>> AI: Veri tabanı sorgulandı. Emriniz işleniyor.`;
-                term.scrollTop = term.scrollHeight;
-            }, 300);
-            input.value = "";
-        }
-
-        function startLive() {
-            document.getElementById('screen').innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/live_stream?channel=UC..." frameborder="0" allowfullscreen></iframe>`;
-        }
-
-        startBoot();
-    </script>
-</body>
-</html>
-
