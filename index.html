@@ -3,92 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V37 | ID & Chat System</title>
+    <title>NEXUS V40 | Utkan Sancak Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
-        :root { --p: #2563eb; --s: #10b981; --d: #0f172a; --r: #f85149; }
+        :root { --p: #2563eb; --s: #10b981; --d: #0f172a; --r: #f85149; --b: #161b22; }
         body { margin: 0; background: var(--d); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* 🆔 GİRİŞ EKRANI */
+        /* 🆔 Giriş Ekranı */
         #login-screen { position: fixed; inset: 0; background: radial-gradient(circle, #1e293b 0%, #0a0c10 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .card { background: #161b22; padding: 30px; border-radius: 25px; border: 1px solid #30363d; text-align: center; width: 85%; max-width: 400px; }
-        input { padding: 15px; border-radius: 12px; border: 1px solid #30363d; background: #0d1117; color: white; width: 90%; margin: 10px 0; outline: none; }
+        .card { background: var(--b); padding: 30px; border-radius: 25px; border: 1px solid #30363d; text-align: center; width: 85%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        input, select { padding: 15px; border-radius: 12px; border: 1px solid #30363d; background: #0d1117; color: white; width: 90%; margin: 10px 0; outline: none; }
         
-        /* SAYFALAR */
-        .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        /* Sayfalar */
+        .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 100px; }
         
-        /* 👤 PROFİL KARTI */
+        /* Profil Header */
         .profile-header { background: linear-gradient(45deg, #1e293b, #0f172a); padding: 25px; border-radius: 20px; border: 1px solid var(--p); margin-bottom: 20px; text-align: center; }
         .id-badge { background: var(--p); color: white; padding: 5px 15px; border-radius: 50px; font-weight: bold; font-size: 14px; display: inline-block; margin-top: 10px; cursor: pointer; }
 
-        /* 💬 DM KUTUSU */
-        #chat-window { position: fixed; inset: 0; background: #0b0f1a; z-index: 5000; display: none; flex-direction: column; }
-        .chat-header { background: var(--p); padding: 20px; display: flex; justify-content: space-between; align-items: center; }
-        #messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px 15px; border-radius: 15px; max-width: 70%; word-wrap: break-word; }
-        .msg.me { background: var(--p); align-self: flex-end; }
-        .msg.them { background: #334155; align-self: flex-start; }
+        /* Modüller */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn-mod { background: var(--b); color: white; border: 1px solid #334155; padding: 20px; border-radius: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-mod:hover { border-color: var(--p); background: #1e293b; }
 
-        /* 📱 ALT NAV */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #161b22; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
-        .nav-item { cursor: pointer; text-align: center; font-size: 12px; color: #8b949e; }
-        
-        .friend-card { background: #161b22; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #30363d; cursor: pointer; }
+        /* Matematik Kutusu */
+        #math-box { display: none; background: var(--b); padding: 20px; border-radius: 20px; border: 2px solid var(--s); margin-bottom: 20px; }
+
+        /* Alt Navigasyon */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #161b22; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; z-index: 1000; }
+        .nav-item { cursor: pointer; text-align: center; font-size: 12px; color: #8b949e; flex: 1; }
+
+        /* Canlı Yayın Ekranı */
+        #live-overlay { position: fixed; inset: 0; background: #000; z-index: 100000; display: none; flex-direction: column; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="card">
-            <h1>NEXUS CORE</h1>
-            <input type="text" id="user-in" placeholder="Adınız Soyadınız">
-            <button onclick="login()" style="width:100%; padding:15px; background:var(--s); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">SİSTEMİ BAŞLAT</button>
+            <h1 style="margin:0; color:var(--p);">NEXUS V40</h1>
+            <p style="color:#8b949e; font-size:14px;">Sunucu Bağlantısı Hazır</p>
+            <input type="text" id="user-in" placeholder="Adınız ve Soyadınız" maxlength="20">
+            <button onclick="login()" style="width:100%; padding:15px; background:var(--s); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer; margin-top:10px;">GİRİŞ YAP</button>
         </div>
     </div>
 
     <div id="home-page" class="page" style="display:block;">
         <div class="profile-header">
-            <div style="font-size: 50px;">🤖</div>
-            <h2 id="p-name" style="margin: 10px 0 0 0;">Misafir</h2>
-            <div class="id-badge" id="p-id" onclick="copyID()">ID: Yükleniyor...</div>
-            <p style="color: #8b949e; font-size: 14px; margin-top: 10px;">IQ: <span id="p-iq">120</span></p>
+            <div style="font-size: 40px;">🦾</div>
+            <h2 id="p-name" style="margin:5px 0;">Misafir</h2>
+            <div class="id-badge" id="p-id" onclick="copyMyID()">ID: Oluşturuluyor...</div>
+            <p style="margin:10px 0 0 0; font-size:14px; color:var(--s);">IQ SEVİYESİ: <span id="p-iq">120</span></p>
         </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <button onclick="alert('Ders modülü hazır!')" style="background:#1e293b; color:white; padding:20px; border-radius:15px; border:1px solid #334155;">🍰 Matematik</button>
-            <button onclick="showPage('social-page')" style="background:#1e293b; color:white; padding:20px; border-radius:15px; border:1px solid #334155;">👥 Arkadaşlar</button>
+
+        <div id="math-box">
+            <h3 id="math-title" style="margin:0 0 10px 0; color:var(--s);">Soru Panelini Açtın</h3>
+            <p id="math-q" style="font-size:22px; margin:15px 0;"></p>
+            <input type="number" id="math-ans" placeholder="Cevap?" style="width:80%;">
+            <br>
+            <button onclick="checkMath()" style="background:var(--s); border:none; padding:10px 20px; border-radius:10px; color:white; font-weight:bold;">KONTROL ET</button>
+            <button onclick="closeMath()" style="background:var(--r); border:none; padding:10px 20px; border-radius:10px; color:white; margin-left:10px;">KAPAT</button>
+        </div>
+
+        <div class="grid">
+            <button class="btn-mod" onclick="openMath()">➕ Matematik Çöz</button>
+            <button class="btn-mod" onclick="showPage('social-page')">👥 Arkadaşlar</button>
+            <button class="btn-mod" onclick="startBroadcast()" style="grid-column: span 2; border-color: var(--r); color: var(--r);">📡 CANLI YAYIN BAŞLAT</button>
         </div>
     </div>
 
     <div id="social-page" class="page">
         <h2>👥 Arkadaşlarım</h2>
         <div id="friends-list">
-            </div>
-        <button onclick="addFriend()" style="width:100%; padding:15px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold; margin-top:20px;">+ Arkadaş Ekle</button>
+            <p style="color:#8b949e; text-align:center;">Henüz arkadaşın yok. ID ile ekle!</p>
+        </div>
+        <button onclick="addFriend()" style="width:100%; padding:15px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold; margin-top:20px;">+ YENİ ARKADAŞ EKLE</button>
     </div>
 
-    <div id="chat-window">
-        <div class="chat-header">
-            <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:20px;">⬅️</button>
-            <span id="chat-target-name">Sohbet</span>
-            <span>💬</span>
+    <div id="live-overlay">
+        <div style="background:#1e293b; padding:15px; display:flex; justify-content:space-between; align-items:center;">
+            <span id="live-status-text" style="color:var(--s); font-weight:bold;">● CANLI YAYIN MODU</span>
+            <button onclick="endBroadcast()" style="background:var(--r); color:white; border:none; padding:8px 15px; border-radius:8px;">Ayrıl</button>
         </div>
-        <div id="messages"></div>
-        <div style="padding:20px; display:flex; gap:10px; background:#161b22;">
-            <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." style="margin:0; flex:1;">
-            <button onclick="sendMsg()" style="padding:10px 20px; background:var(--s); color:white; border:none; border-radius:10px;">Gönder</button>
-        </div>
+        <iframe id="live-frame" src="" allow="camera; microphone; fullscreen; display-capture; autoplay" style="flex:1; border:none;"></iframe>
     </div>
 
     <div class="nav">
         <div class="nav-item" onclick="showPage('home-page')">🏠<br>Profil</div>
         <div class="nav-item" onclick="showPage('social-page')">👥<br>Sosyal</div>
-        <div class="nav-item" onclick="alert('Kurucu: Utkan Sancak')">🛡️<br>Admin</div>
+        <div class="nav-item" onclick="alert('Nexus Kurucusu: Utkan Sancak\nSürüm: V40 Sunucu Modu')">🛡️<br>Admin</div>
     </div>
 
     <script>
-        // Firebase Config (Senin bilgilerini buraya yerleştirdim)
+        // --- FIREBASE AYARLARI ---
         const firebaseConfig = {
             apiKey: "AIzaSyDYsWcFVJhvmeorcea8x2Biw1GpHjQuXFY",
             authDomain: "nexus-ai-bc26b.firebaseapp.com",
@@ -98,89 +106,118 @@
             appId: "1:122857450705:web:61ca30f3e1513c1859a9f0",
             databaseURL: "https://nexus-ai-bc26b-default-rtdb.europe-west1.firebasedatabase.app/"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let myData = null;
-        let chatTargetID = null;
 
+        let myData = { name: "", id: "", iq: 120 };
+        let currentMathAns = 0;
+
+        // --- GİRİŞ FONKSİYONU ---
         function login() {
-            const name = document.getElementById('user-in').value;
-            if(name.length < 2) return alert("İsim çok kısa!");
+            const nameInput = document.getElementById('user-in').value;
+            if(nameInput.length < 2) return alert("Lütfen geçerli bir isim gir!");
             
-            const id = "NXS-" + Math.floor(1000 + Math.random() * 9000);
-            myData = { name, id, iq: 120 };
+            myData.name = nameInput;
+            myData.id = "NXS-" + Math.floor(1000 + Math.random() * 9000);
             
-            db.ref('users/' + id).set(myData);
+            // Firebase'e Kaydet
+            db.ref('users/' + myData.id).set(myData);
             
-            document.getElementById('p-name').innerText = name;
-            document.getElementById('p-id').innerText = "ID: " + id;
+            document.getElementById('p-name').innerText = myData.name;
+            document.getElementById('p-id').innerText = "ID: " + myData.id;
             document.getElementById('login-screen').style.display = 'none';
+            
+            listenForBroadcasts(); // Bildirimleri dinlemeye başla
         }
 
+        // --- SAYFA GEÇİŞLERİ ---
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
             document.getElementById(id).style.display = 'block';
         }
 
+        // --- MATEMATİK SİSTEMİ (Hatasız) ---
+        function openMath() {
+            document.getElementById('math-box').style.display = 'block';
+            generateQuestion();
+        }
+
+        function generateQuestion() {
+            let n1 = Math.floor(Math.random() * 50) + 1;
+            let n2 = Math.floor(Math.random() * 50) + 1;
+            currentMathAns = n1 + n2;
+            document.getElementById('math-q').innerText = `${n1} + ${n2} işleminin sonucu nedir?`;
+        }
+
+        function checkMath() {
+            const ans = document.getElementById('math-ans').value;
+            if(ans == currentMathAns) {
+                alert("🎉 DOĞRU! +5 IQ kazandın.");
+                myData.iq += 5;
+                document.getElementById('p-iq').innerText = myData.iq;
+                document.getElementById('math-ans').value = "";
+                generateQuestion();
+            } else {
+                alert("❌ Hatalı cevap. Tekrar dene!");
+            }
+        }
+
+        function closeMath() { document.getElementById('math-box').style.display = 'none'; }
+
+        // --- ARKADAŞLIK SİSTEMİ ---
         function addFriend() {
-            const fid = prompt("Arkadaşının ID'sini gir (NXS-XXXX):");
+            const fid = prompt("Arkadaşının ID'sini gir (Örn: NXS-1234):");
             if(!fid) return;
-            
+
             db.ref('users/' + fid).once('value', (s) => {
                 if(s.exists()) {
                     const friend = s.val();
                     const list = document.getElementById('friends-list');
-                    list.innerHTML += `
-                        <div class="friend-card" onclick="openChat('${fid}', '${friend.name}')">
-                            <span>👤 ${friend.name} (${fid})</span>
-                            <span style="color:var(--s)">Mesaj At</span>
-                        </div>`;
+                    if(list.innerHTML.includes('Henüz')) list.innerHTML = "";
+                    list.innerHTML += `<div style="background:var(--b); padding:15px; border-radius:15px; margin-bottom:10px; border:1px solid #30363d;">👤 ${friend.name} (${fid}) <span style="color:var(--s); float:right;">● Aktif</span></div>`;
+                    alert(friend.name + " eklendi!");
                 } else {
-                    alert("Kullanıcı bulunamadı!");
+                    alert("🚨 Bu ID'ye sahip biri bulunamadı!");
                 }
             });
         }
 
-        function openChat(id, name) {
-            chatTargetID = id;
-            document.getElementById('chat-target-name').innerText = name;
-            document.getElementById('chat-window').style.display = 'flex';
-            loadMessages();
-        }
-
-        function closeChat() { document.getElementById('chat-window').style.display = 'none'; }
-
-        function sendMsg() {
-            const txt = document.getElementById('chat-input').value;
-            if(!txt) return;
-            const chatID = [myData.id, chatTargetID].sort().join("_");
-            db.ref('chats/' + chatID).push({
-                sender: myData.id,
-                text: txt,
+        // --- CANLI YAYIN VE BİLDİRİM SİSTEMİ ---
+        function startBroadcast() {
+            const roomID = "Nexus_Room_" + myData.id;
+            db.ref('broadcast').set({
+                sender: myData.name,
+                url: "https://meet.jit.si/" + roomID,
+                active: true,
                 time: Date.now()
             });
-            document.getElementById('chat-input').value = "";
+            openLiveUI("https://meet.jit.si/" + roomID);
         }
 
-        function loadMessages() {
-            const chatID = [myData.id, chatTargetID].sort().join("_");
-            db.ref('chats/' + chatID).on('value', (s) => {
-                const box = document.getElementById('messages');
-                box.innerHTML = "";
-                s.forEach((m) => {
-                    const msg = m.val();
-                    const cls = msg.sender === myData.id ? "me" : "them";
-                    box.innerHTML += `<div class="msg ${cls}">${msg.text}</div>`;
-                });
-                box.scrollTop = box.scrollHeight;
+        function listenForBroadcasts() {
+            db.ref('broadcast').on('value', (snap) => {
+                const data = snap.val();
+                if(data && data.active && data.sender !== myData.name) {
+                    const join = confirm(`🚨 BİLDİRİM: ${data.sender} canlı yayın başlattı! Katılmak ister misin?`);
+                    if(join) openLiveUI(data.url);
+                }
             });
         }
 
-        function copyID() {
-            const idText = document.getElementById('p-id').innerText.replace("ID: ", "");
-            navigator.clipboard.writeText(idText);
-            alert("ID Kopyalandı: " + idText);
+        function openLiveUI(url) {
+            document.getElementById('live-frame').src = url;
+            document.getElementById('live-overlay').style.display = 'flex';
+        }
+
+        function endBroadcast() {
+            document.getElementById('live-overlay').style.display = 'none';
+            document.getElementById('live-frame').src = "";
+            db.ref('broadcast').update({ active: false });
+        }
+
+        function copyMyID() {
+            navigator.clipboard.writeText(myData.id);
+            alert("ID Kopyalandı: " + myData.id);
         }
     </script>
 </body>
