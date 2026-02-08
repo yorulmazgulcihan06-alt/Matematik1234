@@ -3,190 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V61 | Infinite Math</title>
+    <title>NEXUS V75 | Utkan OS</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
-        :root { --p: #3b82f6; --s: #10b981; --d: #080c14; --r: #ef4444; --b: #161b22; --y: #fbbf24; }
-        body { margin: 0; background: var(--d); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        #login-screen { position: fixed; inset: 0; background: var(--d); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-card { text-align: center; background: var(--b); padding: 30px; border-radius: 20px; border: 2px solid var(--p); width: 85%; max-width: 400px; }
-        input { padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0d1117; color: white; width: 90%; margin: 10px 0; outline: none; }
-        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; }
-        .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 90px; }
-        .card { background: var(--b); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #30363d; }
+        :root { --p: #3b82f6; --s: #10b981; --d: #080c14; --r: #ef4444; --b: #161b22; --y: #fbbf24; --tr: #da291c; }
+        body { margin: 0; background: var(--d); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; transition: 0.5s; }
         
-        /* ADMIN PANEL - KIRMIZI KARE */
-        #admin-terminal { background: #000; border: 2px solid var(--r); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; box-shadow: 0 0 15px var(--r); }
+        /* ADMIN PANEL VE TERMINAL */
+        #admin-terminal { background: #000; border: 2px solid var(--r); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; box-shadow: 0 0 20px var(--r); }
+        .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 100px; }
+        .card { background: var(--b); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #30363d; position: relative; }
         
-        /* SORU TASARIMI */
-        .option { background: #0d1117; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #334155; cursor: pointer; transition: 0.3s; text-align: center; }
-        .option:hover { border-color: var(--p); background: #1e293b; }
+        /* BUTONLAR VE ETKİLEŞİM */
+        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; background: var(--p); transition: 0.3s; }
+        .btn:active { transform: scale(0.95); }
+        .option { background: #0d1117; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #334155; cursor: pointer; text-align: center; }
+
+        /* ONARIM EKRANI (KARARTMA) */
+        #repair-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 900000; pointer-events: none; transition: 0.5s; }
+        .repair-active { box-shadow: 0 0 30px var(--y) !important; border: 3px solid var(--y) !important; animation: pulse 0.8s infinite !important; z-index: 999999 !important; position: relative !important; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        /* SİSTEM EKRANLARI */
+        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 100000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        #login-screen { position: fixed; inset: 0; background: var(--d); z-index: 50000; display: flex; align-items: center; justify-content: center; }
+        .nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #0f172a; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; z-index: 1000; }
         
-        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #0f172a; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
-        .nav-item { cursor: pointer; text-align: center; font-size: 11px; color: #64748b; }
-        .active { color: var(--p); font-weight: bold; }
+        /* ANİMASYONLAR */
+        .hacking { animation: shake 0.2s infinite; color: lime !important; }
+        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -2px); } 100% { transform: translate(1px, -1px); } }
+        .frozen { pointer-events: none; filter: grayscale(1) blur(2px); }
     </style>
 </head>
 <body>
 
+    <div id="repair-overlay">
+        <div style="position:absolute; top:40px; left:50%; transform:translateX(-50%); color:var(--y); font-weight:bold; text-align:center; width:100%;">
+            <h1 style="margin:0; font-size:40px;">⚡ AI SYSTEM REPAIR</h1>
+            <p style="font-size:20px;">Sorunlu modülü seçin, Gemini onarsın!</p>
+        </div>
+    </div>
+
+    <div id="overlay">
+        <h1 id="ov-icon" style="font-size: 100px; margin:0;">⚖️</h1>
+        <h2 id="ov-title">HAKİM KARARI</h2>
+        <p id="ov-msg">Sistem suistimali tespit edildi.</p>
+        <button onclick="location.reload()" class="btn" style="width:200px;">SİSTEMİ YENİLE</button>
+    </div>
+
     <div id="login-screen">
-        <div class="login-card">
-            <h1 style="color:var(--p);">NEXUS V61</h1>
-            <input type="text" id="user-in" placeholder="Giriş Kodunu Yaz...">
-            <button onclick="login()" class="btn" style="background:var(--p);">SİSTEME GİR</button>
+        <div class="card" style="width: 320px; text-align: center; border-color: var(--p);">
+            <h1 style="color:var(--p); margin-bottom:5px;">NEXUS V75</h1>
+            <p style="font-size:10px; color:gray;">Utkan Ulaş Yorulmaz © 2026</p>
+            <input type="text" id="user-in" placeholder="Kod veya Adın..." style="width:90%; padding:12px; margin:15px 0; background:#000; border:1px solid #334155; color:white; border-radius:10px;">
+            <button onclick="login()" class="btn">SİSTEME BAĞLAN</button>
         </div>
     </div>
 
     <div id="home-page" class="page" style="display:block;">
         <div id="admin-terminal">
-            <h4 style="margin:0 0 10px 0; color:var(--r);">🛡️ ROOT COMMAND CENTER</h4>
-            <div style="display:flex; gap:5px;">
-                <input type="text" id="terminal-input" placeholder="Komut (ban:ID)" style="margin:0; flex:1;">
-                <button onclick="runCommand()" style="background:var(--r); padding:0 15px; border-radius:10px; border:none; color:white;">OK</button>
+            <h4 style="color:var(--r); margin:0 0 10px 0;">🛡️ UTKAN ROOT COMMANDS</h4>
+            <input type="text" id="cmd-input" placeholder="Komut (örn: bildirim:ID:Mesaj)" style="width:90%; padding:10px; background:#111; border:1px solid var(--r); color:white; border-radius:8px;">
+            <button onclick="runCommand()" class="btn" style="background:var(--r);">YÜRÜT</button>
+        </div>
+        <div class="card" style="text-align:center;">
+            <div style="font-size:50px;">👤</div>
+            <h2 id="u-name">...</h2>
+            <p id="u-id" style="color:var(--p); font-weight:bold;">ID: ...</p>
+            <p id="u-score" style="color:var(--s); font-size:20px;">Puan: 0</p>
+        </div>
+    </div>
+
+    <div id="study-page" class="page">
+        <h2>📚 Türk Eğitim Bulutu</h2>
+        <div class="card">
+            <p>Bir ders seç (Sadece Türk Kanalları):</p>
+            <button class="btn" style="background:#ff0000;" onclick="loadVideo('Matematik')">📐 Matematik (Tonguç)</button>
+            <button class="btn" style="background:#34a853;" onclick="loadVideo('Fen')">🔬 Fen Bilimleri</button>
+            <div id="video-area" style="display:none; margin-top:15px;">
+                <h4 id="v-title">Yükleniyor...</h4>
+                <div id="player"></div>
+                <div id="game-offer" style="display:none; margin-top:15px; border-top:1px solid var(--y); padding-top:10px;">
+                    <p style="color:var(--y);">🇹🇷 Yoruldun mu? Milli bir oyun molası ver!</p>
+                    <button class="btn" style="background:var(--tr);" onclick="showPage('game-page')">🕹️ BAYRAK YARIŞI (BAŞLAT)</button>
+                </div>
             </div>
         </div>
-
-        <div class="card" style="text-align:center;">
-            <div style="font-size: 40px;">👤</div>
-            <h2 id="display-name" style="margin:5px 0;">...</h2>
-            <p id="display-id" style="color:var(--p); font-weight:bold; margin:0;">ID: ...</p>
-            <p id="display-role" style="font-size:10px; opacity:0.6; margin-top:5px;">YETKİ: USER</p>
-        </div>
-        <button onclick="window.open('https://meet.jit.si/Nexus'+myData.id)" class="btn" style="background:var(--r);">📡 CANLI ETÜT BAŞLAT</button>
     </div>
 
-    <div id="math-page" class="page">
-        <h2 style="color:var(--y);">📐 Sonsuz Soru Çözümü</h2>
-        <div class="card" id="question-container">
-            <h3 id="question-text">Soru Yükleniyor...</h3>
-            <div id="options-container"></div>
-            <p id="score-text" style="text-align:center; color:var(--s); font-weight:bold; margin-top:15px;">Puan: 0</p>
+    <div id="game-page" class="page">
+        <div style="text-align:center;">
+            <h2 style="color:var(--tr);">🇹🇷 MİLLİ GÖREV</h2>
+            <div id="game-canvas" class="card" style="height:200px; display:flex; align-items:center; justify-content:center; font-size:24px; border:3px solid var(--tr);">
+                🚩 BAYRAK YÜKSELİYOR!
+            </div>
+            <button onclick="playGame()" class="btn" style="background:var(--tr);">TIKLA VE YÜKSELT!</button>
+            <button onclick="showPage('home-page')" class="btn" style="background:gray;">Kapat</button>
         </div>
-    </div>
-
-    <div id="social-page" class="page">
-        <h2>👥 Arkadaşlar</h2>
-        <div class="card">
-            <input type="text" id="friend-id-in" placeholder="Arkadaş ID">
-            <button onclick="addFriend()" class="btn" style="background:var(--p);">ARKADAŞ EKLE</button>
-        </div>
-        <div id="friends-list"></div>
     </div>
 
     <div class="nav">
-        <div class="nav-item active" onclick="showPage('home-page', this)">🏠 Profil</div>
-        <div class="nav-item" onclick="showPage('math-page', this)">📐 Sorular</div>
-        <div class="nav-item" onclick="showPage('social-page', this)">👥 Sosyal</div>
+        <div onclick="showPage('home-page')">🏠<br>Profil</div>
+        <div onclick="showPage('study-page')">📚<br>Ders</div>
+        <div onclick="aiRepairTrigger()" style="color:var(--y); font-weight:bold;">🤖<br>ONAR</div>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDYsWcFVJhvmeorcea8x2Biw1GpHjQuXFY",
-            authDomain: "nexus-ai-bc26b.firebaseapp.com",
-            projectId: "nexus-ai-bc26b",
-            databaseURL: "https://nexus-ai-bc26b-default-rtdb.europe-west1.firebasedatabase.app/"
-        };
+        const firebaseConfig = { apiKey: "AIzaSy...", databaseURL: "https://nexus-ai..." }; // Buraya kendi configini koy
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        
         let myData = { name: "", id: "", role: "user", score: 0 };
+        let repairMode = false;
 
         function login() {
             const val = document.getElementById('user-in').value.trim();
-            if(!val) return;
-
-            if(val === "utkanpro2026") {
-                myData = { name: "Utkan Ulaş Yorulmaz", role: "owner", id: "ADMIN-UTKAN", score: 0 };
-            } else if(val === "mustipro2026") {
-                myData = { name: "Mustafa Yetkili", role: "admin", id: "ADMIN-MUSTI", score: 0 };
-            } else if(val === "akıllı tahta Pro 2026") {
-                myData = { name: "Akıllı Tahta", role: "owner", id: "ADMIN-TAHTA", score: 0 };
-            } else {
-                myData = { name: val, id: "NXS-" + Math.floor(1000 + Math.random() * 9000), role: "user", score: 0 };
-            }
-
-            localStorage.setItem('nexus_session_v61', JSON.stringify(myData));
-            startApp();
-        }
-
-        function startApp() {
+            if(val === "utkanpro2026") myData = { name: "Utkan Ulaş Yorulmaz", role: "owner", id: "ADMIN-UTKAN", score: 0 };
+            else myData = { name: val, id: "NXS-" + Math.floor(1000 + Math.random() * 9000), role: "user", score: 0 };
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('display-name').innerText = myData.name;
-            document.getElementById('display-id').innerText = "ID: " + myData.id;
-            document.getElementById('display-role').innerText = "YETKİ: " + myData.role.toUpperCase();
-            
-            // ÜSTTEKİ KARE KONTROLÜ
-            if(myData.role === "owner" || myData.role === "admin") {
-                document.getElementById('admin-terminal').style.display = 'block';
-            }
-
-            db.ref('users/' + myData.id).set(myData);
-            generateQuestion(); // İlk soruyu oluştur
-            loadFriends();
+            document.getElementById('u-name').innerText = myData.name;
+            document.getElementById('u-id').innerText = "ID: " + myData.id;
+            if(myData.role === "owner") document.getElementById('admin-terminal').style.display = 'block';
+            startListeners();
         }
 
-        // --- SONSUZ SORU MOTORU ---
-        function generateQuestion() {
-            const container = document.getElementById('options-container');
-            const qText = document.getElementById('question-text');
-            container.innerHTML = "";
+        // --- ETKİLEŞİMLİ ONARIM MODU (HAZIR OL!) ---
+        function aiRepairTrigger() {
+            repairMode = true;
+            const overlay = document.getElementById('repair-overlay');
+            overlay.style.display = 'block';
+            overlay.style.pointerEvents = 'none';
 
-            // Rastgele 2 sayı oluştur (Milyonlar basamağı eğitimi için)
-            const num1 = Math.floor(Math.random() * 9000000) + 1000000;
-            const basamaklar = ["Milyonlar", "Yüz Binler", "On Binler", "Binler"];
-            const secilenBasamak = basamaklar[Math.floor(Math.random() * basamaklar.length)];
-            
-            qText.innerText = `${num1.toLocaleString('tr-TR')} sayısının "${secilenBasamak}" basamağındaki rakam kaçtır?`;
+            // Butonları parlat
+            document.querySelectorAll('.btn, .nav div').forEach(el => el.classList.add('repair-active'));
 
-            // Doğru cevabı bul
-            let correctAns;
-            const s = num1.toString();
-            if(secilenBasamak === "Milyonlar") correctAns = s[0];
-            else if(secilenBasamak === "Yüz Binler") correctAns = s[1];
-            else if(secilenBasamak === "On Binler") correctAns = s[2];
-            else correctAns = s[3];
+            alert("🤖 Gemini AI: Sistem karartıldı. Şimdi sorunlu butona dokun!");
 
-            // Şıkları oluştur
-            let options = [correctAns];
-            while(options.length < 4) {
-                let r = Math.floor(Math.random() * 10).toString();
-                if(!options.includes(r)) options.push(r);
-            }
-            options.sort(() => Math.random() - 0.5);
-
-            options.forEach(opt => {
-                const div = document.createElement('div');
-                div.className = "option";
-                div.innerText = opt;
-                div.onclick = () => {
-                    if(opt === correctAns) {
-                        myData.score += 10;
-                        document.getElementById('score-text').innerText = "Puan: " + myData.score;
-                        alert("DOĞRU! 🎉 Yeni soruya geçiliyor...");
-                        generateQuestion(); // YENİ SORU GELSİN
-                    } else {
-                        alert("YANLIŞ! ❌ Tekrar dene.");
-                    }
-                };
-                container.appendChild(div);
-            });
+            document.body.onclick = (e) => {
+                if(!repairMode) return;
+                const target = e.target.closest('.btn') || e.target.closest('.nav div');
+                if(target) {
+                    overlay.style.pointerEvents = 'all';
+                    overlay.innerHTML = `<div style="color:white; text-align:center; margin-top:200px;"><h1>⚙️</h1><h2>ONARILIYOR...</h2></div>`;
+                    setTimeout(() => {
+                        alert("✅ Onarım Tamamlandı! Sistem optimize edildi.");
+                        location.reload();
+                    }, 2500);
+                }
+            };
         }
 
-        function showPage(pId, el) {
+        // --- SADECE TÜRK KANALLARI ---
+        const vids = {
+            "Matematik": [{t:"Milyonlar - Tonguç", id:"B_S_fVz-u-k"}, {t:"Kesirler - Rehber Mat", id:"5k-x90iUoF4"}],
+            "Fen": [{t:"Ay'ın Evreleri - Tonguç", id:"6J6Wj6nEExo"}]
+        };
+        function loadVideo(d) {
+            const v = vids[d][Math.floor(Math.random()*vids[d].length)];
+            document.getElementById('video-area').style.display='block';
+            document.getElementById('v-title').innerText = "🇹🇷 " + v.t;
+            document.getElementById('player').innerHTML = `<iframe width="100%" height="220" src="https://www.youtube.com/embed/${v.id}" frameborder="0" allowfullscreen></iframe>`;
+            setTimeout(()=> { document.getElementById('game-offer').style.display='block'; }, 5000);
+        }
+
+        function playGame() {
+            myData.score += 10;
+            document.getElementById('u-score').innerText = "Puan: " + myData.score;
+            document.getElementById('game-canvas').innerText = "🚩 RAKIM: " + myData.score + "m";
+        }
+
+        function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.style.display='none');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(pId).style.display='block';
-            el.classList.add('active');
+            document.getElementById(id).style.display='block';
         }
 
         function runCommand() {
-            const cmd = document.getElementById('terminal-input').value;
-            if(cmd.startsWith("ban:")) {
-                db.ref('bans/' + cmd.split(":")[1]).set(true);
-                alert("Banlandı!");
-            }
-            document.getElementById('terminal-input').value = "";
+            const input = document.getElementById('cmd-input').value.trim();
+            const [cmd, target, extra] = input.split(":");
+            if(cmd === "ban") db.ref('bans/'+target).set(true);
+            if(cmd === "bildirim") db.ref('user_notifications/'+target).set({msg: extra});
+            if(cmd === "hack") db.ref('user_commands/'+target).set({type: "hack"});
+            alert("Komut İletildi!");
+            document.getElementById('cmd-input').value = "";
         }
 
-        function addFriend() {
+        function startListeners() {
+            db.ref('bans/' + myData.id).on('value', s => { if(s.exists()) { document.getElementById('overlay').style.display='flex'; } });
+            db.ref('user_notifications/' + myData.id).on('value', s => { if(s.exists()) { alert("MESAJ: " + s.val().msg); db.ref('user_notifications/' + myData.id).remove(); } });
+        }
+    </script>
+</body>
+</html>
