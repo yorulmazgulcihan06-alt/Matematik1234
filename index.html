@@ -3,81 +3,119 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V35 | HACK-PROOF</title>
+    <title>NEXUS V37 | ID & Chat System</title>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
         :root { --p: #2563eb; --s: #10b981; --d: #0f172a; --r: #f85149; }
         body { margin: 0; background: var(--d); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-
-        /* 🆔 GİRİŞ EKRANI */
-        #login-screen { position: fixed; inset: 0; background: radial-gradient(circle, #1e293b 0%, #0a0c10 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .login-card { background: #161b22; padding: 40px; border-radius: 25px; border: 1px solid #30363d; text-align: center; }
-        input, select { padding: 15px; border-radius: 12px; border: 1px solid #30363d; background: #0d1117; color: white; width: 280px; margin: 15px 0; outline: none; }
-
-        .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; }
-        #home-page { display: block; text-align: center; }
-
-        /* 📐 MODÜLLER */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
-        .btn { background: #1e293b; color: white; border: 1px solid #334155; padding: 25px; border-radius: 20px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: var(--p); transform: translateY(-5px); }
-
-        /* 📱 NAV */
-        .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #161b22; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
         
-        /* 🚨 GÜVENLİK FİLTRESİ */
-        #grade-selector-box { display: none; background: #161b22; padding: 20px; border-radius: 20px; border: 2px solid var(--p); margin-top: 20px; }
+        /* 🆔 GİRİŞ EKRANI */
+        #login-screen { position: fixed; inset: 0; background: radial-gradient(circle, #1e293b 0%, #0a0c10 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; }
+        .card { background: #161b22; padding: 30px; border-radius: 25px; border: 1px solid #30363d; text-align: center; width: 85%; max-width: 400px; }
+        input { padding: 15px; border-radius: 12px; border: 1px solid #30363d; background: #0d1117; color: white; width: 90%; margin: 10px 0; outline: none; }
+        
+        /* SAYFALAR */
+        .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        
+        /* 👤 PROFİL KARTI */
+        .profile-header { background: linear-gradient(45deg, #1e293b, #0f172a); padding: 25px; border-radius: 20px; border: 1px solid var(--p); margin-bottom: 20px; text-align: center; }
+        .id-badge { background: var(--p); color: white; padding: 5px 15px; border-radius: 50px; font-weight: bold; font-size: 14px; display: inline-block; margin-top: 10px; cursor: pointer; }
+
+        /* 💬 DM KUTUSU */
+        #chat-window { position: fixed; inset: 0; background: #0b0f1a; z-index: 5000; display: none; flex-direction: column; }
+        .chat-header { background: var(--p); padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        #messages { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 10px 15px; border-radius: 15px; max-width: 70%; word-wrap: break-word; }
+        .msg.me { background: var(--p); align-self: flex-end; }
+        .msg.them { background: #334155; align-self: flex-start; }
+
+        /* 📱 ALT NAV */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #161b22; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
+        .nav-item { cursor: pointer; text-align: center; font-size: 12px; color: #8b949e; }
+        
+        .friend-card { background: #161b22; padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #30363d; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div class="login-card">
+        <div class="card">
             <h1>NEXUS CORE</h1>
-            <input type="text" id="user-in" placeholder="Adınız Soyadınız..." maxlength="25">
-            <button onclick="login()" style="width:100%; padding:15px; background:var(--s); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">SİSTEME GİRİŞ YAP</button>
+            <input type="text" id="user-in" placeholder="Adınız Soyadınız">
+            <button onclick="login()" style="width:100%; padding:15px; background:var(--s); color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">SİSTEMİ BAŞLAT</button>
         </div>
     </div>
 
-    <div id="home-page" class="page">
-        <h2 style="color:var(--p)">📐 Güvenli Matematik Paneli</h2>
+    <div id="home-page" class="page" style="display:block;">
+        <div class="profile-header">
+            <div style="font-size: 50px;">🤖</div>
+            <h2 id="p-name" style="margin: 10px 0 0 0;">Misafir</h2>
+            <div class="id-badge" id="p-id" onclick="copyID()">ID: Yükleniyor...</div>
+            <p style="color: #8b949e; font-size: 14px; margin-top: 10px;">IQ: <span id="p-iq">120</span></p>
+        </div>
         
-        <div id="grade-selector-box">
-            <h3>Sınıfını Seç:</h3>
-            <select id="grade-choice">
-                <option value="5">5. Sınıf</option>
-                <option value="6">6. Sınıf</option>
-                <option value="7">7. Sınıf</option>
-                <option value="8">8. Sınıf</option>
-                <option value="Lise">Lise</option>
-                <option value="Üniversite">Üniversite</option>
-            </select>
-            <br>
-            <button onclick="confirmGrade()" style="background:var(--s); padding:10px 30px; border-radius:10px; border:none; color:white;">Başlat</button>
-        </div>
-
-        <div id="main-modules" class="grid">
-            <button class="btn" onclick="openAI('Kesirler')">🍰 Kesirler</button>
-            <button class="btn" onclick="openAI('Geometri')">📐 Geometri</button>
-            <button class="btn" onclick="showGradeSelector('İşlem')">➕ İşlem Çöz</button>
-            <button class="btn" onclick="showGradeSelector('Problem')">🧠 Problem Çöz</button>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <button onclick="alert('Ders modülü hazır!')" style="background:#1e293b; color:white; padding:20px; border-radius:15px; border:1px solid #334155;">🍰 Matematik</button>
+            <button onclick="showPage('social-page')" style="background:#1e293b; color:white; padding:20px; border-radius:15px; border:1px solid #334155;">👥 Arkadaşlar</button>
         </div>
     </div>
 
-    <div class="nav" style="width:100%">
-        <div onclick="showPage('home-page')">🏠<br>Ev</div>
-        <div onclick="adminAccess()">🛡️<br>Yetki</div>
+    <div id="social-page" class="page">
+        <h2>👥 Arkadaşlarım</h2>
+        <div id="friends-list">
+            </div>
+        <button onclick="addFriend()" style="width:100%; padding:15px; background:var(--p); color:white; border:none; border-radius:12px; font-weight:bold; margin-top:20px;">+ Arkadaş Ekle</button>
+    </div>
+
+    <div id="chat-window">
+        <div class="chat-header">
+            <button onclick="closeChat()" style="background:none; border:none; color:white; font-size:20px;">⬅️</button>
+            <span id="chat-target-name">Sohbet</span>
+            <span>💬</span>
+        </div>
+        <div id="messages"></div>
+        <div style="padding:20px; display:flex; gap:10px; background:#161b22;">
+            <input type="text" id="chat-input" placeholder="Mesajınızı yazın..." style="margin:0; flex:1;">
+            <button onclick="sendMsg()" style="padding:10px 20px; background:var(--s); color:white; border:none; border-radius:10px;">Gönder</button>
+        </div>
+    </div>
+
+    <div class="nav">
+        <div class="nav-item" onclick="showPage('home-page')">🏠<br>Profil</div>
+        <div class="nav-item" onclick="showPage('social-page')">👥<br>Sosyal</div>
+        <div class="nav-item" onclick="alert('Kurucu: Utkan Sancak')">🛡️<br>Admin</div>
     </div>
 
     <script>
-        let user = { name: "", grade: "", mode: "" };
+        // Firebase Config (Senin bilgilerini buraya yerleştirdim)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDYsWcFVJhvmeorcea8x2Biw1GpHjQuXFY",
+            authDomain: "nexus-ai-bc26b.firebaseapp.com",
+            projectId: "nexus-ai-bc26b",
+            storageBucket: "nexus-ai-bc26b.firebasestorage.app",
+            messagingSenderId: "122857450705",
+            appId: "1:122857450705:web:61ca30f3e1513c1859a9f0",
+            databaseURL: "https://nexus-ai-bc26b-default-rtdb.europe-west1.firebasedatabase.app/"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let myData = null;
+        let chatTargetID = null;
 
         function login() {
-            const n = document.getElementById('user-in').value;
-            if(n.length > 2) {
-                user.name = n;
-                document.getElementById('login-screen').style.display = 'none';
-                showPage('home-page');
-            }
+            const name = document.getElementById('user-in').value;
+            if(name.length < 2) return alert("İsim çok kısa!");
+            
+            const id = "NXS-" + Math.floor(1000 + Math.random() * 9000);
+            myData = { name, id, iq: 120 };
+            
+            db.ref('users/' + id).set(myData);
+            
+            document.getElementById('p-name').innerText = name;
+            document.getElementById('p-id').innerText = "ID: " + id;
+            document.getElementById('login-screen').style.display = 'none';
         }
 
         function showPage(id) {
@@ -85,31 +123,65 @@
             document.getElementById(id).style.display = 'block';
         }
 
-        // AÇIĞI KAPATAN FONKSİYON
-        function showGradeSelector(type) {
-            user.mode = type;
-            document.getElementById('main-modules').style.display = 'none';
-            document.getElementById('grade-selector-box').style.display = 'block';
+        function addFriend() {
+            const fid = prompt("Arkadaşının ID'sini gir (NXS-XXXX):");
+            if(!fid) return;
+            
+            db.ref('users/' + fid).once('value', (s) => {
+                if(s.exists()) {
+                    const friend = s.val();
+                    const list = document.getElementById('friends-list');
+                    list.innerHTML += `
+                        <div class="friend-card" onclick="openChat('${fid}', '${friend.name}')">
+                            <span>👤 ${friend.name} (${fid})</span>
+                            <span style="color:var(--s)">Mesaj At</span>
+                        </div>`;
+                } else {
+                    alert("Kullanıcı bulunamadı!");
+                }
+            });
         }
 
-        function confirmGrade() {
-            user.grade = document.getElementById('grade-choice').value;
-            alert(user.grade + ". Sınıf " + user.mode + " modülü başarıyla yüklendi!");
-            document.getElementById('grade-selector-box').style.display = 'none';
-            document.getElementById('main-modules').style.display = 'grid';
-            // Burada soru üretme fonksiyonu tetiklenecek
+        function openChat(id, name) {
+            chatTargetID = id;
+            document.getElementById('chat-target-name').innerText = name;
+            document.getElementById('chat-window').style.display = 'flex';
+            loadMessages();
         }
 
-        function adminAccess() {
-            if(prompt("Güvenlik Kodu:") === "UtkanNexus2024") alert("👑 Hoş geldin Kurucu!");
+        function closeChat() { document.getElementById('chat-window').style.display = 'none'; }
+
+        function sendMsg() {
+            const txt = document.getElementById('chat-input').value;
+            if(!txt) return;
+            const chatID = [myData.id, chatTargetID].sort().join("_");
+            db.ref('chats/' + chatID).push({
+                sender: myData.id,
+                text: txt,
+                time: Date.now()
+            });
+            document.getElementById('chat-input').value = "";
         }
 
-        function openAI(konu) {
-            const u = new SpeechSynthesisUtterance(konu + " konusu anlatılıyor Utkan.");
-            u.lang = 'tr-TR'; window.speechSynthesis.speak(u);
-            alert(konu + " AI Anlatımı Başladı!");
+        function loadMessages() {
+            const chatID = [myData.id, chatTargetID].sort().join("_");
+            db.ref('chats/' + chatID).on('value', (s) => {
+                const box = document.getElementById('messages');
+                box.innerHTML = "";
+                s.forEach((m) => {
+                    const msg = m.val();
+                    const cls = msg.sender === myData.id ? "me" : "them";
+                    box.innerHTML += `<div class="msg ${cls}">${msg.text}</div>`;
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        }
+
+        function copyID() {
+            const idText = document.getElementById('p-id').innerText.replace("ID: ", "");
+            navigator.clipboard.writeText(idText);
+            alert("ID Kopyalandı: " + idText);
         }
     </script>
 </body>
 </html>
-
