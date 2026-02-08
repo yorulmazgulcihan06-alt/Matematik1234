@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V45 | Utkan Sancak</title>
+    <title>NEXUS V46 | Utkan Sancak</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
@@ -14,45 +14,53 @@
         input { padding: 15px; border-radius: 12px; border: 1px solid #30363d; background: #0d1117; color: white; width: 90%; margin: 10px 0; outline: none; }
         .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; }
-        .friend-card { background: var(--b); padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid var(--p); display: flex; justify-content: space-between; align-items: center; }
+        .profile-header { background: linear-gradient(45deg, #1e293b, #0f172a); padding: 25px; border-radius: 20px; border: 1px solid var(--p); text-align: center; margin-bottom: 20px; }
+        .id-badge { background: var(--p); color: white; padding: 5px 15px; border-radius: 50px; cursor: pointer; display: inline-block; margin-top: 10px; }
+        .friend-card { background: var(--b); padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
+        .nav { position: fixed; bottom: 0; left:0; width: 100%; height: 70px; background: #161b22; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
         <div class="card">
-            <h1 style="color:var(--p);">NEXUS V45</h1>
+            <h1 style="color:var(--p);">NEXUS V46</h1>
+            <p>Sisteme bir kez kayıt olun, sizi hep tanıyalım.</p>
             <input type="text" id="user-in" placeholder="Adınız Soyadınız">
             <button onclick="login()" class="btn" style="background:var(--s);">SİSTEMİ BAŞLAT</button>
         </div>
     </div>
 
     <div id="home-page" class="page" style="display:block;">
-        <div style="background:linear-gradient(45deg, #1e293b, #0f172a); padding:25px; border-radius:20px; border:1px solid var(--p); text-align:center; margin-bottom:20px;">
-            <h2 id="p-name">Hoş geldin</h2>
-            <div id="p-id" style="background:var(--p); color:white; padding:5px 15px; border-radius:50px; cursor:pointer;" onclick="copyID()">ID: Bekleniyor...</div>
+        <div class="profile-header">
+            <div style="font-size: 50px;">👤</div>
+            <h2 id="p-name">Yükleniyor...</h2>
+            <div class="id-badge" id="p-id" onclick="copyID()">ID Alınıyor...</div>
         </div>
         <button onclick="startBroadcast()" class="btn" style="background:var(--r);">📡 CANLI YAYIN BAŞLAT</button>
-        <button onclick="showPage('social-page')" class="btn" style="background:var(--p);">👥 ARKADAŞLARIM</button>
+        <button onclick="logout()" class="btn" style="background:#334155; font-size: 12px;">Çıkış Yap / Hesabı Sıfırla</button>
     </div>
 
     <div id="social-page" class="page">
         <h2>👥 Arkadaşlarım</h2>
-        <div id="friends-list"><p style="color:#8b949e; text-align:center;">Henüz kimse yok.</p></div>
+        <div id="friends-list"><p style="color:#8b949e; text-align:center;">Arkadaşınız henüz eklenmemiş.</p></div>
         <button onclick="addFriend()" class="btn" style="background:var(--p);">+ ARKADAŞ EKLE (ID İLE)</button>
-        <button onclick="showPage('home-page')" class="btn" style="background:#334155;">GERİ DÖN</button>
     </div>
 
     <div id="live-overlay" style="position:fixed; inset:0; background:#000; z-index:100000; display:none; flex-direction:column;">
         <div style="background:#1e293b; padding:15px; display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--s); font-weight:bold;">● CANLI YAYIN</span>
+            <span id="live-status" style="color:var(--s); font-weight:bold;">● CANLI YAYIN AKTİF</span>
             <button onclick="closeLive()" style="background:var(--r); color:white; border:none; padding:8px 15px; border-radius:5px;">Yayını Kapat</button>
         </div>
         <iframe id="live-frame" src="" allow="camera; microphone; fullscreen; display-capture; autoplay" style="flex:1; border:none;"></iframe>
     </div>
 
+    <div class="nav">
+        <div onclick="showPage('home-page')" style="cursor:pointer; text-align:center;">🏠<br><small>Profil</small></div>
+        <div onclick="showPage('social-page')" style="cursor:pointer; text-align:center;">👥<br><small>Sosyal</small></div>
+    </div>
+
     <script>
-        // Veritabanı linkin resimdekiyle (1000043720.jpg) birebir eşlendi
         const firebaseConfig = {
             apiKey: "AIzaSyDYsWcFVJhvmeorcea8x2Biw1GpHjQuXFY",
             authDomain: "nexus-ai-bc26b.firebaseapp.com",
@@ -60,43 +68,40 @@
             storageBucket: "nexus-ai-bc26b.firebasestorage.app",
             messagingSenderId: "122857450705",
             appId: "1:122857450705:web:61ca30f3e1513c1859a9f0",
-            databaseURL: "https://nexus-ai-bc26b-default-rtdb.firebaseio.com/"
+            databaseURL: "https://nexus-ai-bc26b-default-rtdb.europe-west1.firebasedatabase.app/"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         let myData = null;
 
+        // SAYFA AÇILDIĞINDA: Hafızayı kontrol et
+        window.onload = function() {
+            const savedUser = localStorage.getItem('nexus_user');
+            if (savedUser) {
+                myData = JSON.parse(savedUser);
+                setupUI(myData);
+            }
+        };
+
         function login() {
             const n = document.getElementById('user-in').value;
-            if(n.length < 2) return alert("İsim çok kısa!");
+            if(n.length < 2) return alert("Lütfen adınızı girin!");
+            
             const id = "NXS-" + Math.floor(1000 + Math.random() * 9000);
             myData = { name: n, id: id };
             
-            // Veritabanına yaz (Senin ismin artık resimdeki beyaz ekranda görünecek!)
+            // Hafızaya ve Firebase'e kaydet
+            localStorage.setItem('nexus_user', JSON.stringify(myData));
             db.ref('users/' + id).set(myData);
             
-            document.getElementById('p-name').innerText = n;
-            document.getElementById('p-id').innerText = "Senin ID: " + id;
-            document.getElementById('login-screen').style.display = 'none';
-            listenForBroadcasts();
+            setupUI(myData);
         }
 
-        function addFriend() {
-            const fid = prompt("Arkadaşının ID'sini yaz (NXS-XXXX):");
-            if(!fid || fid === myData.id) return;
-
-            // Veritabanında o kişiyi ara
-            db.ref('users/' + fid).once('value', (snap) => {
-                if(snap.exists()) {
-                    const friend = snap.val();
-                    const list = document.getElementById('friends-list');
-                    if(list.innerHTML.includes('Henüz')) list.innerHTML = "";
-                    list.innerHTML += `<div class="friend-card"><span>👤 ${friend.name}</span><b style="color:var(--s)">EKLENDİ</b></div>`;
-                    alert(friend.name + " eklendi!");
-                } else {
-                    alert("🚨 BULUNAMADI! Arkadaşına söyle: Önce siteye girip 'SİSTEMİ BAŞLAT' demeli!");
-                }
-            });
+        function setupUI(user) {
+            document.getElementById('p-name').innerText = user.name;
+            document.getElementById('p-id').innerText = "Senin ID: " + user.id;
+            document.getElementById('login-screen').style.display = 'none';
+            listenForBroadcasts();
         }
 
         function showPage(id) {
@@ -104,17 +109,34 @@
             document.getElementById(id).style.display = 'block';
         }
 
+        function addFriend() {
+            const fid = prompt("Arkadaşının ID'sini gir (Örn: NXS-1234):");
+            if(!fid || fid === myData.id) return;
+
+            db.ref('users/' + fid).once('value', (snap) => {
+                if(snap.exists()) {
+                    const f = snap.val();
+                    const list = document.getElementById('friends-list');
+                    if(list.innerHTML.includes('henüz')) list.innerHTML = "";
+                    list.innerHTML += `<div class="friend-card"><span>👤 ${f.name}</span><b style="color:var(--s)">EKLENDİ</b></div>`;
+                    alert(f.name + " eklendi!");
+                } else {
+                    alert("Bu ID bulunamadı. Arkadaşının önce giriş yapması gerek!");
+                }
+            });
+        }
+
         function startBroadcast() {
-            const url = "https://meet.jit.si/Nexus_Room_" + myData.id;
+            const url = "https://meet.jit.si/Nexus_Room_" + myData.id + "#config.prejoinPageEnabled=false";
             db.ref('broadcast').set({ active: true, sender: myData.name, url: url });
             openLive(url);
         }
 
         function listenForBroadcasts() {
             db.ref('broadcast').on('value', (snap) => {
-                const data = snap.val();
-                if(data && data.active && data.sender !== myData.name) {
-                    if(confirm(data.sender + " yayında! Katılmak ister misin?")) openLive(data.url);
+                const d = snap.val();
+                if(d && d.active && d.sender !== myData.name) {
+                    if(confirm(d.sender + " canlı yayında! Katılmak ister misin?")) openLive(d.url);
                 }
             });
         }
@@ -128,6 +150,13 @@
             document.getElementById('live-overlay').style.display = 'none';
             document.getElementById('live-frame').src = "";
             db.ref('broadcast').update({ active: false });
+        }
+
+        function logout() {
+            if(confirm("Hesap bilgilerini temizlemek istiyor musun?")) {
+                localStorage.removeItem('nexus_user');
+                location.reload();
+            }
         }
 
         function copyID() {
