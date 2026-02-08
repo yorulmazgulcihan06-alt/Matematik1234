@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V59 | Full System</title>
+    <title>NEXUS V61 | Infinite Math</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
@@ -16,11 +16,13 @@
         .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 90px; }
         .card { background: var(--b); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #30363d; }
         
-        /* SORU ÇÖZME STİLLERİ */
-        .option { background: #0d1117; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #334155; cursor: pointer; transition: 0.3s; }
-        .option:hover { border-color: var(--p); }
+        /* ADMIN PANEL - KIRMIZI KARE */
+        #admin-terminal { background: #000; border: 2px solid var(--r); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; box-shadow: 0 0 15px var(--r); }
         
-        #admin-terminal { background: #000; border: 2px solid var(--r); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; }
+        /* SORU TASARIMI */
+        .option { background: #0d1117; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1px solid #334155; cursor: pointer; transition: 0.3s; text-align: center; }
+        .option:hover { border-color: var(--p); background: #1e293b; }
+        
         .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #0f172a; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
         .nav-item { cursor: pointer; text-align: center; font-size: 11px; color: #64748b; }
         .active { color: var(--p); font-weight: bold; }
@@ -30,55 +32,45 @@
 
     <div id="login-screen">
         <div class="login-card">
-            <h1 style="color:var(--p);">NEXUS V59</h1>
-            <input type="text" id="user-in" placeholder="Giriş Kodu veya İsim">
-            <button onclick="login()" class="btn" style="background:var(--p);">GİRİŞ YAP</button>
+            <h1 style="color:var(--p);">NEXUS V61</h1>
+            <input type="text" id="user-in" placeholder="Giriş Kodunu Yaz...">
+            <button onclick="login()" class="btn" style="background:var(--p);">SİSTEME GİR</button>
         </div>
     </div>
 
     <div id="home-page" class="page" style="display:block;">
         <div id="admin-terminal">
-            <h4 style="margin:0 0 10px 0; color:var(--r);">🛡️ ROOT PANEL</h4>
-            <input type="text" id="terminal-input" placeholder="ban:ID" style="width:70%;">
-            <button onclick="runCommand()" style="background:var(--r); border:none; padding:10px; border-radius:8px; color:white;">OK</button>
+            <h4 style="margin:0 0 10px 0; color:var(--r);">🛡️ ROOT COMMAND CENTER</h4>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="terminal-input" placeholder="Komut (ban:ID)" style="margin:0; flex:1;">
+                <button onclick="runCommand()" style="background:var(--r); padding:0 15px; border-radius:10px; border:none; color:white;">OK</button>
+            </div>
         </div>
 
         <div class="card" style="text-align:center;">
-            <h2 id="display-name">...</h2>
-            <p id="display-id" style="color:var(--p); font-weight:bold;">ID: ...</p>
-            <p id="display-role" style="font-size:12px; opacity:0.7;">YÜKLENİYOR...</p>
+            <div style="font-size: 40px;">👤</div>
+            <h2 id="display-name" style="margin:5px 0;">...</h2>
+            <p id="display-id" style="color:var(--p); font-weight:bold; margin:0;">ID: ...</p>
+            <p id="display-role" style="font-size:10px; opacity:0.6; margin-top:5px;">YETKİ: USER</p>
         </div>
-        <button onclick="window.open('https://meet.jit.si/NexusEtut'+myData.id)" class="btn" style="background:var(--r);">📡 CANLI ETÜT AÇ</button>
+        <button onclick="window.open('https://meet.jit.si/Nexus'+myData.id)" class="btn" style="background:var(--r);">📡 CANLI ETÜT BAŞLAT</button>
     </div>
 
     <div id="math-page" class="page">
-        <h2 style="color:var(--y);">📐 Soru Çözme Üssü</h2>
-        
-        <div class="card">
-            <p><b>Soru 1:</b> 5.240.100 sayısının "on binler" basamağındaki rakam kaçtır?</p>
-            <div class="option" onclick="checkMath(this, true)">4</div>
-            <div class="option" onclick="checkMath(this, false)">2</div>
-            <div class="option" onclick="checkMath(this, false)">0</div>
-        </div>
-
-        <div class="card">
-            <p><b>Soru 2:</b> 2/5 + 1/10 işleminin sonucu hangisidir?</p>
-            <div class="option" onclick="checkMath(this, false)">3/15</div>
-            <div class="option" onclick="checkMath(this, true)">5/10</div>
-            <div class="option" onclick="checkMath(this, false)">2/10</div>
+        <h2 style="color:var(--y);">📐 Sonsuz Soru Çözümü</h2>
+        <div class="card" id="question-container">
+            <h3 id="question-text">Soru Yükleniyor...</h3>
+            <div id="options-container"></div>
+            <p id="score-text" style="text-align:center; color:var(--s); font-weight:bold; margin-top:15px;">Puan: 0</p>
         </div>
     </div>
 
     <div id="social-page" class="page">
-        <h2 style="color:var(--s);">👥 Sosyal & Arkadaşlar</h2>
-        
+        <h2>👥 Arkadaşlar</h2>
         <div class="card">
-            <p style="margin:0 0 10px 0;">Arkadaşının ID'sini yaz:</p>
-            <input type="text" id="friend-id-in" placeholder="NXS-1234 gibi..." style="width:90%;">
-            <button onclick="addFriend()" class="btn" style="background:var(--p);">ARKADAŞI EKLE</button>
+            <input type="text" id="friend-id-in" placeholder="Arkadaş ID">
+            <button onclick="addFriend()" class="btn" style="background:var(--p);">ARKADAŞ EKLE</button>
         </div>
-
-        <h3>Arkadaşlarım</h3>
         <div id="friends-list"></div>
     </div>
 
@@ -98,38 +90,23 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         
-        let myData = JSON.parse(localStorage.getItem('nexus_v59_session')) || { name: "", id: "", role: "user" };
-
-        window.onload = function() { if(myData.id) startApp(); };
+        let myData = { name: "", id: "", role: "user", score: 0 };
 
         function login() {
             const val = document.getElementById('user-in').value.trim();
             if(!val) return;
 
-            const codes = {
-                "utkanpro2026": { name: "Utkan Ulaş Yorulmaz", role: "owner", id: "ADMIN-UTKAN" },
-                "mustipro2026": { name: "Mustafa Yetkili", role: "admin", id: "ADMIN-MUSTI" },
-                "akıllı tahta Pro 2026": { name: "Akıllı Tahta (YETKİLİ)", role: "owner", id: "ADMIN-TAHTA" }
-            };
-
-            if(codes[val]) {
-                db.ref('used_codes/' + val.replace(/\s/g, '_')).once('value', s => {
-                    if(s.exists() && s.val() !== codes[val].id) {
-                        alert("BU KOD BAŞKASI TARAFINDAN KULLANILDI!");
-                    } else {
-                        myData = codes[val];
-                        db.ref('used_codes/' + val.replace(/\s/g, '_')).set(myData.id);
-                        saveAndStart();
-                    }
-                });
+            if(val === "utkanpro2026") {
+                myData = { name: "Utkan Ulaş Yorulmaz", role: "owner", id: "ADMIN-UTKAN", score: 0 };
+            } else if(val === "mustipro2026") {
+                myData = { name: "Mustafa Yetkili", role: "admin", id: "ADMIN-MUSTI", score: 0 };
+            } else if(val === "akıllı tahta Pro 2026") {
+                myData = { name: "Akıllı Tahta", role: "owner", id: "ADMIN-TAHTA", score: 0 };
             } else {
-                myData = { name: val, id: "NXS-" + Math.floor(1000 + Math.random() * 9000), role: "user" };
-                saveAndStart();
+                myData = { name: val, id: "NXS-" + Math.floor(1000 + Math.random() * 9000), role: "user", score: 0 };
             }
-        }
 
-        function saveAndStart() {
-            localStorage.setItem('nexus_v59_session', JSON.stringify(myData));
+            localStorage.setItem('nexus_session_v61', JSON.stringify(myData));
             startApp();
         }
 
@@ -139,42 +116,60 @@
             document.getElementById('display-id').innerText = "ID: " + myData.id;
             document.getElementById('display-role').innerText = "YETKİ: " + myData.role.toUpperCase();
             
-            db.ref('users/' + myData.id).update(myData);
-
+            // ÜSTTEKİ KARE KONTROLÜ
             if(myData.role === "owner" || myData.role === "admin") {
                 document.getElementById('admin-terminal').style.display = 'block';
             }
+
+            db.ref('users/' + myData.id).set(myData);
+            generateQuestion(); // İlk soruyu oluştur
             loadFriends();
         }
 
-        function checkMath(el, isCorrect) {
-            if(isCorrect) {
-                el.style.background = "var(--s)";
-                alert("Doğru Cevap! Tebrikler. 🎉");
-            } else {
-                el.style.background = "var(--r)";
-                alert("Yanlış Cevap, tekrar dene. ❌");
+        // --- SONSUZ SORU MOTORU ---
+        function generateQuestion() {
+            const container = document.getElementById('options-container');
+            const qText = document.getElementById('question-text');
+            container.innerHTML = "";
+
+            // Rastgele 2 sayı oluştur (Milyonlar basamağı eğitimi için)
+            const num1 = Math.floor(Math.random() * 9000000) + 1000000;
+            const basamaklar = ["Milyonlar", "Yüz Binler", "On Binler", "Binler"];
+            const secilenBasamak = basamaklar[Math.floor(Math.random() * basamaklar.length)];
+            
+            qText.innerText = `${num1.toLocaleString('tr-TR')} sayısının "${secilenBasamak}" basamağındaki rakam kaçtır?`;
+
+            // Doğru cevabı bul
+            let correctAns;
+            const s = num1.toString();
+            if(secilenBasamak === "Milyonlar") correctAns = s[0];
+            else if(secilenBasamak === "Yüz Binler") correctAns = s[1];
+            else if(secilenBasamak === "On Binler") correctAns = s[2];
+            else correctAns = s[3];
+
+            // Şıkları oluştur
+            let options = [correctAns];
+            while(options.length < 4) {
+                let r = Math.floor(Math.random() * 10).toString();
+                if(!options.includes(r)) options.push(r);
             }
-        }
+            options.sort(() => Math.random() - 0.5);
 
-        function addFriend() {
-            const fid = document.getElementById('friend-id-in').value.trim();
-            if(!fid) return;
-            db.ref('friends/' + myData.id + '/' + fid).set(true);
-            alert("İstek gönderildi/Eklendi!");
-            document.getElementById('friend-id-in').value = "";
-        }
-
-        function loadFriends() {
-            db.ref('friends/' + myData.id).on('value', s => {
-                const list = document.getElementById('friends-list');
-                list.innerHTML = "";
-                s.forEach(c => {
-                    db.ref('users/' + c.key).once('value', u => {
-                        const f = u.val();
-                        if(f) list.innerHTML += `<div class="card">👤 ${f.name} <br> <small style="color:var(--p)">ID: ${f.id}</small></div>`;
-                    });
-                });
+            options.forEach(opt => {
+                const div = document.createElement('div');
+                div.className = "option";
+                div.innerText = opt;
+                div.onclick = () => {
+                    if(opt === correctAns) {
+                        myData.score += 10;
+                        document.getElementById('score-text').innerText = "Puan: " + myData.score;
+                        alert("DOĞRU! 🎉 Yeni soruya geçiliyor...");
+                        generateQuestion(); // YENİ SORU GELSİN
+                    } else {
+                        alert("YANLIŞ! ❌ Tekrar dene.");
+                    }
+                };
+                container.appendChild(div);
             });
         }
 
@@ -188,10 +183,28 @@
         function runCommand() {
             const cmd = document.getElementById('terminal-input').value;
             if(cmd.startsWith("ban:")) {
-                db.ref('bans/'+cmd.split(":")[1]).set(true);
+                db.ref('bans/' + cmd.split(":")[1]).set(true);
                 alert("Banlandı!");
             }
             document.getElementById('terminal-input').value = "";
+        }
+
+        function addFriend() {
+            const fid = document.getElementById('friend-id-in').value;
+            if(fid) db.ref('friends/'+myData.id+'/'+fid).set(true);
+        }
+
+        function loadFriends() {
+            db.ref('friends/' + myData.id).on('value', s => {
+                const list = document.getElementById('friends-list');
+                list.innerHTML = "";
+                s.forEach(c => {
+                    db.ref('users/' + c.key).once('value', u => {
+                        const f = u.val();
+                        if(f) list.innerHTML += `<div class="card">👤 ${f.name} (ID: ${f.id})</div>`;
+                    });
+                });
+            });
         }
     </script>
 </body>
