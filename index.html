@@ -3,218 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V27 | AI Eğitim & Güvenlik Platformu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>NEXUS PRO | Ultimate AI Platform</title>
     <style>
-        :root {
-            --primary: #2563eb;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --success: #10b981;
-            --gold: #fbbf24;
-        }
-
-        body {
-            margin: 0; font-family: 'Inter', sans-serif;
-            background: #f1f5f9; color: var(--dark);
-            overflow-x: hidden; padding-bottom: 70px;
-        }
-
-        /* 🛡️ YASAL GÜVENLİK DUVARI (Girişte Çıkan) */
-        #secure-gate {
-            position: fixed; inset: 0; background: var(--dark);
-            z-index: 999999; display: flex; align-items: center; justify-content: center; padding: 20px;
-        }
-        .warning-panel {
-            max-width: 500px; background: white; border-radius: 30px; padding: 30px;
-            text-align: center; border: 5px solid var(--danger);
-        }
-        .legal-scroll {
-            text-align: left; background: #fef2f2; padding: 15px;
-            border-radius: 15px; font-size: 13px; max-height: 200px;
-            overflow-y: auto; margin: 20px 0; border: 1px solid #fee2e2;
-        }
-
-        /* 📱 ANA ARAYÜZ */
-        #main-app { display: none; }
-        header { background: var(--primary); color: white; padding: 20px; text-align: center; font-weight: 900; font-size: 24px; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: white; overflow-x: hidden; }
         
-        /* 📺 CANLI YAYIN VE AI GUARDIAN EKRANI */
-        .video-container {
-            width: 90%; max-width: 800px; margin: 20px auto;
-            background: #000; border-radius: 20px; position: relative;
-            overflow: hidden; aspect-ratio: 16/9;
+        /* 🎨 HAREKETLİ AI EKRANI */
+        #ai-canvas {
+            width: 100%; height: 250px; background: linear-gradient(45deg, #1e293b, #334155);
+            display: flex; align-items: center; justify-content: center; position: relative;
+            border-bottom: 4px solid #2563eb; overflow: hidden;
         }
-        #live-stream { width: 100%; height: 100%; object-fit: cover; transition: 0.1s; }
-        #ai-status-tag {
-            position: absolute; top: 10px; left: 10px;
-            background: rgba(0,0,0,0.6); color: var(--success);
-            padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;
-        }
-        .blackout { filter: brightness(0) !important; }
+        .ai-robot { font-size: 80px; animation: float 3s ease-in-out infinite; z-index: 2; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .wave { position: absolute; width: 100%; height: 50px; background: rgba(37, 99, 235, 0.3); bottom: 0; animation: wave 2s linear infinite; }
+        @keyframes wave { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
-        /* 💬 WEPLAY TARZI ALT NAVİGASYON */
-        .bottom-nav {
-            position: fixed; bottom: 0; width: 100%; height: 70px;
-            background: white; border-top: 1px solid #e2e8f0;
-            display: flex; justify-content: space-around; align-items: center; z-index: 1000;
-        }
-        .nav-item { text-align: center; font-size: 11px; font-weight: bold; cursor: pointer; color: #64748b; }
-        .nav-item span { font-size: 24px; display: block; }
-        .nav-item.active { color: var(--primary); }
+        /* 📋 ANA PANEL VE BUTONLAR */
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; }
+        .btn { background: #1e293b; border: 1px solid #334155; color: white; padding: 20px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #2563eb; transform: scale(1.05); }
+        .btn-large { grid-column: span 2; background: #2563eb; font-weight: bold; }
 
-        /* 📩 INSTAGRAM TARZI DM KUTUSU */
-        #dm-window {
-            position: fixed; bottom: 80px; right: 20px; width: 320px; height: 450px;
-            background: white; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            display: none; flex-direction: column; overflow: hidden; border: 1px solid #ddd;
+        /* 🛡️ DM KUTUSU VE SOHBET */
+        #dm-box {
+            position: fixed; bottom: 80px; right: 20px; width: 300px; height: 400px;
+            background: white; color: black; border-radius: 20px; display: none; flex-direction: column;
+            z-index: 1000; box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
-        .dm-header { background: var(--primary); color: white; padding: 15px; font-weight: bold; display: flex; justify-content: space-between; }
-        .dm-body { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .dm-footer { padding: 10px; border-top: 1px solid #eee; display: flex; }
-        .dm-footer input { flex: 1; border: 1px solid #ddd; padding: 10px; border-radius: 20px; outline: none; }
+        .dm-head { background: #2563eb; color: white; padding: 10px; border-radius: 20px 20px 0 0; display: flex; justify-content: space-between; }
+        .dm-msgs { flex: 1; padding: 10px; overflow-y: auto; font-size: 14px; }
+        .dm-input { display: flex; padding: 10px; border-top: 1px solid #ddd; }
+        .dm-input input { flex: 1; padding: 5px; border-radius: 10px; border: 1px solid #ddd; }
 
-        /* 🎓 KÜÇÜK ÖĞRETMEN ROZETİ */
-        #badge { font-size: 12px; background: var(--gold); padding: 2px 8px; border-radius: 5px; display: none; }
+        /* 💻 KOD YAZMA EKRANI (CODE EDITOR) */
+        #code-editor {
+            position: fixed; top: 50px; left: 5%; width: 90%; height: 80%;
+            background: #1a1a1a; border-radius: 15px; display: none; z-index: 2000; border: 2px solid #2563eb;
+        }
+        textarea { width: 100%; height: 80%; background: #1a1a1a; color: #00ff00; border: none; padding: 10px; font-family: monospace; resize: none; }
+
+        /* 📱 ALT MENÜ */
+        .bottom-nav { position: fixed; bottom: 0; width: 100%; height: 60px; background: #1e293b; display: flex; justify-content: space-around; align-items: center; border-top: 2px solid #2563eb; }
+        
+        .blackout { filter: brightness(0) !important; background: black !important; }
     </style>
 </head>
 <body>
 
-<div id="secure-gate">
-    <div class="warning-panel">
-        <h2 style="color:var(--danger)">🚨 GÜVENLİK PROTOKOLÜ</h2>
-        <div class="legal-scroll">
-            <b>1.</b> IBAN, T.C. No ve Fotoğraf paylaşımı yasaktır.<br>
-            <b>2.</b> Sistemin bir açığını bulup suistimal ederseniz tüm sorumluluk SİZE aittir.<br>
-            <b>3.</b> Küfür ve argo "0 Tolerans" ile ban sebebidir.<br>
-            <b>4.</b> NEXUS AI, güvenliğiniz için tüm yayınları 0.1 saniye hızla denetler.
-        </div>
-        <button onclick="acceptTerms()" style="background:var(--danger); color:white; border:none; padding:15px 30px; border-radius:15px; font-weight:900; cursor:pointer; width:100%">KABUL EDİYORUM VE GİRİŞ YAP</button>
-    </div>
-</div>
-
-<div id="main-app">
-    <header>NEXUS CORE <span id="badge">🌟 KÜÇÜK ÖĞRETMEN</span></header>
-
-    <div class="video-container">
-        <div id="ai-status-tag">🟢 YAYIN GÜVENLİ (AI GUARD)</div>
-        <div id="live-stream" style="background: #1e293b; display: flex; align-items: center; justify-content: center; color: white; flex-direction: column;">
-            <span style="font-size: 50px;">🤖</span>
-            <p id="ai-msg">AI Öğretmen Hazır...</p>
-        </div>
+    <div id="ai-canvas">
+        <div id="ai-tag" style="position:absolute; top:10px; left:10px; color:#10b981; font-weight:bold;">🟢 AI GUARDIAN AKTİF</div>
+        <div class="ai-robot" id="robot-img">🤖</div>
+        <div class="wave"></div>
+        <div id="ai-speech" style="position:absolute; bottom:20px; background:rgba(0,0,0,0.7); padding:5px 15px; border-radius:10px;">Dersi başlatmanı bekliyorum...</div>
     </div>
 
-    <div style="text-align:center; padding: 20px;">
-        <button onclick="startAiLesson()" style="padding:10px 20px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold;">🤖 Yapay Zeka Dersi Başlat</button>
-        <p style="font-size: 12px; color: #666; margin-top: 10px;">(AI Guardian 0.1 sn hızla denetliyor)</p>
+    <div class="grid-menu">
+        <div class="btn btn-large" onclick="startLesson('Matematik')">📐 Matematik Konu Anlatımı</div>
+        <div class="btn" onclick="startLesson('Fen Bilimleri')">🧪 Fen Bilimleri</div>
+        <div class="btn" onclick="startLesson('Sosyal')">🌍 Sosyal Bilgiler</div>
+        <div class="btn" onclick="openEditor()">💻 Kod Yazma Ekranı</div>
+        <div class="btn" onclick="solveQuestions()">📝 Soru Çözme</div>
+        <div class="btn btn-large" style="background:#dc2626;" onclick="adminControl()">👑 Yetki / Admin Paneli</div>
+    </div>
+
+    <div id="code-editor">
+        <div style="padding:10px; background:#2563eb; display:flex; justify-content:space-between;">
+            <span>NEXUS Code Studio</span>
+            <span onclick="document.getElementById('code-editor').style.display='none'" style="cursor:pointer;">✖</span>
+        </div>
+        <textarea id="code-input" placeholder="// Kodlarını buraya yaz Utkan..."></textarea>
+        <button onclick="alert('Kod başarıyla derlendi!')" style="width:100%; padding:10px; background:#10b981; color:white; border:none; cursor:pointer;">KODU ÇALIŞTIR</button>
+    </div>
+
+    <div id="dm-box">
+        <div class="dm-head"><span id="dm-title">Sohbet</span> <span onclick="document.getElementById('dm-box').style.display='none'" style="cursor:pointer;">✖</span></div>
+        <div class="dm-msgs" id="dm-content"></div>
+        <div class="dm-input">
+            <input type="text" id="msg-input" placeholder="Mesaj yaz...">
+            <button onclick="sendMsg()">GÖNDER</button>
+        </div>
     </div>
 
     <div class="bottom-nav">
-        <div class="nav-item active"><span>🏠</span>Ev</div>
-        <div class="nav-item" onclick="openDM('Hakim')"><span>⚖️</span>Hakim</div>
-        <div class="nav-item" onclick="openDM('Sohbet')"><span>💬</span>Sohbet</div>
-        <div class="nav-item" onclick="adminCommand()"><span>👑</span>Admin</div>
+        <div onclick="location.reload()">🏠 Ana Sayfa</div>
+        <div onclick="openDM('Hakim')">⚖️ Hakim</div>
+        <div onclick="openDM('Arkadaş')">💬 Sohbet</div>
+        <div onclick="adminControl()">🛡️ Mod Al</div>
     </div>
 
-    <div id="dm-window">
-        <div class="dm-header"><span id="dm-title">Sohbet</span> <span onclick="closeDM()" style="cursor:pointer">✖</span></div>
-        <div class="dm-body" id="dm-messages"></div>
-        <div class="dm-footer">
-            <input type="text" id="dm-input" placeholder="Mesaj yazın...">
-            <button onclick="sendMessage()" style="border:none; background:none; color:var(--primary); font-weight:bold; padding:5px;">Gönder</button>
-        </div>
-    </div>
-</div>
+    <script>
+        let role = "Öğrenci";
 
-<script>
-    let role = "Öğrenci";
-    let myID = "NXS-" + Math.floor(Math.random() * 9000 + 1000);
+        // AI DERS ANLATIMI VE SESLİ SİMÜLASYON
+        function startLesson(ders) {
+            const speech = document.getElementById('ai-speech');
+            const robot = document.getElementById('robot-img');
+            speech.innerText = `${ders} dersi anlatılıyor... Robot ses sentezleniyor...`;
+            robot.style.animation = "float 0.5s ease-in-out infinite"; // Robot heyecanlanır
+            
+            // 0.1 Saniye Hata Onarım (Self-Healing)
+            let glitch = setInterval(() => {
+                if(Math.random() > 0.95) {
+                    document.getElementById('ai-canvas').classList.add('blackout');
+                    setTimeout(() => {
+                        document.getElementById('ai-canvas').classList.remove('blackout');
+                        console.log("🛡️ AI Guardian: Çabuk geri dön! Sistem onarıldı.");
+                    }, 100);
+                }
+            }, 1000);
+        }
 
-    // GİRİŞ ONAYI
-    function acceptTerms() {
-        document.getElementById('secure-gate').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-        console.log("Kullanıcı ID:", myID);
-    }
+        // KOD EDİTÖRÜNÜ AÇ
+        function openEditor() { document.getElementById('code-editor').style.display = 'block'; }
 
-    // AI ÖĞRETMEN VE KENDİ KENDİNİ ONARMA (SELF-HEALING)
-    function startAiLesson() {
-        document.getElementById('ai-msg').innerText = "Matematik Dersi Anlatılıyor...";
-        // Sistem çökme simülasyonu ve 0.1 sn onarım
-        setInterval(() => {
-            let errorChance = Math.random();
-            if (errorChance > 0.98) { // %2 ihtimalle hata oluşursa
-                const stream = document.getElementById('live-stream');
-                stream.classList.add('blackout'); // Ekran kararır
-                console.log("⚠️ HATA TESPİT EDİLDİ! Guardian müdahale ediyor...");
-                
-                setTimeout(() => { // 0.1 saniye sonra düzeltme
-                    stream.classList.remove('blackout');
-                    console.log("🛡️ SİSTEM ONARILDI: 'Çabuk geri dön!' komutu başarıyla uygulandı.");
-                }, 100);
+        // DM VE HAKİM SİSTEMİ
+        function openDM(target) {
+            document.getElementById('dm-box').style.display = 'flex';
+            document.getElementById('dm-title').innerText = target;
+        }
+
+        function sendMsg() {
+            const inp = document.getElementById('msg-input');
+            const cont = document.getElementById('dm-content');
+            // Küfür Kontrolü
+            if(inp.value.toLowerCase().includes("lan")) {
+                alert("🚨 NEXUS AI: Küfür yasak! Sistem seni izliyor.");
+                return;
             }
-        }, 500);
-    }
-
-    // ARGO VE IBAN FİLTRESİ (0 TOLERANS)
-    function nexusGuard(text) {
-        const forbidden = ["lan", "gerizekalı", "iban", "kufur", "velet"];
-        let cleanText = text.toLowerCase();
-        let isBad = false;
-        
-        forbidden.forEach(word => {
-            if (cleanText.includes(word)) isBad = true;
-        });
-
-        if (isBad) {
-            alert("❌ NEXUS AI: Bu mesaj yasaklı içerik barındırıyor! Engellendi.");
-            return "⚠️ [MESAJ ENGELLENDİ]";
-        }
-        return text;
-    }
-
-    // DM SİSTEMİ
-    function openDM(target) {
-        document.getElementById('dm-window').style.display = 'flex';
-        document.getElementById('dm-title').innerText = target;
-        if(target === 'Hakim') {
-            addMessage("⚖️ Hakim:", "Sitenin bir açığını bulduysanız lütfen buradan bildirin.");
-        }
-    }
-
-    function closeDM() { document.getElementById('dm-window').style.display = 'none'; }
-
-    function sendMessage() {
-        const inp = document.getElementById('dm-input');
-        const box = document.getElementById('dm-messages');
-        if (inp.value) {
-            const safeMsg = nexusGuard(inp.value);
-            addMessage("Sen:", safeMsg);
+            cont.innerHTML += `<div><b>Sen:</b> ${inp.value}</div>`;
             inp.value = "";
         }
-    }
 
-    function addMessage(user, msg) {
-        const box = document.getElementById('dm-messages');
-        box.innerHTML += `<div><b>${user}</b> ${msg}</div>`;
-        box.scrollTop = box.scrollHeight;
-    }
-
-    // ADMIN KOMUTLARI (OWNER & MOD)
-    function adminCommand() {
-        let cmd = prompt("NEXUS KOMUT SATIRI (Owner/Mod:ID):");
-        if (cmd === "owner") {
-            role = "Kurucu";
-            document.body.style.border = "8px solid var(--gold)";
-            document.getElementById('badge').style.display = "inline";
-            alert("👑 HOŞ GELDİN KURUCU UTKAN!");
-        } else if (cmd.startsWith("mod:")) {
-            if (role !== "Kurucu") return alert("Yetersiz yetki!");
-            let id = cmd.split(":")[1];
-            alert(`🛡️ ID:${id} başarıyla Moderatör yapıldı. Bildirim gönderildi!`);
+        // ADMİN VE YETKİ KOMUTLARI
+        function adminControl() {
+            let pass = prompt("Gizli Komutu Gir (owner / mod:ID):");
+            if(pass === "owner") {
+                role = "Kurucu";
+                document.body.style.border = "5px solid gold";
+                alert("👑 Hoş geldin Kurucu Utkan! Tüm yetkiler açıldı.");
+            } else if(pass && pass.startsWith("mod:")) {
+                if(role !== "Kurucu") return alert("Bu yetki sadece Utkan'da var!");
+                alert(`${pass.split(":")[1]} ID'li kullanıcıya Moderatör bildirimi gitti!`);
+            }
         }
-    }
-</script>
 
+        function solveQuestions() {
+            alert("📝 Yapay Zeka senin için 10 adet soru hazırlıyor... Lütfen bekle.");
+        }
+    </script>
 </body>
 </html>
