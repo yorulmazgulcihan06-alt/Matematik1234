@@ -3,23 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V58 | Smart Board Edition</title>
+    <title>NEXUS V59 | Full System</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
         :root { --p: #3b82f6; --s: #10b981; --d: #080c14; --r: #ef4444; --b: #161b22; --y: #fbbf24; }
         body { margin: 0; background: var(--d); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         #login-screen { position: fixed; inset: 0; background: var(--d); z-index: 10000; display: flex; align-items: center; justify-content: center; }
-        .login-card { text-align: center; background: var(--b); padding: 30px; border-radius: 20px; border: 2px solid var(--p); width: 85%; max-width: 450px; }
-        input { padding: 15px; border-radius: 12px; border: 1px solid #334155; background: #0d1117; color: white; width: 90%; margin: 10px 0; outline: none; font-size: 16px; }
-        .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; font-size: 16px; transition: 0.3s; }
-        .btn:active { transform: scale(0.98); }
+        .login-card { text-align: center; background: var(--b); padding: 30px; border-radius: 20px; border: 2px solid var(--p); width: 85%; max-width: 400px; }
+        input { padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0d1117; color: white; width: 90%; margin: 10px 0; outline: none; }
+        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; }
         .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 90px; }
+        .card { background: var(--b); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #30363d; }
         
-        /* ADMIN PANEL */
-        #admin-terminal { background: #000; border: 2px solid var(--r); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; box-shadow: 0 0 15px rgba(239, 68, 68, 0.2); }
-        #log-box { background: #050505; color: #00ff00; font-family: monospace; padding: 8px; font-size: 11px; height: 80px; overflow-y: auto; margin-top: 10px; border-radius: 5px; border: 1px solid #222; }
+        /* SORU ÇÖZME STİLLERİ */
+        .option { background: #0d1117; padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #334155; cursor: pointer; transition: 0.3s; }
+        .option:hover { border-color: var(--p); }
         
+        #admin-terminal { background: #000; border: 2px solid var(--r); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; }
         .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #0f172a; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
         .nav-item { cursor: pointer; text-align: center; font-size: 11px; color: #64748b; }
         .active { color: var(--p); font-weight: bold; }
@@ -29,38 +30,61 @@
 
     <div id="login-screen">
         <div class="login-card">
-            <h1 style="color:var(--p); margin-bottom:10px;">NEXUS V58</h1>
+            <h1 style="color:var(--p);">NEXUS V59</h1>
             <input type="text" id="user-in" placeholder="Giriş Kodu veya İsim">
-            <button onclick="login()" class="btn" style="background:var(--p);">SİSTEMİ BAŞLAT</button>
+            <button onclick="login()" class="btn" style="background:var(--p);">GİRİŞ YAP</button>
         </div>
     </div>
 
     <div id="home-page" class="page" style="display:block;">
         <div id="admin-terminal">
-            <h4 style="margin:0 0 10px 0; color:var(--r); letter-spacing: 1px;">🛡️ ROOT TERMINAL</h4>
-            <div style="display:flex; gap:10px;">
-                <input type="text" id="terminal-input" placeholder="Komut (ban:ID)" style="margin:0; flex:1; padding:10px; font-size:12px;">
-                <button onclick="runCommand()" style="background:var(--r); padding:0 15px; border-radius:10px; border:none; color:white; font-weight:bold;">EXEC</button>
-            </div>
-            <div id="log-box">> Sistem aktif. Yetki doğrulandı.</div>
+            <h4 style="margin:0 0 10px 0; color:var(--r);">🛡️ ROOT PANEL</h4>
+            <input type="text" id="terminal-input" placeholder="ban:ID" style="width:70%;">
+            <button onclick="runCommand()" style="background:var(--r); border:none; padding:10px; border-radius:8px; color:white;">OK</button>
         </div>
 
-        <div style="background:linear-gradient(135deg, #1e293b, #0f172a); padding:30px; border-radius:20px; border:1px solid var(--p); text-align:center;">
-            <div style="font-size: 50px; margin-bottom:10px;">🛡️</div>
-            <h2 id="display-name" style="margin:0;">Yükleniyor...</h2>
-            <p id="display-id" style="color:var(--p); font-weight:bold; margin:10px 0;">ID: ...</p>
-            <div id="role-tag" style="padding:5px 15px; border-radius:50px; background:rgba(59,130,246,0.2); font-size:12px; display:inline-block; font-weight:bold;">ROL: USER</div>
+        <div class="card" style="text-align:center;">
+            <h2 id="display-name">...</h2>
+            <p id="display-id" style="color:var(--p); font-weight:bold;">ID: ...</p>
+            <p id="display-role" style="font-size:12px; opacity:0.7;">YÜKLENİYOR...</p>
         </div>
-        
-        <button onclick="window.open('https://meet.jit.si/NexusSmart'+myData.id)" class="btn" style="background:var(--r); margin-top:20px;">📡 TAHTA ÜZERİNDEN YAYIN AÇ</button>
+        <button onclick="window.open('https://meet.jit.si/NexusEtut'+myData.id)" class="btn" style="background:var(--r);">📡 CANLI ETÜT AÇ</button>
     </div>
 
-    <div id="math-page" class="page"><h2>📐 Eğitim Modülleri</h2><p>Ders içerikleri burada listelenecek.</p></div>
-    <div id="social-page" class="page"><h2>👥 Sosyal Ağ</h2><div id="friends-list"></div></div>
+    <div id="math-page" class="page">
+        <h2 style="color:var(--y);">📐 Soru Çözme Üssü</h2>
+        
+        <div class="card">
+            <p><b>Soru 1:</b> 5.240.100 sayısının "on binler" basamağındaki rakam kaçtır?</p>
+            <div class="option" onclick="checkMath(this, true)">4</div>
+            <div class="option" onclick="checkMath(this, false)">2</div>
+            <div class="option" onclick="checkMath(this, false)">0</div>
+        </div>
+
+        <div class="card">
+            <p><b>Soru 2:</b> 2/5 + 1/10 işleminin sonucu hangisidir?</p>
+            <div class="option" onclick="checkMath(this, false)">3/15</div>
+            <div class="option" onclick="checkMath(this, true)">5/10</div>
+            <div class="option" onclick="checkMath(this, false)">2/10</div>
+        </div>
+    </div>
+
+    <div id="social-page" class="page">
+        <h2 style="color:var(--s);">👥 Sosyal & Arkadaşlar</h2>
+        
+        <div class="card">
+            <p style="margin:0 0 10px 0;">Arkadaşının ID'sini yaz:</p>
+            <input type="text" id="friend-id-in" placeholder="NXS-1234 gibi..." style="width:90%;">
+            <button onclick="addFriend()" class="btn" style="background:var(--p);">ARKADAŞI EKLE</button>
+        </div>
+
+        <h3>Arkadaşlarım</h3>
+        <div id="friends-list"></div>
+    </div>
 
     <div class="nav">
-        <div class="nav-item active" onclick="showPage('home-page', this)">🏠 Panel</div>
-        <div class="nav-item" onclick="showPage('math-page', this)">📐 Dersler</div>
+        <div class="nav-item active" onclick="showPage('home-page', this)">🏠 Profil</div>
+        <div class="nav-item" onclick="showPage('math-page', this)">📐 Sorular</div>
         <div class="nav-item" onclick="showPage('social-page', this)">👥 Sosyal</div>
     </div>
 
@@ -74,17 +98,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         
-        let myData = JSON.parse(localStorage.getItem('nexus_v58_session')) || { name: "", id: "", role: "user" };
+        let myData = JSON.parse(localStorage.getItem('nexus_v59_session')) || { name: "", id: "", role: "user" };
 
-        window.onload = function() {
-            if(myData.id) startApp();
-        };
+        window.onload = function() { if(myData.id) startApp(); };
 
         function login() {
             const val = document.getElementById('user-in').value.trim();
-            if(!val) return alert("İsim veya kod girilmedi!");
+            if(!val) return;
 
-            // KRİTİK KOD KONTROLÜ
             const codes = {
                 "utkanpro2026": { name: "Utkan Ulaş Yorulmaz", role: "owner", id: "ADMIN-UTKAN" },
                 "mustipro2026": { name: "Mustafa Yetkili", role: "admin", id: "ADMIN-MUSTI" },
@@ -94,54 +115,66 @@
             if(codes[val]) {
                 db.ref('used_codes/' + val.replace(/\s/g, '_')).once('value', s => {
                     if(s.exists() && s.val() !== codes[val].id) {
-                        alert("BU GÜVENLİK KODU DAHA ÖNCE KULLANILDI!");
+                        alert("BU KOD BAŞKASI TARAFINDAN KULLANILDI!");
                     } else {
                         myData = codes[val];
                         db.ref('used_codes/' + val.replace(/\s/g, '_')).set(myData.id);
-                        localStorage.setItem('nexus_v58_session', JSON.stringify(myData));
-                        startApp();
+                        saveAndStart();
                     }
                 });
             } else {
-                // NORMAL KULLANICI (İsim olarak yetkili ismi yazsa bile user olur)
-                let id = "NXS-" + Math.floor(1000 + Math.random() * 9000);
-                myData = { name: val, id: id, role: "user" };
-                localStorage.setItem('nexus_v58_session', JSON.stringify(myData));
-                startApp();
+                myData = { name: val, id: "NXS-" + Math.floor(1000 + Math.random() * 9000), role: "user" };
+                saveAndStart();
             }
+        }
+
+        function saveAndStart() {
+            localStorage.setItem('nexus_v59_session', JSON.stringify(myData));
+            startApp();
         }
 
         function startApp() {
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('display-name').innerText = myData.name;
-            document.getElementById('display-id').innerText = "KİMLİK: " + myData.id;
-            document.getElementById('role-tag').innerText = "YETKİ: " + myData.role.toUpperCase();
+            document.getElementById('display-id').innerText = "ID: " + myData.id;
+            document.getElementById('display-role').innerText = "YETKİ: " + myData.role.toUpperCase();
             
             db.ref('users/' + myData.id).update(myData);
 
             if(myData.role === "owner" || myData.role === "admin") {
                 document.getElementById('admin-terminal').style.display = 'block';
-                listenLogs();
+            }
+            loadFriends();
+        }
+
+        function checkMath(el, isCorrect) {
+            if(isCorrect) {
+                el.style.background = "var(--s)";
+                alert("Doğru Cevap! Tebrikler. 🎉");
+            } else {
+                el.style.background = "var(--r)";
+                alert("Yanlış Cevap, tekrar dene. ❌");
             }
         }
 
-        function runCommand() {
-            const cmd = document.getElementById('terminal-input').value;
-            if(!cmd || myData.role === "user") return;
-            const target = cmd.split(":")[1];
-            if(cmd.startsWith("ban:")) {
-                db.ref('bans/'+target).set(true);
-                alert("HEDEF ENGELLENDİ: " + target);
-            }
-            document.getElementById('terminal-input').value = "";
+        function addFriend() {
+            const fid = document.getElementById('friend-id-in').value.trim();
+            if(!fid) return;
+            db.ref('friends/' + myData.id + '/' + fid).set(true);
+            alert("İstek gönderildi/Eklendi!");
+            document.getElementById('friend-id-in').value = "";
         }
 
-        function listenLogs() {
-            db.ref('all_logs').limitToLast(5).on('value', s => {
-                const lb = document.getElementById('log-box');
-                lb.innerHTML = "";
-                s.forEach(l => { lb.innerHTML += `<div>> ${l.val().senderName}: ${l.val().text}</div>`; });
-                lb.scrollTop = lb.scrollHeight;
+        function loadFriends() {
+            db.ref('friends/' + myData.id).on('value', s => {
+                const list = document.getElementById('friends-list');
+                list.innerHTML = "";
+                s.forEach(c => {
+                    db.ref('users/' + c.key).once('value', u => {
+                        const f = u.val();
+                        if(f) list.innerHTML += `<div class="card">👤 ${f.name} <br> <small style="color:var(--p)">ID: ${f.id}</small></div>`;
+                    });
+                });
             });
         }
 
@@ -150,6 +183,15 @@
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(pId).style.display='block';
             el.classList.add('active');
+        }
+
+        function runCommand() {
+            const cmd = document.getElementById('terminal-input').value;
+            if(cmd.startsWith("ban:")) {
+                db.ref('bans/'+cmd.split(":")[1]).set(true);
+                alert("Banlandı!");
+            }
+            document.getElementById('terminal-input').value = "";
         }
     </script>
 </body>
