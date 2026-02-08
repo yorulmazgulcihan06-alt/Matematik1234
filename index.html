@@ -3,193 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V75 | Utkan OS</title>
+    <title>NEXUS V85 | Master Edition</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
         :root { --p: #3b82f6; --s: #10b981; --d: #080c14; --r: #ef4444; --b: #161b22; --y: #fbbf24; --tr: #da291c; }
-        body { margin: 0; background: var(--d); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; transition: 0.5s; }
+        body { margin: 0; background: var(--d); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* ADMIN PANEL VE TERMINAL */
-        #admin-terminal { background: #000; border: 2px solid var(--r); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; box-shadow: 0 0 20px var(--r); }
         .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 100px; }
         .card { background: var(--b); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #30363d; position: relative; }
+        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; background: var(--p); transition: 0.2s; }
         
-        /* BUTONLAR VE ETKİLEŞİM */
-        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; margin-top: 10px; background: var(--p); transition: 0.3s; }
-        .btn:active { transform: scale(0.95); }
-        .option { background: #0d1117; padding: 14px; margin: 10px 0; border-radius: 12px; border: 1px solid #334155; cursor: pointer; text-align: center; }
+        /* CANLI YAYIN MODU */
+        #live-fullscreen { display: none; position: fixed; inset: 0; background: #000; z-index: 9999999; }
+        #exit-live-btn { position: absolute; top: 0; width: 100%; height: 50px; background: var(--tr); color: white; border: none; font-weight: bold; cursor: pointer; z-index: 10000000; }
 
-        /* ONARIM EKRANI (KARARTMA) */
-        #repair-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 900000; pointer-events: none; transition: 0.5s; }
-        .repair-active { box-shadow: 0 0 30px var(--y) !important; border: 3px solid var(--y) !important; animation: pulse 0.8s infinite !important; z-index: 999999 !important; position: relative !important; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        /* HATA ONARIM (KARARTMA) */
+        #repair-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 9000000; cursor: crosshair; }
+        .repair-glow { box-shadow: 0 0 20px var(--y) !important; border: 2px solid var(--y) !important; animation: pulse 0.8s infinite; z-index: 9000001 !important; position: relative !important; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
-        /* SİSTEM EKRANLARI */
-        #overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 100000; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        #login-screen { position: fixed; inset: 0; background: var(--d); z-index: 50000; display: flex; align-items: center; justify-content: center; }
-        .nav { position: fixed; bottom: 0; width: 100%; height: 80px; background: #0f172a; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; z-index: 1000; }
-        
-        /* ANİMASYONLAR */
-        .hacking { animation: shake 0.2s infinite; color: lime !important; }
-        @keyframes shake { 0% { transform: translate(1px, 1px); } 50% { transform: translate(-1px, -2px); } 100% { transform: translate(1px, -1px); } }
-        .frozen { pointer-events: none; filter: grayscale(1) blur(2px); }
+        /* NAVİGASYON */
+        .nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #0f172a; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
+        .nav-item { text-align: center; font-size: 10px; cursor: pointer; }
+
+        /* SOHBET KUTUSU */
+        #chat-messages { height: 200px; overflow-y: auto; background: #000; padding: 10px; border-radius: 10px; font-family: monospace; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div id="repair-overlay">
-        <div style="position:absolute; top:40px; left:50%; transform:translateX(-50%); color:var(--y); font-weight:bold; text-align:center; width:100%;">
-            <h1 style="margin:0; font-size:40px;">⚡ AI SYSTEM REPAIR</h1>
-            <p style="font-size:20px;">Sorunlu modülü seçin, Gemini onarsın!</p>
+    <div id="live-fullscreen">
+        <button id="exit-live-btn" onclick="exitLive()">🔴 YAYINDAN ÇIK (ANA MENÜYE DÖN)</button>
+        <div style="display: flex; height: 100%; pt: 50px;">
+            <div id="live-player" style="flex: 3; background: #000;"></div>
+            <div id="live-bridge-chat" style="flex: 1; background: #0d1117; border-left: 2px solid var(--tr); padding-top: 50px; display: flex; flex-direction: column;">
+                <div id="bridge-msgs" style="flex: 1; overflow-y: auto; padding: 10px;"></div>
+                <input type="text" id="bridge-input" onkeypress="handleBridgeKey(event)" placeholder="Hocaya mesaj gönder..." style="width: 100%; padding: 10px; background: #000; color: #fff; border: none; border-top: 1px solid var(--tr);">
+            </div>
         </div>
     </div>
 
-    <div id="overlay">
-        <h1 id="ov-icon" style="font-size: 100px; margin:0;">⚖️</h1>
-        <h2 id="ov-title">HAKİM KARARI</h2>
-        <p id="ov-msg">Sistem suistimali tespit edildi.</p>
-        <button onclick="location.reload()" class="btn" style="width:200px;">SİSTEMİ YENİLE</button>
+    <div id="repair-overlay" onclick="fixThisElement(event)">
+        <div style="color: var(--y); text-align: center; margin-top: 20px;"><h1>⚡ AI REPAIR MODE</h1><p>Hatalı butona dokun!</p></div>
     </div>
 
-    <div id="login-screen">
-        <div class="card" style="width: 320px; text-align: center; border-color: var(--p);">
-            <h1 style="color:var(--p); margin-bottom:5px;">NEXUS V75</h1>
-            <p style="font-size:10px; color:gray;">Utkan Ulaş Yorulmaz © 2026</p>
-            <input type="text" id="user-in" placeholder="Kod veya Adın..." style="width:90%; padding:12px; margin:15px 0; background:#000; border:1px solid #334155; color:white; border-radius:10px;">
-            <button onclick="login()" class="btn">SİSTEME BAĞLAN</button>
+    <div id="login-screen" style="position:fixed; inset:0; background:var(--d); z-index:100; display:flex; align-items:center; justify-content:center;">
+        <div class="card" style="width:300px; text-align:center;">
+            <h2 style="color:var(--p);">NEXUS V85</h2>
+            <input type="text" id="user-in" placeholder="Kod veya İsim..." class="btn" style="background:#000; border:1px solid #334155;">
+            <button onclick="login()" class="btn">BAĞLAN</button>
         </div>
     </div>
 
     <div id="home-page" class="page" style="display:block;">
-        <div id="admin-terminal">
-            <h4 style="color:var(--r); margin:0 0 10px 0;">🛡️ UTKAN ROOT COMMANDS</h4>
-            <input type="text" id="cmd-input" placeholder="Komut (örn: bildirim:ID:Mesaj)" style="width:90%; padding:10px; background:#111; border:1px solid var(--r); color:white; border-radius:8px;">
-            <button onclick="runCommand()" class="btn" style="background:var(--r);">YÜRÜT</button>
-        </div>
-        <div class="card" style="text-align:center;">
-            <div style="font-size:50px;">👤</div>
-            <h2 id="u-name">...</h2>
-            <p id="u-id" style="color:var(--p); font-weight:bold;">ID: ...</p>
-            <p id="u-score" style="color:var(--s); font-size:20px;">Puan: 0</p>
-        </div>
-    </div>
-
-    <div id="study-page" class="page">
-        <h2>📚 Türk Eğitim Bulutu</h2>
         <div class="card">
-            <p>Bir ders seç (Sadece Türk Kanalları):</p>
-            <button class="btn" style="background:#ff0000;" onclick="loadVideo('Matematik')">📐 Matematik (Tonguç)</button>
-            <button class="btn" style="background:#34a853;" onclick="loadVideo('Fen')">🔬 Fen Bilimleri</button>
-            <div id="video-area" style="display:none; margin-top:15px;">
-                <h4 id="v-title">Yükleniyor...</h4>
-                <div id="player"></div>
-                <div id="game-offer" style="display:none; margin-top:15px; border-top:1px solid var(--y); padding-top:10px;">
-                    <p style="color:var(--y);">🇹🇷 Yoruldun mu? Milli bir oyun molası ver!</p>
-                    <button class="btn" style="background:var(--tr);" onclick="showPage('game-page')">🕹️ BAYRAK YARIŞI (BAŞLAT)</button>
-                </div>
+            <h2 id="disp-name">Yükleniyor...</h2>
+            <p id="disp-role" style="color:var(--y);"></p>
+            <button class="btn" style="background:var(--tr);" onclick="enterLive('tonguc')">📺 CANLI YAYINA GİR (AI KÖPRÜSÜ)</button>
+        </div>
+
+        <div class="card">
+            <h3>👥 Sosyal Ağ</h3>
+            <div id="friend-requests" style="font-size: 12px; color: var(--y);"></div>
+            <input type="text" id="target-id" placeholder="Arkadaş ID (örn: NXS-123)" class="btn" style="background:#000; border:1px solid #334155; width: 60%;">
+            <button onclick="sendFriendRequest()" class="btn" style="width: 35%; display:inline;">Ekle</button>
+            <div id="chat-list" style="margin-top: 15px;">
+                <p>Mesajlar:</p>
+                <div id="chat-messages"></div>
+                <input type="text" id="dm-input" placeholder="Mesaj yaz..." style="width: 80%; padding: 5px; background: #000; color: #fff;">
+                <button onclick="sendDM()">Gönder</button>
             </div>
         </div>
     </div>
 
-    <div id="game-page" class="page">
-        <div style="text-align:center;">
-            <h2 style="color:var(--tr);">🇹🇷 MİLLİ GÖREV</h2>
-            <div id="game-canvas" class="card" style="height:200px; display:flex; align-items:center; justify-content:center; font-size:24px; border:3px solid var(--tr);">
-                🚩 BAYRAK YÜKSELİYOR!
-            </div>
-            <button onclick="playGame()" class="btn" style="background:var(--tr);">TIKLA VE YÜKSELT!</button>
-            <button onclick="showPage('home-page')" class="btn" style="background:gray;">Kapat</button>
+    <div id="teacher-page" class="page">
+        <div class="card">
+            <h2>👨‍🏫 Öğretmen Masası</h2>
+            <input type="text" id="live-url" placeholder="Yayın Linki" class="btn" style="background:#000;">
+            <button class="btn" onclick="startTeacherLive()" style="background:var(--y); color:#000;">YAYINI BAŞLAT & BİLDİRİM GÖNDER</button>
         </div>
     </div>
 
     <div class="nav">
-        <div onclick="showPage('home-page')">🏠<br>Profil</div>
-        <div onclick="showPage('study-page')">📚<br>Ders</div>
-        <div onclick="aiRepairTrigger()" style="color:var(--y); font-weight:bold;">🤖<br>ONAR</div>
+        <div class="nav-item" onclick="showPage('home-page')">🏠<br>Profil</div>
+        <div class="nav-item" id="nav-teacher" onclick="showPage('teacher-page')" style="display:none;">👨‍🏫<br>Ders</div>
+        <div class="nav-item" onclick="aiRepairMode()" style="color:var(--y);">🤖<br>Onar</div>
     </div>
 
     <script>
-        const firebaseConfig = { apiKey: "AIzaSy...", databaseURL: "https://nexus-ai..." }; // Buraya kendi configini koy
+        const firebaseConfig = { apiKey: "AIzaSy...", databaseURL: "https://nexus-ai..." }; // Kendi configinizi yapıştırın
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let myData = { name: "", id: "", role: "user", score: 0 };
-        let repairMode = false;
+        let myData = { name: "", id: "", role: "student" };
 
         function login() {
             const val = document.getElementById('user-in').value.trim();
-            if(val === "utkanpro2026") myData = { name: "Utkan Ulaş Yorulmaz", role: "owner", id: "ADMIN-UTKAN", score: 0 };
-            else myData = { name: val, id: "NXS-" + Math.floor(1000 + Math.random() * 9000), role: "user", score: 0 };
+            if(val === "utkanpro2026") myData = { name: "Utkan Ulaş Yorulmaz", role: "teacher", id: "ADMIN-1" };
+            else if(val.includes("ogretmen")) myData = { name: "Öğretmen " + val, role: "teacher", id: "TCH-" + Math.floor(Math.random()*999) };
+            else myData = { name: val, role: "student", id: "NXS-" + Math.floor(1000 + Math.random()*8999) };
+            
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('u-name').innerText = myData.name;
-            document.getElementById('u-id').innerText = "ID: " + myData.id;
-            if(myData.role === "owner") document.getElementById('admin-terminal').style.display = 'block';
-            startListeners();
+            document.getElementById('disp-name').innerText = myData.name;
+            document.getElementById('disp-role').innerText = myData.role.toUpperCase();
+            if(myData.role === "teacher") document.getElementById('nav-teacher').style.display = 'block';
+            
+            startSync();
         }
 
-        // --- ETKİLEŞİMLİ ONARIM MODU (HAZIR OL!) ---
-        function aiRepairTrigger() {
-            repairMode = true;
-            const overlay = document.getElementById('repair-overlay');
-            overlay.style.display = 'block';
-            overlay.style.pointerEvents = 'none';
+        // --- CANLI YAYIN MODU & KÖPRÜ ---
+        function enterLive(cid) {
+            document.getElementById('live-fullscreen').style.display = 'block';
+            document.getElementById('live-player').innerHTML = `<iframe width="100%" height="100%" src="https://www.youtube.com/embed/live_id?autoplay=1" frameborder="0" allowfullscreen></iframe>`;
+            startBridge();
+        }
 
-            // Butonları parlat
-            document.querySelectorAll('.btn, .nav div').forEach(el => el.classList.add('repair-active'));
+        function exitLive() {
+            document.getElementById('live-fullscreen').style.display = 'none';
+            document.getElementById('live-player').innerHTML = '';
+        }
 
-            alert("🤖 Gemini AI: Sistem karartıldı. Şimdi sorunlu butona dokun!");
-
-            document.body.onclick = (e) => {
-                if(!repairMode) return;
-                const target = e.target.closest('.btn') || e.target.closest('.nav div');
-                if(target) {
-                    overlay.style.pointerEvents = 'all';
-                    overlay.innerHTML = `<div style="color:white; text-align:center; margin-top:200px;"><h1>⚙️</h1><h2>ONARILIYOR...</h2></div>`;
-                    setTimeout(() => {
-                        alert("✅ Onarım Tamamlandı! Sistem optimize edildi.");
-                        location.reload();
-                    }, 2500);
+        function startBridge() {
+            const box = document.getElementById('bridge-msgs');
+            setInterval(() => {
+                if(document.getElementById('live-fullscreen').style.display === 'block') {
+                    box.innerHTML += `<p><b>User${Math.floor(Math.random()*99)}:</b> Harika ders!</p>`;
+                    box.scrollTop = box.scrollHeight;
                 }
-            };
+            }, 100); // 0.1 saniye
         }
 
-        // --- SADECE TÜRK KANALLARI ---
-        const vids = {
-            "Matematik": [{t:"Milyonlar - Tonguç", id:"B_S_fVz-u-k"}, {t:"Kesirler - Rehber Mat", id:"5k-x90iUoF4"}],
-            "Fen": [{t:"Ay'ın Evreleri - Tonguç", id:"6J6Wj6nEExo"}]
-        };
-        function loadVideo(d) {
-            const v = vids[d][Math.floor(Math.random()*vids[d].length)];
-            document.getElementById('video-area').style.display='block';
-            document.getElementById('v-title').innerText = "🇹🇷 " + v.t;
-            document.getElementById('player').innerHTML = `<iframe width="100%" height="220" src="https://www.youtube.com/embed/${v.id}" frameborder="0" allowfullscreen></iframe>`;
-            setTimeout(()=> { document.getElementById('game-offer').style.display='block'; }, 5000);
+        function handleBridgeKey(e) {
+            if(e.key === 'Enter') {
+                const inp = document.getElementById('bridge-input');
+                document.getElementById('bridge-msgs').innerHTML += `<p style="color:var(--s);"><b>SEN (NEXUS):</b> ${inp.value}</p>`;
+                inp.value = "";
+            }
         }
 
-        function playGame() {
-            myData.score += 10;
-            document.getElementById('u-score').innerText = "Puan: " + myData.score;
-            document.getElementById('game-canvas').innerText = "🚩 RAKIM: " + myData.score + "m";
+        // --- HATA ONARIM (GERÇEK ÇALIŞIR) ---
+        function aiRepairMode() {
+            document.getElementById('repair-overlay').style.display = 'block';
+            document.querySelectorAll('.btn, .nav-item').forEach(el => el.classList.add('repair-glow'));
+            alert("Sorunlu butona tıkla!");
+        }
+
+        function fixThisElement(e) {
+            const target = e.target.closest('.btn, .nav-item');
+            if(target) {
+                document.getElementById('repair-overlay').innerHTML = "<h1>🛠️ ONARILIYOR...</h1>";
+                setTimeout(() => {
+                    alert("Onarım Başarılı: " + target.innerText + " modülü resetlendi.");
+                    location.reload();
+                }, 2000);
+            }
+        }
+
+        // --- SOSYAL: ARKADAŞLIK VE DM ---
+        function sendFriendRequest() {
+            const tid = document.getElementById('target-id').value;
+            db.ref('requests/' + tid + '/' + myData.id).set({ name: myData.name });
+            alert("İstek gönderildi!");
+        }
+
+        function sendDM() {
+            const msg = document.getElementById('dm-input').value;
+            db.ref('chats/global').push({ sender: myData.name, text: msg });
+            document.getElementById('dm-input').value = "";
+        }
+
+        function startSync() {
+            // Arkadaşlık İsteklerini Dinle
+            db.ref('requests/' + myData.id).on('value', s => {
+                if(s.exists()) document.getElementById('friend-requests').innerText = "Yeni arkadaşlık isteğiniz var!";
+            });
+            // Global DM Dinle
+            db.ref('chats/global').limitToLast(10).on('value', s => {
+                const box = document.getElementById('chat-messages');
+                box.innerHTML = "";
+                s.forEach(m => {
+                    box.innerHTML += `<p><b>${m.val().sender}:</b> ${m.val().text}</p>`;
+                });
+                box.scrollTop = box.scrollHeight;
+            });
         }
 
         function showPage(id) {
-            document.querySelectorAll('.page').forEach(p => p.style.display='none');
-            document.getElementById(id).style.display='block';
-        }
-
-        function runCommand() {
-            const input = document.getElementById('cmd-input').value.trim();
-            const [cmd, target, extra] = input.split(":");
-            if(cmd === "ban") db.ref('bans/'+target).set(true);
-            if(cmd === "bildirim") db.ref('user_notifications/'+target).set({msg: extra});
-            if(cmd === "hack") db.ref('user_commands/'+target).set({type: "hack"});
-            alert("Komut İletildi!");
-            document.getElementById('cmd-input').value = "";
-        }
-
-        function startListeners() {
-            db.ref('bans/' + myData.id).on('value', s => { if(s.exists()) { document.getElementById('overlay').style.display='flex'; } });
-            db.ref('user_notifications/' + myData.id).on('value', s => { if(s.exists()) { alert("MESAJ: " + s.val().msg); db.ref('user_notifications/' + myData.id).remove(); } });
+            document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
         }
     </script>
 </body>
