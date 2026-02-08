@@ -1,147 +1,141 @@
-         <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS CORE | SYSTEM INITIALIZING...</title>
+    <title>EBA | Dijital Matematik & Siber Analiz v5.0</title>
     <style>
-        :root {
-            --neon: #00f2ff; --matrix: #00ff41; --gold: #ffd700; --danger: #ff0000;
-        }
-        body, html { 
-            margin: 0; padding: 0; background: #000; color: white; 
-            font-family: 'Courier New', monospace; height: 100%; overflow: hidden;
-        }
+        :root { --meb: #e11d48; --eba: #0056b3; --kali: #0081ff; --admin: #0f172a; --matrix: #00ff41; }
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; height: 100%; overflow: hidden; background: #f0f2f5; }
 
-        /* AĞIR YÜKLENME EKRANI (TELEFONU HİSSETTİREN KISIM) */
-        #loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: black; z-index: 10000; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center;
+        /* ÜST KONTROL PANELİ */
+        #admin-bar {
+            background: var(--admin); color: white; padding: 10px 25px;
+            display: flex; align-items: center; gap: 15px; font-family: 'Consolas', monospace;
+            font-size: 12px; border-bottom: 2px solid var(--kali); z-index: 1000;
         }
-        .matrix-loader {
-            font-size: 14px; color: var(--matrix); width: 80%; height: 60%;
-            overflow: hidden; border: 1px solid #222; padding: 10px;
-        }
-        .progress-bar {
-            width: 80%; height: 4px; background: #111; margin-top: 20px;
-            position: relative; overflow: hidden;
-        }
-        .progress-fill {
-            position: absolute; width: 0%; height: 100%; background: var(--neon);
-            box-shadow: 0 0 20px var(--neon);
-        }
+        .cmd-input { background: #1e293b; border: 1px solid var(--kali); color: var(--matrix); padding: 5px; border-radius: 4px; outline: none; width: 200px; }
+        .view-source-btn { background: var(--kali); color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
 
-        /* ANA PANEL (SADECE SAHİP İÇİN) */
-        .nexus-interface {
-            display: grid; grid-template-columns: 300px 1fr 400px;
-            height: 100vh; display: none; /* İlk başta gizli */
+        /* KOD GÖRÜNTÜLEME EKRANI (GİZLİ) */
+        #source-viewer {
+            position: fixed; inset: 0; background: #050505; color: var(--matrix);
+            z-index: 200000; display: none; padding: 40px; overflow-y: auto; font-family: 'Courier New', monospace;
         }
+        .exit-source { position: fixed; top: 20px; right: 40px; background: var(--meb); color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; z-index: 200001; }
 
-        /* SOL: SERVER & KERNEL */
-        .sidebar { background: #080808; border-right: 2px solid #1a1a1a; padding: 20px; }
-        .server-log { font-size: 11px; color: #555; height: 150px; overflow: hidden; margin-bottom: 20px; }
-        .node-btn { 
-            width: 100%; padding: 15px; margin: 10px 0; background: #111;
-            border: 1px solid #333; color: white; cursor: pointer; transition: 0.5s;
-        }
-        .node-btn:hover { border-color: var(--neon); background: #001a1a; box-shadow: 0 0 15px var(--neon); }
-
-        /* ORTA: VİDEO HUB & AI SOLVER */
-        .stage { background: #030303; display: flex; flex-direction: column; padding: 20px; }
-        .display-unit {
-            flex-grow: 1; background: radial-gradient(circle, #111 0%, #000 100%);
-            border-radius: 30px; border: 3px solid #1a1a1a; display: flex;
-            align-items: center; justify-content: center; position: relative;
-        }
-        .solver-box {
-            height: 200px; margin-top: 20px; background: #080808;
-            border-radius: 20px; border-top: 5px solid var(--neon); padding: 20px;
-        }
-
-        /* SAĞ: AI SUPREME CORE */
-        .ai-core { background: #050505; border-left: 2px solid var(--neon); display: flex; flex-direction: column; }
-        .terminal { flex-grow: 1; padding: 20px; overflow-y: auto; color: #00ccff; font-size: 13px; }
-        .input-group { padding: 20px; background: #000; border-top: 1px solid #222; display: flex; gap: 10px; }
-        #cmd-input { flex: 1; background: #080808; border: 1px solid var(--neon); color: white; padding: 15px; border-radius: 10px; }
+        /* GİRİŞ VE ANA SİSTEM */
+        #auth-gate { position: fixed; inset: 0; background: white; z-index: 100000; display: flex; align-items: center; justify-content: center; }
+        .gate-card { width: 380px; padding: 40px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); text-align: center; border-top: 6px solid var(--meb); }
+        
+        #system-root { display: none; height: 100vh; grid-template-rows: auto 70px 1fr 30px; }
+        header { background: white; border-bottom: 2px solid #ddd; display: flex; align-items: center; padding: 0 30px; }
+        .workspace { display: grid; grid-template-columns: 350px 1fr; gap: 20px; padding: 20px; overflow: hidden; }
+        .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; }
+        .ai-term { background: #000; color: var(--matrix); font-family: 'Consolas', monospace; padding: 15px; border-radius: 8px; font-size: 11px; flex-grow: 1; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-    <div id="loading-overlay">
-        <h1 style="color: white; letter-spacing: 5px;">NEXUS OMNI CORE v2026</h1>
-        <div class="matrix-loader" id="matrix-console"></div>
-        <div class="progress-bar"><div class="progress-fill" id="p-fill"></div></div>
-        <p id="loading-status" style="color: #444; margin-top: 10px;">INITIALIZING KERNEL...</p>
+    <button id="exit-btn" class="exit-source" style="display:none;" onclick="hideSource()">SİSTEME GERİ DÖN [X]</button>
+    <div id="source-viewer">
+        <pre id="code-content"></pre>
     </div>
 
-    <div class="nexus-interface" id="main-ui">
-        <div class="sidebar">
-            <div class="server-log" id="s-log">> BOOTING NODES...</div>
-            <h3 style="color:var(--neon)">SUNUCU YÖNETİMİ</h3>
-            <button class="node-btn" onclick="openSystem('MATH')">📐 MATEMATİK MOTORU</button>
-            <button class="node-btn" onclick="openSystem('PHYSICS')">🧪 FİZİK LABORATUVARI</button>
-            <div id="master-only" style="display:none; margin-top: 40px;">
-                <p style="color:var(--gold); font-size: 12px;">OWNER COMMANDS ACTIVE</p>
-                <button class="node-btn" style="border-color:var(--gold)" onclick="openSystem('YT')">🌐 YOUTUBE TUNNEL</button>
-            </div>
-        </div>
-
-        <div class="stage">
-            <div class="display-unit" id="screen">
-                <button id="live-trigger" style="background:var(--danger); color:white; padding: 20px 40px; border-radius: 50px; border:none; font-weight:bold; cursor:pointer; display:none;" onclick="startLive()">🔴 CANLI YAYINA BAĞLAN (0.1s)</button>
-            </div>
-            <div class="solver-box">
-                <h4 style="margin:0; color:var(--neon)">SONSUZ SORU ÇÖZÜM MERKEZİ</h4>
-                <textarea id="q-input" style="width:100%; height:100px; background:#000; color:white; border:1px solid #222; margin-top:10px; border-radius:10px;" placeholder="Sorunu buraya bırak, Sahip..."></textarea>
-                <button style="margin-top:10px; padding:10px 20px; background:var(--neon); border:none; cursor:pointer; font-weight:bold;" onclick="solve()">ANALİZ ET</button>
-            </div>
-        </div>
-
-        <div class="ai-core">
-            <div style="padding:15px; border-bottom:1px solid #222; font-weight:bold; color:var(--neon)">🤖 MASTER AI CORE</div>
-            <div class="terminal" id="term-out">> SYSTEM READY.</div>
-            <div class="input-group">
-                <input type="text" id="cmd-input" placeholder="Emrini yaz..." onkeypress="if(event.key==='Enter') runAI()">
-                <button style="background:var(--neon); border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;" onclick="runAI()">GÖNDER</button>
-            </div>
+    <div id="auth-gate">
+        <div class="gate-card">
+            <img src="https://upload.wikimedia.org/wikipedia/tr/2/25/Eba_logo.png" width="100">
+            <h3>Sistem Sahibi Kimlik Doğrulama</h3>
+            <input type="text" id="uname" style="width:100%; padding:10px; margin:10px 0;" placeholder="Adınız">
+            <input type="password" id="ukey" style="width:100%; padding:10px; margin:10px 0;" placeholder="Anahtar (sahip2026)">
+            <button onclick="boot()" style="width:100%; padding:12px; background:var(--meb); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">SİSTEMİ BAŞLAT</button>
         </div>
     </div>
 
-    <script>
-        const matrixLogs = [
-            "DECRYPTING ANKARA SHIELD...", "BYPASSING FIREWALLS...", "CONNECTING TO GLOBAL SERVER...",
-            "INITIALIZING AI o3-MAX ENGINE...", "7-LAYER STEALTH ACTIVE...", "SAHİP 2026 KEY VERIFIED...",
-            "GENERATING POLIMORPHIC CODE...", "LOADING MATH DATABASE...", "ALL SYSTEMS ONLINE."
-        ];
+    <div id="system-root">
+        <div id="admin-bar">
+            <span>[KONTROL]</span>
+            <input type="text" id="admin-cmd" class="cmd-input" placeholder="ban:isim" onkeypress="if(event.key==='Enter') executeCmd()">
+            <button class="view-source-btn" onclick="showSource()">KODLARI GÖSTER (SRC)</button>
+            <span id="cmd-feedback" style="color:var(--kali)">Sistem Aktif, SAHİP.</span>
+        </div>
 
-        let logIdx = 0;
-        const matrixDiv = document.getElementById('matrix-console');
-        const fill = document.getElementById('p-fill');
+        <header>
+            <img src="https://upload.wikimedia.org/wikipedia/tr/2/25/Eba_logo.png" height="30">
+            <div style="margin-left:20px; font-weight:bold; color:#444;">MEB MATEMATİK DİJİTAL ASİSTANI | <span id="p-name" style="color:var(--meb)">UTKAN</span></div>
+        </header>
 
-        // [AĞIR YÜKLENME SİMÜLASYONU]
-        function startBoot() {
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 2;
-                fill.style.width = progress + "%";
-                
-                if(Math.random() > 0.8) {
-                    matrixDiv.innerHTML += `<br>> ${matrixLogs[logIdx % matrixLogs.length]}`;
-                    matrixDiv.scrollTop = matrixDiv.scrollHeight;
-                    logIdx++;
-                }
+        <div class="workspace">
+            <div class="card">
+                <div style="font-weight:bold; color:var(--meb); margin-bottom:10px;">📘 KONU & SORU ANALİZİ</div>
+                <div id="math-box" style="font-size:13px; background:#fff5f5; padding:10px; border-radius:5px;"></div>
+                <div class="ai-term" id="ai-term"></div>
+            </div>
+            <div class="card">
+                <div style="font-weight:bold; color:var(--kali); margin-bottom:10px;">🛰️ ANKARA SUNUCU & KALI_SHIELD LOGLARI</div>
+                <div id="server-logs" style="font-family:'Consolas',monospace; font-size:11px;"></div>
+            </div>
+        </div>
 
-                if(progress >= 100) {
-                    clearInterval(interval);
-                    showLogin();
-                }
-            }, 50);
+        <footer style="background:var(--admin); color:#64748b; font-size:10px; display:flex; align-items:center; padding:0 20px;">
+            MEB_ROBOT_INTERCEPTOR: ACTIVE | KALI_CORE_SECURE | SUNUCU: ONLINE
+        </footer>
+    </div>
+
+<script>
+    const dataSet = [
+        { c: "<b>Kesirler:</b> Paydası 10, 100, 1000 olan kesirler ondalık gösterimle ifade edilir.", s: "Soru: 3/10 nedir? \nÇözüm: 0,3 (Onda birler analizi tamamlandı)" },
+        { c: "<b>Milyonlar:</b> Sayı bölükleri sağdan sola; Birler, Binler, Milyonlar şeklindedir.", s: "Soru: 15.200.000 sayısında kaç milyon var? \nÇözüm: 15 Milyon (Bölük ayrıştırma tamam)" }
+    ];
+
+    function boot() {
+        if(document.getElementById('ukey').value === "sahip2026") {
+            document.getElementById('auth-gate').style.display = 'none';
+            document.getElementById('system-root').style.display = 'grid';
+            document.getElementById('p-name').textContent = document.getElementById('uname').value.toUpperCase();
+            startLive();
+        } else { alert("Hatalı kod!"); }
+    }
+
+    // KODLARI GÖSTERME FONKSİYONU
+    function showSource() {
+        const fullCode = document.documentElement.outerHTML;
+        document.getElementById('code-content').textContent = "// UTKAN KALI-AI SİSTEM KODLARI ÇEKİLİYOR...\n\n" + fullCode;
+        document.getElementById('source-viewer').style.display = 'block';
+        document.getElementById('exit-btn').style.display = 'block';
+    }
+
+    function hideSource() {
+        document.getElementById('source-viewer').style.display = 'none';
+        document.getElementById('exit-btn').style.display = 'none';
+    }
+
+    function executeCmd() {
+        const cmd = document.getElementById('admin-cmd').value;
+        const feedback = document.getElementById('cmd-feedback');
+        if(cmd.startsWith("ban:")) {
+            feedback.textContent = `[!] ${cmd.split(":")[1]} SİSTEMDEN KOVULDU.`;
+            feedback.style.color = "red";
         }
+        document.getElementById('admin-cmd').value = "";
+    }
 
-        function showLogin() {
-            const auth = prompt("SYSTEM ACCESS ID:");
-            if(auth === "sahip2026") {
-                document.getElementById('loading-overlay').style.display = 'none';
-                document.getElementById('main-ui').style.display = 'grid';
-    
+    function startLive() {
+        let i = 0;
+        setInterval(() => {
+            document.getElementById('math-box').innerHTML = dataSet[i % dataSet.length].c;
+            document.getElementById('ai-term').innerHTML = "ROOT@UTKAN_AI:~$ ANALİZ...<br>" + dataSet[i % dataSet.length].s;
+            i++;
+        }, 5000);
+
+        setInterval(() => {
+            const p = document.createElement('div');
+            p.textContent = Math.random() > 0.4 ? `[OK] Veri_Paketi_${Math.floor(Math.random()*99)} alındı.` : `> [SHIELD] KALI: MEB Robotu engellendi.`;
+            p.style.color = p.textContent.includes("SHIELD") ? "var(--kali)" : "#666";
+            document.getElementById('server-logs').prepend(p);
+            if(document.getElementById('server-logs').childNodes.length > 30) document.getElementById('server-logs').lastChild.remove();
+        }, 500);
+    }
+</script>
+</body>
+</html>
+
