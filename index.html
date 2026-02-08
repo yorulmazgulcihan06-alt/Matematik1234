@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V53 | Pro Admin</title>
+    <title>NEXUS V54 | Utkan Ulaş Yorulmaz</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
@@ -13,11 +13,9 @@
         .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; color: white; margin-top: 5px; }
         input { padding: 12px; border-radius: 10px; border: 1px solid #334155; background: #0d1117; color: white; width: 85%; margin: 5px 0; outline: none; }
         
-        /* ADMIN KOMUT KARESI */
-        #admin-terminal { background: #000; border: 2px solid var(--r); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); }
-        #terminal-input { border-color: var(--r); font-family: monospace; width: 70%; }
+        #admin-terminal { background: #000; border: 2px solid var(--r); padding: 15px; border-radius: 15px; margin-bottom: 20px; display: none; }
+        #log-content { background: #050505; color: #00ff00; font-family: monospace; padding: 10px; font-size: 11px; height: 100px; overflow-y: auto; border: 1px solid #1a1a1a; margin-top: 10px; }
         
-        #log-content { background: #050505; color: #00ff00; font-family: 'Courier New', monospace; padding: 10px; font-size: 11px; height: 120px; overflow-y: auto; border-radius: 8px; border: 1px solid #1a1a1a; margin-top: 10px; }
         .nav { position: fixed; bottom: 0; width: 100%; height: 75px; background: #0f172a; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
         .nav-item { cursor: pointer; text-align: center; font-size: 10px; color: #64748b; }
         .active { color: var(--p); font-weight: bold; }
@@ -26,41 +24,39 @@
 <body>
 
     <div id="login-screen" style="position:fixed; inset:0; background:var(--d); z-index:10000; display:flex; align-items:center; justify-content:center;">
-        <div style="text-align:center; background:var(--b); padding:30px; border-radius:20px; border:1px solid var(--p);">
-            <h2>NEXUS V53</h2>
-            <input type="text" id="user-in" placeholder="Kullanıcı Adı veya Kod">
+        <div style="text-align:center; background:var(--b); padding:30px; border-radius:20px; border:1px solid var(--p); width: 80%; max-width: 400px;">
+            <h2 style="color:var(--p);">NEXUS V54</h2>
+            <input type="text" id="user-in" placeholder="Kullanıcı Adı">
             <button onclick="login()" class="btn" style="background:var(--p);">SİSTEMİ AÇ</button>
         </div>
     </div>
 
     <div id="ban-screen" style="position:fixed; inset:0; background:black; color:red; z-index:20000; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center;">
-        <h1 style="font-size: 50px;">🚫</h1>
+        <h1 style="font-size: 80px;">🚫</h1>
         <h1>ERİŞİM ENGELLENDİ</h1>
-        <p>Hesabınız site sahibi tarafından banlanmıştır.</p>
+        <p>Hesabınız Utkan tarafından banlanmıştır.</p>
     </div>
 
     <div id="home-page" class="page" style="display:block;">
-        
         <div id="admin-terminal">
             <h4 style="margin:0 0 10px 0; color:var(--r);">🛡️ NEXUS COMMAND CENTER</h4>
             <div style="display:flex; gap:5px;">
-                <input type="text" id="terminal-input" placeholder="Komut (ban:ID, mod:ID)..." style="margin:0;">
-                <button onclick="runCommand()" style="background:var(--r); color:white; border:none; border-radius:8px; padding:0 10px; cursor:pointer;">ÇALIŞTIR</button>
+                <input type="text" id="terminal-input" placeholder="ban:ID / mod:ID" style="margin:0; flex:1;">
+                <button onclick="runCommand()" style="background:var(--r); padding:0 10px; border-radius:8px;">OK</button>
             </div>
-            <div id="log-content">Sistem beklemede...</div>
+            <div id="log-content">> Sistem hazır, loglar bekleniyor...</div>
         </div>
 
         <div style="background:var(--b); padding:20px; border-radius:20px; border:1px solid var(--p); text-align:center;">
-            <h2 id="display-name">...</h2>
-            <p id="display-id" style="color:var(--p); margin:0;">ID: ...</p>
-            <p id="display-role" style="font-size:10px; opacity:0.6;">Rütbe: Standart</p>
+            <h2 id="display-name" style="margin:0;">...</h2>
+            <p id="display-id" style="color:var(--p); margin:5px 0;">ID: ...</p>
+            <p id="display-role" style="font-size:10px; opacity:0.6; text-transform:uppercase;">ROL: STANDART</p>
         </div>
-
         <button onclick="window.open('https://meet.jit.si/Nexus'+myData.id)" class="btn" style="background:var(--r); margin-top:20px;">📡 CANLI ETÜT BAŞLAT</button>
     </div>
 
-    <div id="math-page" class="page"><h2>📐 Soru Üssü</h2><p>5. Sınıf Matematik soruları yükleniyor...</p></div>
-    <div id="social-page" class="page"><h2>👥 Sosyal</h2><div id="friends-list"></div><button onclick="addFriend()" class="btn" style="background:var(--p);">+ Arkadaş Ekle</button></div>
+    <div id="math-page" class="page"><h2>📐 5. Sınıf Matematik</h2><p>Milyonlar, Kesirler ve Ondalık Gösterimler...</p></div>
+    <div id="social-page" class="page"><h2>👥 Sosyal</h2><div id="friends-list"></div><button onclick="addFriend()" class="btn" style="background:var(--p);">+ ARKADAŞ EKLE</button></div>
 
     <div class="nav">
         <div class="nav-item active" onclick="showPage('home-page', this)">🏠 Nexus</div>
@@ -80,28 +76,27 @@
         let myData = { name: "", id: "", role: "user" };
 
         function login() {
-            const val = document.getElementById('user-in').value;
-            if(!val) return;
+            const val = document.getElementById('user-in').value.trim();
+            if(!val) return alert("Lütfen isim girin!");
             
             let name = val;
             let role = "user";
             let id = "NXS-" + Math.floor(1000 + Math.random() * 9000);
 
+            // ÖZEL UTKAN TANIMA SİSTEMİ
             if(val === "utkanpro2026") {
-                name = "Utkan (SAHİB)"; role = "owner"; id = "ADMIN-1";
+                name = "Utkan Ulaş Yorulmaz";
+                role = "owner";
+                id = "ADMIN-UTKAN";
             }
 
-            // Önce banlı mı diye bak
+            // Ban kontrolü yap ve uygulamayı başlat
             db.ref('bans/'+id).once('value', s => {
                 if(s.exists()) {
                     document.getElementById('ban-screen').style.display='flex';
                 } else {
                     myData = { name, id, role };
-                    // Eğer veritabanında önceden mod olarak atanmışsa rolü güncelle
-                    db.ref('users/'+id+'/role').once('value', rs => {
-                        if(rs.exists()) myData.role = rs.val();
-                        startApp();
-                    });
+                    startApp();
                 }
             });
         }
@@ -109,12 +104,11 @@
         function startApp() {
             document.getElementById('login-screen').style.display='none';
             document.getElementById('display-name').innerText = myData.name;
-            document.getElementById('display-id').innerText = "ID: " + myData.id;
-            document.getElementById('display-role').innerText = "Rütbe: " + myData.role.toUpperCase();
+            document.getElementById('display-id').innerText = "KİMLİK: " + myData.id;
+            document.getElementById('display-role').innerText = "YETKİ: " + myData.role;
             
-            db.ref('users/'+myData.id).set(myData);
+            db.ref('users/'+myData.id).update(myData);
 
-            // Eğer Yetkiliyse Komut Karesini Göster
             if(myData.role === "owner" || myData.role === "mod") {
                 document.getElementById('admin-terminal').style.display = 'block';
                 listenLogs();
@@ -124,30 +118,25 @@
 
         function runCommand() {
             const cmd = document.getElementById('terminal-input').value;
-            if(!cmd) return;
+            if(!cmd || myData.role !== "owner") return;
 
-            if(myData.role === "owner") {
-                if(cmd.startsWith("ban:")) {
-                    const target = cmd.split(":")[1];
-                    db.ref('bans/'+target).set(true);
-                    alert(target + " banlandı.");
-                } else if(cmd.startsWith("unban:")) {
-                    const target = cmd.split(":")[1];
-                    db.ref('bans/'+target).remove();
-                    alert(target + " banı açıldı.");
-                } else if(cmd.startsWith("mod:")) {
-                    const target = cmd.split(":")[1];
-                    db.ref('users/'+target+'/role').set('mod');
-                    alert(target + " mod yapıldı.");
-                }
-            } else {
-                alert("Bu komut için SAHİB yetkisi lazım!");
+            if(cmd.startsWith("ban:")) {
+                const tid = cmd.split(":")[1];
+                db.ref('bans/'+tid).set(true);
+                alert(tid + " sistemden uzaklaştırıldı.");
+            } else if(cmd.startsWith("unban:")) {
+                const tid = cmd.split(":")[1];
+                db.ref('bans/'+tid).remove();
+                alert(tid + " yasağı kaldırıldı.");
+            } else if(cmd.startsWith("mod:")) {
+                const tid = cmd.split(":")[1];
+                db.ref('users/'+tid+'/role').set('mod');
+                alert(tid + " moderatör yapıldı.");
             }
             document.getElementById('terminal-input').value = "";
         }
 
         function listenLogs() {
-            // Hakim Logları (Mesaj takibi)
             db.ref('all_logs').limitToLast(10).on('value', s => {
                 const box = document.getElementById('log-content');
                 box.innerHTML = "";
@@ -159,20 +148,26 @@
             });
         }
 
-        // Klasik Fonksiyonlar
         function showPage(pId, el) {
             document.querySelectorAll('.page').forEach(p => p.style.display='none');
             document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById(pId).style.display='block'; el.classList.add('active');
+            document.getElementById(pId).style.display='block';
+            el.classList.add('active');
         }
-        function addFriend() { const id = prompt("Arkadaş ID:"); if(id) db.ref('friends/'+myData.id+'/'+id).set(true); }
+
+        function addFriend() {
+            const fid = prompt("Arkadaş ID gir:");
+            if(fid) db.ref('friends/'+myData.id+'/'+fid).set(true);
+        }
+
         function loadFriends() {
             db.ref('friends/'+myData.id).on('value', s => {
-                const list = document.getElementById('friends-list'); list.innerHTML = "";
+                const list = document.getElementById('friends-list');
+                list.innerHTML = "";
                 s.forEach(c => {
                     db.ref('users/'+c.key).once('value', u => {
                         const f = u.val();
-                        list.innerHTML += `<div style="background:var(--b); padding:15px; border-radius:15px; margin-bottom:10px;">👤 ${f.name}</div>`;
+                        list.innerHTML += `<div style="background:var(--b); padding:15px; border-radius:12px; margin-bottom:10px;">👤 ${f.name}</div>`;
                     });
                 });
             });
