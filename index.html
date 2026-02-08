@@ -3,37 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V41 | Utkan Sancak</title>
+    <title>NEXUS V42 | Utkan Sancak Projesi</title>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
     <style>
         :root { --p: #2563eb; --s: #10b981; --d: #0f172a; --r: #f85149; --b: #161b22; }
         body { margin: 0; background: var(--d); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        
-        /* Giriş Ekranı */
         #login-screen { position: fixed; inset: 0; background: radial-gradient(circle, #1e293b 0%, #0a0c10 100%); z-index: 10000; display: flex; align-items: center; justify-content: center; }
         .card { background: var(--b); padding: 30px; border-radius: 25px; border: 1px solid #30363d; text-align: center; width: 85%; max-width: 400px; }
         input { padding: 15px; border-radius: 12px; border: 1px solid #30363d; background: #0d1117; color: white; width: 90%; margin: 10px 0; outline: none; }
-        
-        /* Sayfa Yapısı */
         .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; padding-bottom: 100px; }
         .profile-header { background: linear-gradient(45deg, #1e293b, #0f172a); padding: 25px; border-radius: 20px; border: 1px solid var(--p); text-align: center; margin-bottom: 20px; }
         .id-badge { background: var(--p); color: white; padding: 5px 15px; border-radius: 50px; font-weight: bold; font-size: 14px; cursor: pointer; display: inline-block; }
-
-        /* Arkadaş Listesi Tasarımı */
         .friend-card { background: var(--b); padding: 15px; border-radius: 15px; margin-bottom: 10px; border: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
-        
-        /* Butonlar */
         .btn { width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: bold; cursor: pointer; margin-top: 10px; color: white; }
-        .btn-blue { background: var(--p); }
-        .btn-green { background: var(--s); }
-        .btn-red { background: var(--r); }
-
-        /* Alt Navigasyon */
         .nav { position: fixed; bottom: 0; width: 100%; height: 70px; background: #161b22; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #334155; }
-        .nav-item { cursor: pointer; text-align: center; font-size: 11px; color: #8b949e; }
-
-        /* Canlı Yayın Ekranı */
         #live-overlay { position: fixed; inset: 0; background: #000; z-index: 100000; display: none; flex-direction: column; }
     </style>
 </head>
@@ -41,47 +25,43 @@
 
     <div id="login-screen">
         <div class="card">
-            <h1 style="color:var(--p);">NEXUS V41</h1>
+            <h1 style="color:var(--p);">NEXUS V42</h1>
             <input type="text" id="user-in" placeholder="Adınız ve Soyadınız">
-            <button onclick="login()" class="btn btn-green">SİSTEMİ BAŞLAT</button>
+            <button onclick="login()" class="btn" style="background:var(--s);">SİSTEMİ BAŞLAT</button>
         </div>
     </div>
 
     <div id="home-page" class="page" style="display:block;">
         <div class="profile-header">
-            <div style="font-size: 40px;">👤</div>
+            <div style="font-size: 40px;">🦾</div>
             <h2 id="p-name">Yükleniyor...</h2>
-            <div class="id-badge" id="p-id" onclick="copyID()">ID: Bekleniyor...</div>
+            <div class="id-badge" id="p-id" onclick="copyID()">ID Alınıyor...</div>
         </div>
-        <button onclick="startBroadcast()" class="btn btn-red">📡 TÜM ARKADAŞLARA CANLI YAYIN AÇ</button>
-        <button onclick="showPage('social-page')" class="btn btn-blue">👥 ARKADAŞLARIMI GÖR</button>
-        <button onclick="alert('Matematik Modülü Yükleniyor...')" class="btn btn-green" style="margin-top:20px;">➕ MATEMATİK ÇÖZ</button>
+        <button onclick="startBroadcast()" class="btn" style="background:var(--r);">📡 HERKESE CANLI YAYIN AÇ</button>
+        <button onclick="showPage('social-page')" class="btn" style="background:var(--p);">👥 ARKADAŞLARIM</button>
     </div>
 
     <div id="social-page" class="page">
         <h2>👥 Arkadaşlarım</h2>
-        <div id="friends-list">
-            <p style="color:#8b949e; text-align:center;">Henüz kimse yok.</p>
-        </div>
-        <button onclick="addFriend()" class="btn btn-blue" style="margin-top:20px;">+ ARKADAŞ EKLE (ID İLE)</button>
+        <div id="friends-list"><p style="color:#8b949e; text-align:center;">Henüz kimse yok.</p></div>
+        <button onclick="addFriend()" class="btn" style="background:var(--p);">+ ARKADAŞ EKLE (ID İLE)</button>
     </div>
 
     <div id="live-overlay">
         <div style="background:#1e293b; padding:15px; display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--s); font-weight:bold;">● CANLI YAYIN</span>
+            <span style="color:var(--s); font-weight:bold;">● CANLI YAYIN MODU</span>
             <button onclick="closeLive()" style="background:var(--r); color:white; border:none; padding:8px 15px; border-radius:5px;">Yayını Kapat</button>
         </div>
         <iframe id="live-frame" src="" allow="camera; microphone; fullscreen; display-capture; autoplay" style="flex:1; border:none;"></iframe>
     </div>
 
     <div class="nav">
-        <div class="nav-item" onclick="showPage('home-page')">🏠<br>Profil</div>
-        <div class="nav-item" onclick="showPage('social-page')">👥<br>Sosyal</div>
-        <div class="nav-item" onclick="alert('Nexus V41 Admin: Utkan')">🛡️<br>Admin</div>
+        <div onclick="showPage('home-page')" style="cursor:pointer; text-align:center;">🏠<br>Profil</div>
+        <div onclick="showPage('social-page')" style="cursor:pointer; text-align:center;">👥<br>Sosyal</div>
     </div>
 
     <script>
-        // --- FIREBASE BAĞLANTISI ---
+        // --- SENİN RESİMLERİNDEKİ YAPILANDIRMA ---
         const firebaseConfig = {
             apiKey: "AIzaSyDYsWcFVJhvmeorcea8x2Biw1GpHjQuXFY",
             authDomain: "nexus-ai-bc26b.firebaseapp.com",
@@ -93,72 +73,45 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
         let myData = null;
 
-        // --- GİRİŞ SİSTEMİ ---
         function login() {
             const n = document.getElementById('user-in').value;
             if(n.length < 2) return alert("Lütfen isim girin!");
-
             const id = "NXS-" + Math.floor(1000 + Math.random() * 9000);
             myData = { name: n, id: id };
-
-            // Firebase'e kaydet (Arkadaşının seni bulabilmesi için)
             db.ref('users/' + id).set(myData);
-
             document.getElementById('p-name').innerText = n;
             document.getElementById('p-id').innerText = "ID: " + id;
             document.getElementById('login-screen').style.display = 'none';
-
-            // Global bildirimleri dinlemeye başla
             listenBroadcasts();
         }
 
-        // --- SAYFA DEĞİŞTİRME ---
         function showPage(id) {
             document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
             document.getElementById(id).style.display = 'block';
         }
 
-        // --- ARKADAŞ EKLEME (FIXED) ---
         function addFriend() {
-            const targetID = prompt("Arkadaşının ID'sini yaz (Örn: NXS-1234):");
+            const targetID = prompt("Arkadaşının ID'sini gir (NXS-XXXX):");
             if(!targetID || targetID === myData.id) return alert("Hatalı ID!");
-
-            // Arkadaşı veritabanında ara
             db.ref('users/' + targetID).once('value', (snapshot) => {
                 if(snapshot.exists()) {
                     const friend = snapshot.val();
                     const list = document.getElementById('friends-list');
                     if(list.innerHTML.includes('Henüz')) list.innerHTML = "";
-                    
-                    list.innerHTML += `
-                        <div class="friend-card">
-                            <span>👤 ${friend.name} (${targetID})</span>
-                            <span style="color:var(--s)">● Aktif</span>
-                        </div>
-                    `;
+                    list.innerHTML += `<div class="friend-card"><span>👤 ${friend.name} (${targetID})</span><span style="color:var(--s)">● Aktif</span></div>`;
                     alert(friend.name + " eklendi!");
                 } else {
-                    alert("Kullanıcı bulunamadı! Arkadaşının sisteme giriş yaptığından emin ol.");
+                    alert("🚨 Arkadaşın sisteme kayıtlı değil! Önce giriş yapması lazım.");
                 }
             });
         }
 
-        // --- CANLI YAYIN BİLDİRİM VE GÖRÜNTÜ SİSTEMİ ---
         function startBroadcast() {
             const room = "Nexus_Room_" + myData.id;
-            const url = "https://meet.jit.si/" + room + "#config.prejoinPageEnabled=false";
-            
-            // Tüm dünyaya duyur
-            db.ref('broadcast').set({
-                active: true,
-                sender: myData.name,
-                url: url,
-                time: Date.now()
-            });
-
+            const url = "https://meet.jit.si/" + room;
+            db.ref('broadcast').set({ active: true, sender: myData.name, url: url });
             openLive(url);
         }
 
@@ -166,8 +119,7 @@
             db.ref('broadcast').on('value', (snap) => {
                 const data = snap.val();
                 if(data && data.active && data.sender !== myData.name) {
-                    const join = confirm(`🚨 ${data.sender} CANLI YAYIN BAŞLATTI! Katılmak ister misin?`);
-                    if(join) openLive(data.url);
+                    if(confirm(`${data.sender} canlı yayın açtı! Katılmak ister misin?`)) openLive(data.url);
                 }
             });
         }
@@ -184,9 +136,8 @@
         }
 
         function copyID() {
-            const id = myData.id;
-            navigator.clipboard.writeText(id);
-            alert("ID Kopyalandı: " + id);
+            navigator.clipboard.writeText(myData.id);
+            alert("ID Kopyalandı: " + myData.id);
         }
     </script>
 </body>
