@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS V95 | AUTH SYSTEM</title>
+    <title>NEXUS V100 | Eğitim & Gelişim Paneli</title>
     <script src="https://www.youtube.com/iframe_api"></script>
     <style>
         :root { --p: #3b82f6; --s: #10b981; --d: #080c14; --r: #ef4444; --b: #161b22; --y: #fbbf24; --tr: #da291c; }
         body { margin: 0; background: var(--d); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; }
         
-        /* ÖZEL KOMUT TERMİNALİ (Sadece Yetkililere) */
-        #admin-terminal { display: none; background: #000; border-bottom: 2px solid var(--r); padding: 10px; position: sticky; top: 0; z-index: 20000000; }
-        #admin-terminal input { background: #111; border: 1px solid var(--r); color: #0f0; padding: 8px; width: 80%; font-family: monospace; }
+        /* ADMİN TERMİNALİ (SADECE SANA ÖZEL) */
+        #admin-terminal { display: none; background: #000; border-bottom: 2px solid var(--r); padding: 10px; position: sticky; top: 0; z-index: 20000000; text-align: center; }
+        #admin-terminal input { background: #111; border: 1px solid var(--r); color: #0f0; padding: 8px; width: 70%; font-family: monospace; outline: none; }
 
         .page { display: none; width: 100%; height: 100vh; padding: 20px; box-sizing: border-box; overflow-y: auto; }
         .card { background: var(--b); padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #30363d; text-align: center; }
@@ -20,47 +20,44 @@
         /* CANLI YAYIN MODU */
         #live-fullscreen { display: none; position: fixed; inset: 0; background: #000; z-index: 9999999; }
         #exit-header { position: absolute; top: 0; width: 100%; height: 50px; background: var(--tr); display: flex; align-items: center; justify-content: center; z-index: 10000000; }
-
-        /* SOHBET */
-        #bridge-msgs { flex: 1; overflow-y: auto; padding: 10px; font-family: monospace; font-size: 13px; text-align: left; }
+        #bridge-msgs { flex: 1; overflow-y: auto; padding: 10px; font-family: monospace; font-size: 12px; text-align: left; background: #080c14; }
     </style>
 </head>
 <body>
 
     <div id="admin-terminal">
-        <span style="color:var(--r); font-weight:bold; font-size:12px;">SYSTEM ROOT > </span>
-        <input type="text" id="cmd-input" placeholder="Komut yaz (ban, alert, restart)...">
-        <button onclick="runCommand()" style="background:var(--r); color:white; border:none; padding:8px; cursor:pointer;">YÜRÜT</button>
+        <span style="color:var(--r); font-weight:bold;">NEXUS ROOT > </span>
+        <input type="text" id="cmd-input" placeholder="Komut (video ID, msg, restart)...">
+        <button onclick="runCommand()" style="background:var(--r); color:white; border:none; padding:8px 15px; cursor:pointer; font-weight:bold;">YÜRÜT</button>
     </div>
 
     <div id="login-screen" style="position:fixed; inset:0; background:var(--d); z-index:1000000; display:flex; align-items:center; justify-content:center;">
-        <div class="card" style="width:320px;">
-            <h1 style="color:var(--p);">NEXUS V95</h1>
-            <p style="font-size:12px; color:gray;">Giriş kodunu yazın</p>
-            <input type="text" id="auth-code" placeholder="Kod..." class="btn" style="background:#000; border:1px solid #334155;">
-            <button onclick="checkAuth()" class="btn">SİSTEMİ AÇ</button>
+        <div class="card" style="width:340px;">
+            <h1 style="color:var(--p);">NEXUS V100</h1>
+            <input type="text" id="auth-code" placeholder="Giriş Kodu..." class="btn" style="background:#000; border:1px solid #334155; text-align:center;">
+            <button onclick="checkAuth()" class="btn">GİRİŞ YAP</button>
         </div>
     </div>
 
     <div id="home-page" class="page" style="display:block;">
         <div class="card">
-            <h2 id="u-name">Hoş geldin!</h2>
+            <h2 id="u-name">Sistem Beklemede...</h2>
             <p id="u-rank" style="font-weight:bold;"></p>
-            <button class="btn" style="background:var(--tr);" onclick="startLive()">📺 CANLI YAYINI BAŞLAT (0.1s AI)</button>
+            <button class="btn" style="background:var(--tr); padding:15px;" onclick="startLive()">📺 CANLI EĞİTİMİ BAŞLAT (AI KÖPRÜSÜ)</button>
         </div>
-        <div class="card">
-            <p>Durum: <span style="color:var(--s);">Sistem Aktif</span></p>
+        <div class="card" style="border-color: var(--s);">
+            <p>Eğitim Durumu: <span style="color:var(--s);">Aktif Senkronizasyon</span></p>
         </div>
     </div>
 
     <div id="live-fullscreen">
         <div id="exit-header">
-            <button onclick="stopLive()" style="background:white; color:var(--tr); border:none; padding:8px 20px; border-radius:20px; font-weight:bold; cursor:pointer;">🔴 ÇIK</button>
+            <button onclick="stopLive()" style="background:white; color:var(--tr); border:none; padding:8px 25px; border-radius:20px; font-weight:bold; cursor:pointer;">🔴 ÇIK</button>
         </div>
         <div style="display:flex; height:100%; padding-top:50px;">
             <div id="video-box" style="flex:3; background:#000;"><div id="yt-player"></div></div>
             <div id="chat-box" style="flex:1; background:#0d1117; border-left:2px solid var(--tr); display:flex; flex-direction:column;">
-                <div style="background:var(--tr); font-size:10px; padding:5px; text-align:center;">AI SOHBET KÖPRÜSÜ</div>
+                <div style="background:var(--tr); font-size:11px; padding:8px; text-align:center;">AI CHAT BRIDGE</div>
                 <div id="bridge-msgs"></div>
             </div>
         </div>
@@ -69,49 +66,59 @@
     <script>
         let player;
         let myData = { name: "", rank: "" };
-        const vids = ["5k-x90iUoF4", "B_S_fVz-u-k", "vD6e7XoEwSg"];
+
+        // --- DEV OYUN VE EĞİTİM HAVUZU (ÇAKTIRMADAN) ---
+        // Samet Karataş, Roblox, Minecraft, Brawl Stars karışık!
+        const gameVids = [
+            "3bWrLC1YbP4", // Samet Karataş Dönerci
+            "ikEwBZbh0xo", // Samet Karataş Zengin vs Fakir
+            "UBJX6qFWUEQ", // Samet Karataş Roblox Kaçış
+            "6mSIn0k7I6k", // Samet Karataş Korku
+            "5k-x90iUoF4", // Tonguç (Kapak olsun diye araya ders koyduk)
+            "vD6e7XoEwSg", // Rehber Matematik (Çaktırmama videosu)
+            "uXpZpZpZpZp", // Rastgele ID (Hata verirse 0.1s geçiş testi için)
+            "9_pS_fVz-u-k"  // Minecraft Popüler
+        ];
         let vIdx = 0;
 
-        // --- YETKİ KONTROL SİSTEMİ ---
         function checkAuth() {
             const code = document.getElementById('auth-code').value.trim();
             const terminal = document.getElementById('admin-terminal');
             
             if (code === "utkanpro" || code === "akılıtahta2026") {
-                myData = { name: code, rank: "SİTE SAHİBİ" };
-                terminal.style.display = "block"; // Terminali aç
-            } 
-            else if (code === "mustipro2026") {
+                myData = { name: "Site Sahibi", rank: "SİTE SAHİBİ" };
+                terminal.style.display = "block"; 
+            } else if (code === "mustipro2026") {
                 myData = { name: "Mustafa", rank: "YETKİLİ" };
-                terminal.style.display = "block"; // Terminali aç
-            } 
-            else {
+                terminal.style.display = "block";
+            } else {
                 myData = { name: code, rank: "ÖĞRENCİ" };
             }
 
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('u-name').innerText = "Merhaba, " + myData.name;
-            document.getElementById('u-rank').innerText = myData.rank;
+            document.getElementById('u-rank').innerText = myRankText = "YETKİ: " + myData.rank;
             document.getElementById('u-rank').style.color = (myData.rank === "ÖĞRENCİ") ? "var(--p)" : "var(--r)";
         }
 
-        // --- 0.1s HATA SAVAR CANLI YAYIN ---
         function startLive() {
             document.getElementById('live-fullscreen').style.display = 'block';
-            loadYT(vids[vIdx]);
-            startBridge();
+            loadVideo(gameVids[vIdx]);
+            startChat();
         }
 
-        function loadYT(id) {
+        function loadVideo(id) {
             if (player) player.destroy();
             player = new YT.Player('yt-player', {
                 height: '100%', width: '100%', videoId: id,
-                playerVars: { 'autoplay': 1 },
-                events: { 'onError': () => { 
-                    console.log("0.1s Hata yakalandı!");
-                    vIdx++; 
-                    if(vids[vIdx]) loadYT(vids[vIdx]); 
-                }}
+                playerVars: { 'autoplay': 1, 'mute': 0 },
+                events: { 
+                    'onError': () => { 
+                        // 0.1 SANİYEDE DİĞER VİDEOYA GEÇİŞ MANTIĞI
+                        vIdx++; 
+                        if(gameVids[vIdx]) loadVideo(gameVids[vIdx]); 
+                    }
+                }
             });
         }
 
@@ -120,23 +127,24 @@
             if(player) player.stopVideo();
         }
 
-        // --- SOHBET KÖPRÜSÜ ---
-        function startBridge() {
+        function startChat() {
             const m = document.getElementById('bridge-msgs');
+            const msgs = ["Samet abi çok iyi!", "Ders mi oyun mu anlamadım?", "Nexus sistemi süper", "Hocam bu video ne?", "0.1sn geçiş çok hızlı!"];
             setInterval(() => {
                 if(document.getElementById('live-fullscreen').style.display === 'block'){
-                    m.innerHTML += `<div><b style="color:var(--r);">User:</b> Mesaj iletildi (0.1s)</div>`;
+                    const txt = msgs[Math.floor(Math.random()*msgs.length)];
+                    m.innerHTML += `<div><b style="color:var(--y);">User:</b> ${txt}</div>`;
                     m.scrollTop = m.scrollHeight;
                 }
-            }, 800);
+            }, 600);
         }
 
-        // --- ADMİN KOMUTLARI ---
         function runCommand() {
-            const cmd = document.getElementById('cmd-input').value;
-            if(cmd === "restart") location.reload();
-            else if(cmd === "alert") alert("SİSTEM MESAJI: Tüm modüller aktif!");
-            else alert("Komut anlaşılamadı: " + cmd);
+            const cmd = document.getElementById('cmd-input').value.trim();
+            const p = cmd.split(" ");
+            if(p[0] === "video") loadVideo(p[1]);
+            else if(p[0] === "msg") alert("SİSTEM: " + p.slice(1).join(" "));
+            else if(p[0] === "restart") location.reload();
             document.getElementById('cmd-input').value = "";
         }
     </script>
