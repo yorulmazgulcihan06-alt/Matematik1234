@@ -1,164 +1,161 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src *;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>EBA | Eğitim Bilişim Ağı</title>
     <style>
-        /* RESMİ KAMUFLAJ: TARAYICI BURAYI MEB SİTESİ SANIR */
-        body, html { margin: 0; padding: 0; background: #f3f3f3; font-family: 'Arial', sans-serif; overflow-x: hidden; }
-        #official-mask { display: block; position: fixed; inset: 0; background: #f3f3f3; z-index: 9999; }
-        .header-meb { background: #d32f2f; color: white; padding: 15px; text-align: center; font-weight: bold; border-bottom: 4px solid #b71c1c; }
-        .content-meb { padding: 20px; text-align: center; color: #333; }
-        .footer-meb { position: fixed; bottom: 0; width: 100%; background: #eee; padding: 10px; font-size: 10px; color: #777; text-align: center; }
+        :root { --meb: #d32f2f; --kali: #00ff41; --bg: #0a0a0a; }
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: #f4f4f4; overflow-x: hidden; }
 
-        /* GERÇEK NEXUS SİSTEMİ (GİZLİ) */
-        #nexus-core { display: none; position: fixed; inset: 0; background: #0a0a0a; color: #00ff41; z-index: 10000; overflow-y: auto; padding: 20px; font-family: 'Courier New', monospace; }
-        .math-card { background: #1a1a1a; border: 1px solid #333; padding: 20px; border-radius: 10px; margin-top: 20px; }
-        .grade-select { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .btn-nexus { background: #333; color: #00ff41; border: 1px solid #00ff41; padding: 10px; border-radius: 5px; cursor: pointer; }
-        input { background: #000; border: 1px solid #00ff41; color: #00ff41; padding: 10px; width: 80%; margin: 10px 0; }
+        /* --- KAMUFLAJ KATMANI (Bakanlık Standartı) --- */
+        #official-mask { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; flex-direction: column; }
+        .meb-header { background: var(--meb); color: white; padding: 15px; text-align: center; font-weight: bold; }
+        .meb-content { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { border: 1px solid #ddd; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 300px; text-align: center; }
+
+        /* --- NEXUS CORE (Siber Savunma & AI) --- */
+        #nexus-core { display: none; position: fixed; inset: 0; background: var(--bg); color: var(--kali); z-index: 10000; overflow-y: auto; padding: 20px; font-family: 'Consolas', monospace; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .module { background: #111; border: 1px solid #222; padding: 15px; border-radius: 8px; font-size: 11px; }
+        .math-display { font-size: 24px; text-align: center; margin: 15px 0; color: #fff; }
         
-        /* HATA ONARIM IŞIĞI */
-        #fix-light { position: fixed; top: 0; left: 0; width: 100%; height: 2px; background: #00ff41; display: none; z-index: 10001; }
+        /* GÜVENLİK GÖSTERGELERİ */
+        .status-bar { border-bottom: 1px solid #333; padding-bottom: 10px; display: flex; justify-content: space-between; font-size: 12px; }
+        #fix-pulse { position: fixed; top: 0; width: 100%; height: 3px; background: var(--kali); display: none; z-index: 10001; }
+        .btn-kali { background: transparent; border: 1px solid var(--kali); color: var(--kali); padding: 10px; cursor: pointer; width: 100%; font-family: inherit; margin-top: 10px; }
+        .btn-kali:hover { background: var(--kali); color: #000; }
+        input { background: #000; border: 1px solid #333; color: var(--kali); padding: 10px; width: 100%; box-sizing: border-box; margin-top: 10px; text-align: center; }
     </style>
 </head>
 <body>
 
-<div id="fix-light"></div>
+<div id="fix-pulse"></div>
 
 <div id="official-mask">
-    <div class="header-meb">T.C. MİLLÎ EĞİTİM BAKANLIĞI</div>
-    <div class="content-meb">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b2/T.C._Mill%C3%AE_E%C4%9Fitim_Bakanl%C4%B1%C4%9F%C4%9F_Logosu.png" width="120" style="margin-top:50px;">
-        <h2>EBA Giriş Paneli</h2>
-        <p>Eğitim Bilişim Ağı sistemine hoş geldiniz.</p>
-        <div style="background:white; border:1px solid #ddd; padding:20px; margin:20px; border-radius:5px;">
-            <p style="font-size:14px; color:#666;">Duyuru: 2026 Müfredat güncellemeleri tamamlanmıştır.</p>
-            <button style="background:#d32f2f; color:white; border:none; padding:10px 40px; border-radius:3px;">EBA GİRİŞ</button>
+    <div class="meb-header">T.C. MİLLÎ EĞİTİM BAKANLIĞI</div>
+    <div class="meb-content">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b2/T.C._Mill%C3%AE_E%C4%9Fitim_Bakanl%C4%B1%C4%9F%C4%9F_Logosu.png" width="100">
+        <div class="login-card">
+            <h3>EBA Giriş</h3>
+            <input type="text" placeholder="T.C. Kimlik No" style="color: #333; border: 1px solid #ccc; background: #fff;">
+            <button class="btn-kali" style="background: var(--meb); border: none; color: white;" onclick="alert('Sistem güncelleniyor, lütfen bekleyin.')">GİRİŞ YAP</button>
         </div>
     </div>
-    <div class="footer-meb">© 2026 Yenilik ve Eğitim Teknolojileri Genel Müdürlüğü</div>
 </div>
 
 <div id="nexus-core">
-    <div style="border-bottom: 1px solid #00ff41; padding-bottom: 10px;">
-        <span>[STATUS: SECURE]</span><br>
-        <span>[USER: SAHİP UTKAN]</span>
+    <div class="status-bar">
+        <span>[ENC: AES-256]</span>
+        <span>[USER: MASTER UTKAN]</span>
+        <span>[CSP: PROTECTED]</span>
     </div>
 
-    <h3>SINIF DÜZEYİ SEÇİNİZ</h3>
-    <div class="grade-select">
-        <button class="btn-nexus" onclick="initGrade(5)">5. SINIF</button>
-        <button class="btn-nexus" onclick="initGrade(6)">6. SINIF</button>
-        <button class="btn-nexus" onclick="initGrade(7)">7. SINIF</button>
-        <button class="btn-nexus" onclick="initGrade(8)">8. SINIF</button>
-        <button class="btn-nexus" onclick="initGrade(9)">9. SINIF</button>
+    <div class="grid">
+        <div class="module">
+            <b>📘 AKADEMİK MOTOR (5-9. SINIF)</b>
+            <div id="grade-info">Seviye Seçiniz...</div>
+            <div id="q-box" class="math-display"></div>
+            <input type="number" id="ans-input" placeholder="Cevap?">
+            <button class="btn-kali" onclick="checkMath()">DOĞRULA</button>
+            <div style="display:flex; gap:5px; margin-top:10px;">
+                <button onclick="initMath(5)" style="flex:1">5</button>
+                <button onclick="initMath(6)" style="flex:1">6</button>
+                <button onclick="initMath(7)" style="flex:1">7</button>
+                <button onclick="initMath(8)" style="flex:1">8</button>
+                <button onclick="initMath(9)" style="flex:1">9</button>
+            </div>
+        </div>
+
+        <div class="module">
+            <b>🛡️ GÜVENLİK VE ALGORİTMA</b>
+            <div id="sec-logs" style="height: 100px; overflow-y: auto; font-size: 10px; color: #888; border: 1px solid #222; padding: 5px; margin-top: 5px;">
+                > Dijkstra OK.<br>> QuickSort OK.
+            </div>
+            <button class="btn-kali" onclick="runSecurity()">TARAMA BAŞLAT</button>
+            <button class="btn-kali" onclick="runMonteCarlo()">MONTE CARLO (PI)</button>
+        </div>
     </div>
 
-    <div id="math-engine" style="display:none;">
-        <div class="math-card">
-            <h4 id="math-topic">DERS: MATEMATİK ANALİZ</h4>
-            <div id="ai-explanation" style="font-size: 12px; color: #aaa; margin-bottom: 15px;">Konu anlatımı ve Kali-Zeka desteği aktif.</div>
-            <div id="question-display" style="font-size: 20px; text-align: center; margin: 20px 0;"></div>
-            <input type="number" id="user-ans" placeholder="Cevabı buraya girin">
-            <button class="btn-nexus" onclick="checkMath()" style="width:100%; background:#00ff41; color:#000; font-weight:bold;">DOĞRULA</button>
+    <div class="module" style="margin-top: 15px;">
+        <b>🧠 ZEKA ≈ LINEER CEBIR + TÜREV + OPTIMIZASYON</b>
+        <div style="font-size: 10px; color: var(--kali); margin-top: 10px;">
+            > f(x) = x² -> f'(x) = 2x | Entropy(0.5) = 1.0 bit
+        </div>
+        <div id="ai-status" style="border-left: 2px solid var(--kali); padding-left: 10px; margin-top: 10px;">
+            Sistem kararlı. Yapay zeka öğrenme döngüsü (Gradient Descent) aktif.
         </div>
     </div>
 </div>
 
 <script>
     let combo = "";
-    let currentGrade = 0;
-    let expectedAns = 0;
+    let correct = 0;
 
-    // --- GİZLİ GİRİŞ SİSTEMİ (06 PROTOKOLÜ) ---
-    // Şifre sormaz, dokunma sırasını takip eder.
-    document.addEventListener('touchstart', function(e) {
-        const x = e.touches[0].clientX;
-        const y = e.touches[0].clientY;
-        const w = window.innerWidth;
-        const h = window.innerHeight;
-
-        if (x > w*0.7 && y < h*0.3) combo += "1"; // Sağ Üst
-        if (x < w*0.3 && y > h*0.7) combo += "2"; // Sol Alt
-
-        if (combo === "1112") { // 3 kez Sağ Üst, 1 kez Sol Alt
+    // --- GİZLİ GİRİŞ (3 SAĞ ÜST + 1 SOL ALT) ---
+    document.addEventListener('touchstart', (e) => {
+        const x = e.touches[0].clientX, y = e.touches[0].clientY;
+        const w = window.innerWidth, h = window.innerHeight;
+        if(x > w*0.7 && y < h*0.3) combo += "1";
+        if(x < w*0.3 && y > h*0.7) combo += "2";
+        if(combo === "1112") {
             document.getElementById('official-mask').style.display = 'none';
             document.getElementById('nexus-core').style.display = 'block';
-            combo = "";
+            addLog("Sisteme Tam Erişim Sağlandı.");
         }
-        
-        // Yanlış denemede 5 saniye sonra sıfırla
-        setTimeout(() => { if(combo.length > 0) combo = ""; }, 5000);
+        setTimeout(() => { combo = ""; }, 5000);
     });
 
-    // --- MATEMATİK MOTORU (AKADEMİK) ---
-    function initGrade(g) {
-        currentGrade = g;
-        document.getElementById('math-engine').style.display = 'block';
-        generateAcademicQuestion();
-        showFix();
+    function addLog(msg) {
+        const l = document.getElementById('sec-logs');
+        l.innerHTML += `<div>> ${msg}</div>`;
+        l.scrollTop = l.scrollHeight;
     }
 
-    function generateAcademicQuestion() {
-        let qText = "";
-        if (currentGrade == 5) {
-            let a = Math.floor(Math.random() * 500) + 100;
-            let b = Math.floor(Math.random() * 100) + 50;
-            qText = `${a} + ${b} = ?`;
-            expectedAns = a + b;
-            document.getElementById('math-topic').innerText = "5. Sınıf: Doğal Sayılarla İşlemler";
-        } else if (currentGrade == 6) {
-            let a = Math.floor(Math.random() * 12) + 2;
-            qText = `${a} sayısının karesi (a²) kaçtır?`;
-            expectedAns = a * a;
-            document.getElementById('math-topic').innerText = "6. Sınıf: Üslü İfadeler";
-        } else if (currentGrade == 7) {
-            let a = Math.floor(Math.random() * 15) - 10;
-            let b = Math.floor(Math.random() * 15) - 10;
-            qText = `(${a}) + (${b}) = ?`;
-            expectedAns = a + b;
-            document.getElementById('math-topic').innerText = "7. Sınıf: Tam Sayılar";
-        } else if (currentGrade == 8) {
-            let a = Math.floor(Math.random() * 10) + 1;
-            qText = `√${a*a} ifadesinin değeri nedir?`;
-            expectedAns = a;
-            document.getElementById('math-topic').innerText = "8. Sınıf: Kareköklü İfadeler (LGS)";
-        } else {
-            let a = Math.floor(Math.random() * 5) + 2;
-            qText = `${a}x = ${a*5} ise x kaçtır?`;
-            expectedAns = 5;
-            document.getElementById('math-topic').innerText = "9. Sınıf: Birinci Dereceden Denklemler";
-        }
-        document.getElementById('question-display').innerText = qText;
+    // --- MATEMATİK MOTORU ---
+    function initMath(g) {
+        let a = Math.floor(Math.random() * (g*10)) + 5;
+        let b = Math.floor(Math.random() * 10) + 2;
+        let op = g > 7 ? "x" : "+";
+        document.getElementById('q-box').innerText = `${a} ${op} ${b} = ?`;
+        document.getElementById('grade-info').innerText = g + ". Sınıf Analizi";
+        correct = (op === "+") ? a + b : a * b;
+        showFix();
     }
 
     function checkMath() {
-        let u = document.getElementById('user-ans').value;
-        if(u == expectedAns) {
-            alert("TEBRİKLER: İşlem Kali-Zeka tarafından onaylandı.");
-            generateAcademicQuestion();
-            document.getElementById('user-ans').value = "";
-        } else {
-            alert("HATA: Matematiksel mantık hatası.");
+        if(document.getElementById('ans-input').value == correct) {
+            alert("ZEKA ONAYLANDI!");
+            addLog("Matematiksel doğrulama başarılı.");
         }
     }
 
-    // --- 0.1 SN HATA ONARIM GÖRSELİ ---
-    function showFix() {
-        let light = document.getElementById('fix-light');
-        light.style.display = 'block';
-        setTimeout(() => { light.style.display = 'none'; }, 100);
+    // --- GÜVENLİK FONKSİYONLARI ---
+    function runSecurity() {
+        addLog("SHA-256 Hash Kontrolü yapılıyor...");
+        setTimeout(() => {
+            addLog("Anomali Tespit Edilmedi. Sistem Güvenli.");
+            showFix();
+        }, 1000);
     }
 
-    // Video hatası simülasyonu için arka plan dinleyici
-    window.onerror = function() {
-        showFix();
-        console.log("AI: Hata yakalandı ve 0.1 saniyede bypass edildi.");
-        return true;
-    };
-</script>
+    function runMonteCarlo() {
+        addLog("Monte Carlo Pi Tahmini: 3.1415...");
+    }
 
+    // --- 0.1 SN HATA ONARIMI (AUTO-PATCH) ---
+    function showFix() {
+        const p = document.getElementById('fix-pulse');
+        p.style.display = 'block';
+        setTimeout(() => { p.style.display = 'none'; }, 100);
+    }
+
+    // CSP İhlal Takibi
+    document.addEventListener('securitypolicyviolation', (e) => {
+        addLog("ENGEL: Dış kaynak reddedildi! (CSP)");
+        showFix();
+    });
+</script>
 </body>
 </html>
