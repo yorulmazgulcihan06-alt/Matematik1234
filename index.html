@@ -3,170 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEXUS INFINITY | MATEMATİK DERSİ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <title>NEXUS INFINITY | OKUL VE DOSTLAR</title>
     <style>
-        :root { --neon: #00f2ff; --interact: #ffca2c; --bg: #050505; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg); color: white; overflow: hidden; position: fixed; width: 100%; height: 100%; }
+        :root { --neon: #00f2ff; --interact: #ffca2c; --bg: #050505; --danger: #ff4757; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #000; color: white; overflow: hidden; position: fixed; width: 100%; height: 100%; }
+
+        /* ÜST PANEL */
+        #top-hud {
+            position: fixed; top: 0; left: 0; right: 0; height: 60px;
+            background: rgba(0,0,0,0.85); border-bottom: 2px solid var(--neon);
+            display: flex; justify-content: space-between; align-items: center; padding: 0 20px; z-index: 1000;
+        }
+        .timer-box { font-family: monospace; color: var(--interact); font-size: 1.5rem; }
 
         /* OYUN SAHNESİ */
-        #stage { 
-            width: 100vw; height: 100vh; 
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200') center/cover;
-            position: relative; display: none;
+        #stage { width: 100vw; height: 100vh; background-size: cover; background-position: center; position: relative; }
+        
+        #player { width: 45px; height: 75px; position: absolute; z-index: 100; pointer-events: none; }
+        #player img { height: 100%; filter: drop-shadow(0 0 8px var(--neon)); }
+
+        .entity { position: absolute; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .entity img { height: 130px; }
+        .label { background: rgba(0,0,0,0.8); padding: 3px 10px; border-radius: 5px; font-size: 0.75rem; margin-bottom: 5px; border: 1px solid var(--neon); }
+
+        /* KONTROLLER */
+        #joy-base { position: absolute; bottom: 30px; left: 30px; width: 110px; height: 110px; background: rgba(255,255,255,0.1); border-radius: 50%; border: 2px solid var(--neon); }
+        #joy-stick { position: absolute; top: 30px; left: 30px; width: 50px; height: 50px; background: var(--neon); border-radius: 50%; }
+        #interact-btn { 
+            position: fixed; bottom: 30px; right: 30px; width: 90px; height: 90px; 
+            background: var(--interact); border-radius: 50%; border: 4px solid white; 
+            color: black; font-weight: 900; display: none; align-items: center; justify-content: center; z-index: 1000; 
         }
 
-        /* MURAT HOCA VE OYUNCU */
-        #player { width: 30px; height: 30px; position: absolute; top: 75%; left: 50%; border-radius: 50%; background: var(--neon); box-shadow: 0 0 15px var(--neon); z-index: 10; }
-        .entity { position: absolute; display: flex; flex-direction: column; align-items: center; }
-        #murat-hoca { top: 25%; left: 45%; }
-        #murat-hoca img { height: 250px; filter: drop-shadow(0 0 10px black); }
+        /* SOHBET / DİYALOG SİSTEMİ */
+        #ui-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 5000; display: none; align-items: center; justify-content: center; }
+        .ui-box { width: 90%; max-width: 500px; background: #151515; border: 3px solid var(--neon); padding: 25px; border-radius: 20px; text-align: center; box-shadow: 0 0 30px var(--neon); }
+        .chat-msg { font-size: 1.1rem; line-height: 1.4; margin-bottom: 20px; min-height: 60px; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; }
+        .c-btn { padding: 12px; background: #222; border: 1px solid var(--neon); color: white; cursor: pointer; border-radius: 10px; font-weight: bold; }
+        .c-btn:hover { background: var(--neon); color: black; }
+        .exit-btn { background: var(--danger); border: none; margin-top: 15px; }
 
-        /* ETKİLEŞİM BUTONU */
-        #interact-btn {
-            position: fixed; bottom: 150px; right: 50px; width: 100px; height: 100px;
-            background: var(--interact); border-radius: 50%; border: 5px solid white;
-            color: black; font-weight: 900; display: none; align-items: center; justify-content: center;
-            box-shadow: 0 0 30px var(--interact); z-index: 1000; cursor: pointer;
-        }
-
-        /* TAHTA VE KLAVYE GİRİŞİ */
-        #blackboard {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
-            z-index: 5000; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .board-content {
-            width: 80%; max-width: 600px; background: #064e3b; border: 15px solid #451a03;
-            border-radius: 10px; padding: 40px; text-align: center; box-shadow: 0 0 50px black;
-        }
-        .chalk-text { font-family: 'Orbitron'; font-size: 1.5rem; margin-bottom: 30px; color: white; }
-        #answer-input {
-            width: 100%; padding: 15px; font-size: 2rem; text-align: center;
-            background: transparent; border: none; border-bottom: 4px dashed white;
-            color: var(--neon); outline: none; font-family: 'Orbitron';
-        }
-
-        /* JOYSTICK */
-        #joy-base { position: absolute; bottom: 40px; left: 40px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; border: 2px solid var(--neon); }
-        #joy-stick { position: absolute; top: 35px; left: 35px; width: 50px; height: 50px; background: var(--neon); border-radius: 50%; }
-
-        #start-screen { position: fixed; inset: 0; background: #000; z-index: 9000; display: flex; align-items: center; justify-content: center; }
+        input { width: 100%; padding: 10px; background: #000; border: 1px solid var(--interact); color: white; text-align: center; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
-<div id="start-screen">
-    <button style="padding: 20px 40px; background: var(--neon); border: none; font-weight: 900; border-radius: 10px;" onclick="Game.start()">DERSE GİR (MURAT HOCA)</button>
+<div id="top-hud">
+    <div id="lesson-info" style="font-weight: bold; color: var(--neon);">DERS: MATEMATİK</div>
+    <div class="timer-box" id="timer">03:00</div>
 </div>
 
 <div id="stage">
-    <div id="murat-hoca" class="entity">
-        <div style="background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 5px; margin-bottom: 5px;">Murat Hoca (Matematik)</div>
-        <img src="https://www.pngarts.com/files/1/Cartoon-Teacher-Transparent-Background-PNG.png">
-    </div>
-
-    <div id="player"></div>
+    <div id="player"><img src="https://cdn-icons-png.flaticon.com/512/3429/3429444.png"></div>
+    <div id="entities"></div>
 
     <div id="joy-base"><div id="joy-stick"></div></div>
+    <div id="interact-btn" onclick="Game.openChat()">SOHBET ET</div>
+</div>
 
-    <div id="interact-btn" onclick="Game.openBoard()">TAHTAYA KALK</div>
-
-    <div id="blackboard">
-        <div class="board-content">
-            <p style="color: #ffca2c; margin-bottom: 10px;">MURAT HOCA SORUYOR:</p>
-            <div class="chalk-text" id="question-text">800.000 + 45.000 = ?</div>
-            <input type="number" id="answer-input" placeholder="Cevabı yaz..." autocomplete="off">
-            <button onclick="Game.checkAnswer()" style="margin-top: 30px; padding: 10px 30px; background: white; color: black; font-weight: 900; border: none; cursor: pointer;">CEVAPLA</button>
-            <p style="margin-top: 20px; font-size: 0.8rem; color: #ccc;">(Klavyeden Enter'a basabilirsin)</p>
-        </div>
+<div id="ui-overlay">
+    <div class="ui-box">
+        <h3 id="ui-name" style="color: var(--interact); margin-bottom: 10px;">İSİM</h3>
+        <p class="chat-msg" id="ui-text"></p>
+        <div id="ui-extra"></div>
+        <div class="btn-group" id="ui-buttons"></div>
+        <button class="c-btn exit-btn" onclick="Game.closeChat()">SOHBETTEN ÇIK</button>
     </div>
 </div>
 
 <script>
 const Game = {
-    px: window.innerWidth / 2, py: window.innerHeight * 0.7,
-    jx: 0, jy: 0,
-    currentQuestion: 0,
-    questions: [
-        { q: "450.000 / 1000 kaçtır?", a: "450" },
-        { q: "5'in karesi (5²) kaçtır?", a: "25" },
-        { q: "En küçük geniş açı kaç derecedir?", a: "91" },
-        { q: "1.000.000 - 1 kaçtır?", a: "999999" }
-    ],
+    px: 300, py: 400, jx: 0, jy: 0,
+    time: 180, isLesson: true,
+    currentTeacher: "Murat Hoca (Matematik)",
+    contact: null,
 
-    start() {
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('stage').style.display = 'block';
-        this.initJoystick();
+    init() {
+        this.loadEnvironment();
+        this.startTimer();
         this.loop();
-        
-        // Enter tuşu desteği
-        document.getElementById('answer-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.checkAnswer();
-        });
+        this.initJoy();
     },
 
-    initJoystick() {
-        const base = document.getElementById('joy-base'), stick = document.getElementById('joy-stick');
-        let active = false;
-        const handle = (e) => {
-            if (!active) return;
-            const t = e.touches ? e.touches[0] : e;
-            const r = base.getBoundingClientRect();
-            let dx = t.clientX - (r.left + 60), dy = t.clientY - (r.top + 60);
-            const d = Math.sqrt(dx*dx + dy*dy);
-            if (d > 40) { dx *= 40/d; dy *= 40/d; }
-            stick.style.transform = `translate(${dx}px, ${dy}px)`;
-            this.jx = dx/40; this.jy = dy/40;
-        };
-        base.addEventListener('touchstart', () => active = true);
-        window.addEventListener('touchmove', handle);
-        window.addEventListener('touchend', () => { active = false; stick.style.transform = ''; this.jx = 0; this.jy = 0; });
-        // PC
-        base.addEventListener('mousedown', () => active = true);
-        window.addEventListener('mousemove', handle);
-        window.addEventListener('mouseup', () => { active = false; stick.style.transform = ''; this.jx = 0; this.jy = 0; });
+    startTimer() {
+        setInterval(() => {
+            if (this.time > 0) {
+                this.time--;
+                let m = Math.floor(this.time/60), s = this.time%60;
+                document.getElementById('timer').innerText = `${m}:${s < 10 ? '0'+s : s}`;
+            } else {
+                this.isLesson = !this.isLesson;
+                this.time = 180;
+                this.loadEnvironment();
+            }
+        }, 1000);
+    },
+
+    loadEnvironment() {
+        const layer = document.getElementById('entities');
+        const stage = document.getElementById('stage');
+        const info = document.getElementById('lesson-info');
+        layer.innerHTML = '';
+
+        if (this.isLesson) {
+            stage.style.backgroundImage = "url('https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200')";
+            const teachers = ["Murat Hoca (Matematik)", "Selin Hoca (Türkçe)", "Hakan Hoca (Fen)"];
+            this.currentTeacher = teachers[Math.floor(Math.random()*teachers.length)];
+            info.innerText = `DERS: ${this.currentTeacher.split(' ')[2].replace('(','').replace(')','')}`;
+            
+            this.ents = [
+                { id:'t', name: this.currentTeacher, x:450, y:220, img:'https://www.pngarts.com/files/1/Cartoon-Teacher-Transparent-Background-PNG.png', role:'teacher' },
+                { id:'arkin', name: 'Arkın', x:200, y:400, img:'https://cdn-icons-png.flaticon.com/512/3429/3429440.png', role:'arkin' },
+                { id:'mustafa', name: 'Mustafa', x:700, y:400, img:'https://cdn-icons-png.flaticon.com/512/3429/3429435.png', role:'mustafa' }
+            ];
+        } else {
+            stage.style.backgroundImage = "url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200')";
+            info.innerText = "TENEFÜS";
+            this.ents = [
+                { id:'mustafa', name: 'Mustafa', x:400, y:350, img:'https://cdn-icons-png.flaticon.com/512/3429/3429435.png', role:'mustafa_market' },
+                { id:'random1', name: 'Ece', x:100, y:450, img:'https://cdn-icons-png.flaticon.com/512/3429/3429433.png', role:'random' }
+            ];
+        }
+
+        this.ents.forEach(e => {
+            layer.innerHTML += `<div class="entity" style="left:${e.x}px; top:${e.y}px"><div class="label">${e.name}</div><img src="${e.img}"></div>`;
+        });
     },
 
     loop() {
         this.px += this.jx * 6; this.py += this.jy * 6;
-        this.px = Math.max(20, Math.min(window.innerWidth-20, this.px));
-        this.py = Math.max(window.innerHeight*0.3, Math.min(window.innerHeight-20, this.py));
-        
+        this.px = Math.max(50, Math.min(window.innerWidth-50, this.px));
+        this.py = Math.max(window.innerHeight*0.35, Math.min(window.innerHeight-50, this.py));
         const p = document.getElementById('player');
-        p.style.left = this.px + 'px'; p.style.top = this.py + 'px';
+        p.style.left = this.px+'px'; p.style.top = this.py+'px';
+        if(this.jx !== 0) p.style.transform = `scaleX(${this.jx > 0 ? 1 : -1})`;
 
-        // Yakınlık Kontrolü
-        const hoca = document.getElementById('murat-hoca').getBoundingClientRect();
-        const dist = Math.hypot(this.px - (hoca.left + 50), this.py - (hoca.top + 125));
-        document.getElementById('interact-btn').style.display = dist < 120 ? 'flex' : 'none';
-
+        let found = null;
+        this.ents.forEach(e => { if(Math.hypot(this.px-e.x, this.py-e.y) < 100) found = e; });
+        this.contact = found;
+        document.getElementById('interact-btn').style.display = found ? 'flex' : 'none';
         requestAnimationFrame(() => this.loop());
     },
 
-    openBoard() {
-        const q = this.questions[this.currentQuestion];
-        document.getElementById('question-text').innerText = q.q;
-        document.getElementById('blackboard').style.display = 'flex';
-        const input = document.getElementById('answer-input');
-        input.value = '';
-        setTimeout(() => input.focus(), 100); // Klavyeyi tetiklemek için odakla
+    openChat() {
+        const e = this.contact;
+        const ui = document.getElementById('ui-overlay');
+        const btns = document.getElementById('ui-buttons');
+        const extra = document.getElementById('ui-extra');
+        ui.style.display = 'flex';
+        btns.innerHTML = ''; extra.innerHTML = '';
+        document.getElementById('ui-name').innerText = e.name;
+
+        if(e.role === 'teacher') {
+            document.getElementById('ui-text').innerText = "Evladım tahtaya gel, şu soruyu çöz: 25 + 15 kaçtır?";
+            extra.innerHTML = '<input type="number" id="ans" placeholder="Cevap...">';
+            btns.innerHTML = '<button class="c-btn" onclick="Game.check(40)">CEVAPLA</button>';
+        } else if(e.role === 'mustafa') {
+            document.getElementById('ui-text').innerText = "Utkan, ders çok sıkıcı değil mi? Tenefüste markete gidelim mi?";
+        } else if(e.role === 'mustafa_market') {
+            document.getElementById('ui-text').innerText = "Markete geldim, sana ne alayım?";
+            btns.innerHTML = '<button class="c-btn" onclick="alert(\'Mustafa sana meyve suyu aldı!\')">MEYVE SUYU AL</button>';
+        } else if(e.role === 'arkin') {
+            document.getElementById('ui-text').innerText = "Ders çalışalım mı? İpucu istersen buradayım.";
+            btns.innerHTML = '<button class="c-btn" onclick="alert(\'Arkın: Bak dostum, önce birler basamağını topla!\')">İPUCU AL</button>';
+        } else {
+            document.getElementById('ui-text').innerText = "Selam Utkan! Oyun nasıl gidiyor?";
+        }
     },
 
-    checkAnswer() {
-        const userAns = document.getElementById('answer-input').value;
-        const correctAns = this.questions[this.currentQuestion].a;
+    check(correct) {
+        const val = document.getElementById('ans').value;
+        alert(val == correct ? "Harika! Doğru." : "Maalesef yanlış.");
+        this.closeChat();
+    },
 
-        if (userAns === correctAns) {
-            alert("MURAT HOCA: Aferin Utkan! Doğru cevap.");
-            this.currentQuestion = (this.currentQuestion + 1) % this.questions.length;
-        } else {
-            alert("MURAT HOCA: Yanlış! " + correctAns + " olmalıydı. Yerine geç!");
-        }
-        document.getElementById('blackboard').style.display = 'none';
+    closeChat() { document.getElementById('ui-overlay').style.display = 'none'; },
+
+    initJoy() {
+        const b = document.getElementById('joy-base'), s = document.getElementById('joy-stick');
+        let act = false;
+        const h = (e) => {
+            if(!act) return;
+            const t = e.touches ? e.touches[0] : e;
+            const r = b.getBoundingClientRect();
+            let dx = t.clientX - (r.left+55), dy = t.clientY - (r.top+55);
+            const d = Math.sqrt(dx*dx+dy*dy);
+            if(d > 40) { dx *= 40/d; dy *= 40/d; }
+            s.style.transform = `translate(${dx}px, ${dy}px)`;
+            this.jx = dx/40; this.jy = dy/40;
+        };
+        b.onmousedown = b.ontouchstart = () => act = true;
+        window.onmousemove = window.ontouchmove = h;
+        window.onmouseup = window.ontouchend = () => { act = false; s.style.transform = ''; this.jx=0; this.jy=0; };
     }
 };
+window.onload = () => Game.init();
 </script>
 </body>
 </html>
+ 
