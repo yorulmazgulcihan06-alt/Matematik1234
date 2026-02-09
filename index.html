@@ -1,114 +1,76 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sultanın Oyun Odası</title>
-    <style>
-        body { 
-            margin: 0; 
-            background: #1a1a1a; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            color: gold;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-        }
-        canvas { 
-            border: 5px solid #8b4513; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            background-color: #000;
-        }
-        #ui {
-            position: absolute;
-            top: 20px;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
+# ==============================
+# MATEMATİK İMPARATORLUĞU
+# Konu Anlatımı + Problem Çözme
+# ==============================
 
-<div id="ui">
-    <h1>FETİH YILANI</h1>
-    <p>Skor: <span id="score">0</span></p>
-</div>
-<canvas id="gameCanvas" width="800" height="600"></canvas>
+def menu():
+    print("\n🏰 MATEMATİK İMPARATORLUĞU 🏰")
+    print("1 - Oran Orantı Konu Anlatımı")
+    print("2 - Oran Orantı Problem Çöz")
+    print("3 - Denklem Konu Anlatımı")
+    print("4 - Denklem Problem Çöz")
+    print("0 - Çıkış")
 
-<script>
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-    const scoreElement = document.getElementById("score");
+def oran_oranti_konu():
+    print("\n📘 ORAN - ORANTI KONU ANLATIMI")
+    print("Oran: İki çokluğun birbirine bölünmesiyle bulunur.")
+    print("Örnek: 4 elma / 2 elma = 2")
+    print("Orantı: İki oranın birbirine eşit olmasıdır.")
+    print("a / b = c / d")
 
-    let box = 20;
-    let snake = [{x: 10 * box, y: 10 * box}];
-    let food = { x: Math.floor(Math.random() * 39 + 1) * box, y: Math.floor(Math.random() * 29 + 1) * box };
-    let score = 0;
-    let d;
+def oran_oranti_problem():
+    print("\n⚔️ ORAN ORANTI PROBLEMİ")
+    print("3 kalem 15 TL ise, 5 kalem kaç TL eder?")
+    
+    cevap = int(input("Cevabınız: "))
+    dogru = 25
+    
+    if cevap == dogru:
+        print("✅ Tebrikler! Doğru cevap.")
+    else:
+        print("❌ Yanlış.")
+        print("Çözüm:")
+        print("3 kalem = 15 TL")
+        print("1 kalem = 5 TL")
+        print("5 kalem = 25 TL")
 
-    // TV Kumandası ve Klavye Dinleyici
-    document.addEventListener("keydown", direction);
+def denklem_konu():
+    print("\n📘 DENKLEM KONU ANLATIMI")
+    print("Denklem: İçinde bilinmeyen bulunan eşitliktir.")
+    print("Örnek: x + 5 = 12")
+    print("Amaç: x'i yalnız bırakmak")
 
-    function direction(event) {
-        let key = event.keyCode;
-        if(key == 37 && d != "RIGHT") d = "LEFT";
-        else if(key == 38 && d != "DOWN") d = "UP";
-        else if(key == 39 && d != "LEFT") d = "RIGHT";
-        else if(key == 40 && d != "UP") d = "DOWN";
-    }
+def denklem_problem():
+    print("\n⚔️ DENKLEM PROBLEMİ")
+    print("x + 7 = 20 denkleminin çözümü nedir?")
+    
+    cevap = int(input("Cevabınız: "))
+    dogru = 13
+    
+    if cevap == dogru:
+        print("✅ Harika! Doğru.")
+    else:
+        print("❌ Yanlış.")
+        print("Çözüm:")
+        print("x + 7 = 20")
+        print("x = 20 - 7")
+        print("x = 13")
 
-    function draw() {
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+# ANA PROGRAM
+while True:
+    menu()
+    secim = input("Seçiminiz: ")
 
-        for(let i = 0; i < snake.length; i++) {
-            ctx.fillStyle = (i == 0) ? "gold" : "white";
-            ctx.fillRect(snake[i].x, snake[i].y, box, box);
-            ctx.strokeStyle = "red";
-            ctx.strokeRect(snake[i].x, snake[i].y, box, box);
-        }
-
-        ctx.fillStyle = "red";
-        ctx.fillRect(food.x, food.y, box, box);
-
-        let snakeX = snake[0].x;
-        let snakeY = snake[0].y;
-
-        if( d == "LEFT") snakeX -= box;
-        if( d == "UP") snakeY -= box;
-        if( d == "RIGHT") snakeX += box;
-        if( d == "DOWN") snakeY += box;
-
-        // Yemek yeme kontrolü
-        if(snakeX == food.x && snakeY == food.y) {
-            score++;
-            scoreElement.innerHTML = score;
-            food = { x: Math.floor(Math.random() * 39 + 1) * box, y: Math.floor(Math.random() * 29 + 1) * box };
-        } else {
-            snake.pop();
-        }
-
-        let newHead = { x: snakeX, y: snakeY };
-
-        // Oyun bitti kontrolleri (Duvara çarpma veya kendine çarpma)
-        if(snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
-            clearInterval(game);
-            alert("Mağlubiyet! Sultanın Skoru: " + score);
-            location.reload();
-        }
-
-        snake.unshift(newHead);
-    }
-
-    function collision(head, array) {
-        for(let i = 0; i < array.length; i++) {
-            if(head.x == array[i].x && head.y == array[i].y) return true;
-        }
-        return false;
-    }
-
-    let game = setInterval(draw, 100); // TV'lerde akıcılık için 100ms idealdir
-</script>
-</body>
-</html>
+    if secim == "1":
+        oran_oranti_konu()
+    elif secim == "2":
+        oran_oranti_problem()
+    elif secim == "3":
+        denklem_konu()
+    elif secim == "4":
+        denklem_problem()
+    elif secim == "0":
+        print("👋 İmparatorluk kapatılıyor...")
+        break
+    else:
+        print("⚠️ Geçersiz seçim!")
