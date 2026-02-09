@@ -2,166 +2,184 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Utkan'ın Hikayesi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS CORE | Matematik Komuta Merkezi</title>
     <style>
-        :root { --neon: #00f2ff; --gold: #ffca2c; --bg: #000; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
-        body { background: #000; color: white; overflow: hidden; position: fixed; width: 100%; height: 100%; }
-
-        /* SAHNELER */
-        .scene { width: 100vw; height: 100vh; display: none; background-size: cover; background-position: center; position: relative; }
+        :root { --neon: #00f2ff; --gold: #ffca2c; --eba: #ff6600; --dark: #0a0a0c; --card: #141418; }
+        body { background: var(--dark); color: white; font-family: 'Segoe UI', sans-serif; margin: 0; overflow-x: hidden; }
         
-        /* KARAKTERLER */
-        .char { position: absolute; display: flex; flex-direction: column; align-items: center; transition: 0.5s; }
-        .char img { height: 130px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
-        .char-tag { background: rgba(0,0,0,0.8); padding: 5px 15px; border-radius: 10px; font-size: 14px; margin-bottom: 5px; border: 1px solid var(--neon); }
-        
-        /* DİALOG SİSTEMİ */
-        #ui { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.95); border-top: 3px solid var(--neon); padding: 25px; z-index: 10000; text-align: center; display: none; }
-        #speaker { color: var(--gold); font-size: 1.5rem; margin-bottom: 10px; font-weight: bold; }
-        #text { font-size: 1.2rem; margin-bottom: 20px; height: 60px; }
-        .btn { background: var(--neon); color: black; border: none; padding: 15px 30px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 1.1rem; }
+        /* NAVBAR */
+        nav { background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--neon); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-size: 1.5rem; font-weight: 900; letter-spacing: 2px; }
+        .logo span { color: var(--neon); }
+        .nav-links button { background: none; border: 1px solid var(--neon); color: var(--neon); padding: 8px 15px; margin-left: 10px; border-radius: 5px; cursor: pointer; transition: 0.3s; }
+        .nav-links button.active { background: var(--neon); color: black; font-weight: bold; }
 
-        /* GİRİŞ EKRANI */
-        #start-screen { position: fixed; inset: 0; background: #000; z-index: 20000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #day-tag { position: fixed; top: 20px; left: 20px; background: var(--neon); color: black; padding: 10px 20px; border-radius: 10px; font-weight: bold; z-index: 5000; display: none; }
+        /* MAIN AREA */
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        
+        /* SECTIONS */
+        .section { display: none; animation: fadeIn 0.5s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* KÜTÜPHANE (HAVALI KARTLAR) */
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 15px; transition: 0.3s; position: relative; overflow: hidden; }
+        .card:hover { border-color: var(--neon); transform: translateY(-5px); }
+        .card h3 { color: var(--gold); margin-top: 0; }
+        .card::after { content: 'RESMİ'; position: absolute; top: 10px; right: -20px; background: var(--eba); font-size: 10px; padding: 2px 25px; transform: rotate(45deg); }
+
+        /* SINAV MODU */
+        .quiz-header { background: var(--eba); padding: 20px; border-radius: 10px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .q-box { background: var(--card); padding: 25px; border-radius: 15px; margin-bottom: 15px; border-left: 5px solid var(--neon); }
+        .q-text { font-size: 1.4rem; margin-bottom: 15px; }
+        input[type="number"] { background: #000; border: 2px solid #444; color: white; padding: 12px; font-size: 1.2rem; border-radius: 8px; width: 150px; outline: none; transition: 0.3s; }
+        input[type="number"]:focus { border-color: var(--neon); box-shadow: 0 0 10px var(--neon); }
+
+        /* AI ANALİZ PANELİ */
+        #ai-panel { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border: 2px solid var(--neon); padding: 30px; border-radius: 20px; text-align: center; }
+        .score-circle { width: 150px; height: 150px; border: 10px solid var(--neon); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 20px auto; font-weight: 900; text-shadow: 0 0 15px var(--neon); }
+
+        .btn-main { background: var(--neon); color: #000; border: none; padding: 15px 40px; border-radius: 30px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        .btn-main:disabled { background: #333; color: #777; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
-<div id="start-screen">
-    <h1 style="color:var(--neon); margin-bottom:30px;">UTKAN'IN HİKAYESİ</h1>
-    <button class="btn" onclick="Game.start()">HİKAYEYE BAŞLA</button>
-</div>
+<nav>
+    <div class="logo">NEXUS<span>CORE</span></div>
+    <div class="nav-links">
+        <button id="nav-lib" onclick="Core.show('library')">BİLGİ ÜSSÜ</button>
+        <button id="nav-train" onclick="Core.show('training')">SONSUZ MOD</button>
+        <button id="nav-exam" onclick="Core.show('exam')" class="active">20 SORULUK SINAV</button>
+    </div>
+</nav>
 
-<div id="day-tag">GÜN: 1</div>
+<div class="container">
+    
+    <div id="exam" class="section active">
+        <div class="quiz-header">
+            <div style="font-weight: bold; font-size: 1.2rem;">📊 MEB/EBA RESMİ SINAV MODÜLÜ</div>
+            <div id="status-tag">5 Soru Gerekli</div>
+        </div>
+        <div id="exam-list"></div>
+        <div style="text-align: center;">
+            <button id="submit-btn" class="btn-main" disabled onclick="Core.analyze()">ANALİZ ET VE GÖNDER</button>
+        </div>
+    </div>
 
-<div id="view">
-    <div id="home" class="scene">
-        <div class="char" style="left: 20%; top: 40%;"><div class="char-tag">Anne</div><img src="https://cdn-icons-png.flaticon.com/512/3429/3429433.png"></div>
+    <div id="training" class="section">
+        <div style="text-align: center; padding: 50px;">
+            <h1 style="color: var(--neon);">SONSUZ ANTRENNAN</h1>
+            <div id="t-question" style="font-size: 4rem; margin: 40px 0;">...</div>
+            <input type="number" id="t-input" placeholder="?" onkeydown="if(event.key==='Enter') Core.checkTrain()">
+            <div id="t-feedback" style="margin-top: 20px; font-size: 1.5rem;"></div>
+        </div>
     </div>
-    <div id="car" class="scene">
-        <div class="char" style="left: 40%; top: 40%;"><div class="char-tag">Baba</div><img src="https://cdn-icons-png.flaticon.com/512/3429/3429440.png"></div>
-    </div>
-    <div id="school" class="scene">
-        <div id="mustafa" class="char" style="left: 15%; top: 45%;"><div class="char-tag">Mustafa (Sinsi)</div><img src="https://cdn-icons-png.flaticon.com/512/3429/3429435.png"></div>
-        <div id="arkin" class="char" style="left: 75%; top: 45%;"><div class="char-tag">Arkın (Dahi)</div><img src="https://cdn-icons-png.flaticon.com/512/4333/4333609.png"></div>
-    </div>
-    <div id="street" class="scene">
-        <div id="murat" class="char" style="left: 45%; top: 35%;"><div class="char-tag">Murat Hoca</div><img src="https://www.pngarts.com/files/1/Cartoon-Teacher-Transparent-Background-PNG.png"></div>
-    </div>
-</div>
 
-<div id="ui">
-    <div id="speaker">ANNE</div>
-    <p id="text">Yükleniyor...</p>
-    <div id="actions"></div>
+    <div id="library" class="section">
+        <h1 style="color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 10px;">2000+ DİJİTAL ARŞİV</h1>
+        <div class="grid">
+            <div class="card"><h3>🎯 Milyonlar</h3><p>9 basamaklı sayıları bölüklerine ayırarak oku. Milyonlar-Binler-Birler.</p></div>
+            <div class="card"><h3>⚡ Hızlı Bölme</h3><p>Sondaki sıfırları karşılıklı yok et. 450.000 / 1000 = 450.</p></div>
+            <div class="card"><h3>📐 Dikdörtgen</h3><p>Çevre = Uzun + Kısa x 2. Alan = Uzun x Kısa.</p></div>
+            <div class="card"><h3>📦 Üslü Sayılar</h3><p>Karesi 2. kuvvet, Küpü 3. kuvvettir. 5'in küpü 125'tir!</p></div>
+        </div>
+    </div>
+
+    <div id="results" class="section">
+        <div id="ai-panel">
+            <h1 style="color: var(--neon);">YAPAY ZEKA ANALİZ RAPORU</h1>
+            <div class="score-circle" id="final-score">0</div>
+            <p id="ai-text" style="font-size: 1.3rem; line-height: 1.6; padding: 0 20px;"></p>
+            <button class="btn-main" onclick="location.reload()">SİSTEMİ YENİDEN BAŞLAT</button>
+        </div>
+    </div>
+
 </div>
 
 <script>
-const Game = {
-    day: 1,
-    step: 0,
-    scenes: {
-        home: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200",
-        car: "https://images.unsplash.com/photo-1449960232330-413952726a0d?w=1200",
-        school: "https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200",
-        street: "https://images.unsplash.com/photo-1524143878510-e3b8d6312402?w=1200"
+const Core = {
+    examData: [],
+    trainAns: 0,
+
+    init() {
+        this.genExam();
+        this.genTrain();
     },
 
-    start() {
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('day-tag').style.display = 'block';
-        document.getElementById('ui').style.display = 'block';
-        this.runStep();
+    show(id) {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+        document.getElementById('nav-' + id.substring(0,3)).classList.add('active');
     },
 
-    showScene(id) {
-        document.querySelectorAll('.scene').forEach(s => s.style.display = 'none');
-        const s = document.getElementById(id);
-        s.style.display = 'block';
-        s.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url(${this.scenes[id]})`;
-    },
-
-    runStep() {
-        const spk = document.getElementById('speaker');
-        const txt = document.getElementById('text');
-        const act = document.getElementById('actions');
-        act.innerHTML = "";
-
-        // Günlük Değişen Garip Olaylar Paneli
-        let garipOlay = "";
-        if(this.day === 3) garipOlay = "(Bugün okulda her yer mor boyanmış!)";
-        if(this.day === 7) garipOlay = "(Bugün herkes tersten konuşuyor!)";
-        if(this.day === 10) garipOlay = "(Final: Bugün okulun son günü, büyük kutlama var!)";
-
-        switch(this.step) {
-            case 0:
-                this.showScene('home');
-                spk.innerText = "ANNE";
-                txt.innerText = `Utkan! Hadi uyan geç kalacaksın! ${garipOlay}`;
-                this.addBtn("Tamam anne öfff", () => { this.step++; this.runStep(); });
-                break;
-            case 1:
-                this.showScene('car');
-                spk.innerText = "BABA";
-                txt.innerText = "Kemerini bağla aslanım, okula gidiyoruz.";
-                this.addBtn("Okula Giriş Yap", () => { this.step++; this.runStep(); });
-                break;
-            case 2:
-                this.showScene('school');
-                spk.innerText = "SİSTEM";
-                txt.innerText = "Dersler işlendi... (1 dakika geçti). Teneffüs zili çaldı!";
-                this.addBtn("Koridora Çık", () => { this.step++; this.runStep(); });
-                break;
-            case 3:
-                spk.innerText = "MUSTAFA & ARKIN";
-                txt.innerText = "Mustafa: 'Kanka markete kaçalım mı?' | Arkın: 'Utkan, dünkü sorunun cevabını buldum!'";
-                this.addBtn("Akşam Maçına Git", () => { this.step++; this.runStep(); });
-                break;
-            case 4:
-                this.showScene('street');
-                spk.innerText = "MURAT HOCA";
-                txt.innerText = "Merhaba evlat! Şu soruyu bil çikolatayı kap: 12 x 5 ?";
-                this.addBtn("60 (Doğru)", () => this.answer(true));
-                this.addBtn("50 (Yanlış)", () => this.answer(false));
-                break;
-            case 5:
-                this.showScene('home');
-                spk.innerText = "SİSTEM";
-                txt.innerText = `${this.day}. Gün bitti. Akşam oldu, uyudun...`;
-                this.addBtn("Yeni Güne Başla", () => {
-                    this.day++;
-                    this.step = 0;
-                    document.getElementById('day-tag').innerText = "GÜN: " + this.day;
-                    if(this.day > 10) {
-                        alert("10 GÜNLÜK SERÜVEN BİTTİ! EFSANE BİR ÖĞRENCİSİN UTKAN!");
-                        location.reload();
-                    }
-                    this.runStep();
-                });
-                break;
+    // 20 SORULUK SINAV SİSTEMİ
+    genExam() {
+        const list = document.getElementById('exam-list');
+        for(let i=0; i<20; i++) {
+            const op = ['+','-','*','/'][Math.floor(Math.random()*4)];
+            let n1, n2, a;
+            if(op==='+'){n1=this.rn(100,999); n2=this.rn(100,999); a=n1+n2;}
+            if(op==='-'){n1=this.rn(500,999); n2=this.rn(100,499); a=n1-n2;}
+            if(op==='*'){n1=this.rn(10,50); n2=this.rn(5,15); a=n1*n2;}
+            if(op==='/'){n2=this.rn(2,12); a=this.rn(5,40); n1=n2*a;}
+            this.examData.push(a);
+            list.innerHTML += `<div class="q-box"><div style="color:var(--neon)">SORU ${i+1}</div><div class="q-text">${n1} ${op==='*'?'x':op==='/'?'÷':op} ${n2} = ?</div><input type="number" class="exam-in" oninput="Core.checkLimit()"></div>`;
         }
     },
 
-    addBtn(label, fn) {
-        const b = document.createElement('button');
-        b.className = "btn";
-        b.style.margin = "5px";
-        b.innerText = label;
-        b.onclick = fn;
-        document.getElementById('actions').appendChild(b);
+    checkLimit() {
+        const inputs = document.querySelectorAll('.exam-in');
+        let count = 0;
+        inputs.forEach(i => { if(i.value !== "") count++; });
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = count < 5;
+        document.getElementById('status-tag').innerText = count < 5 ? `${5-count} Soru Daha Gerekli` : "GÖNDERİME HAZIR";
+        document.getElementById('status-tag').style.color = count < 5 ? "white" : "black";
+        if(count >= 5) document.getElementById('status-tag').parentElement.style.background = varName('--neon');
     },
 
-    answer(isCorrect) {
-        if(isCorrect) alert("MURAT HOCA: Helal olsun Utkan! Al çikolatanı 🍫");
-        else alert("MURAT HOCA: Yanlış! Arkın çikolatayı kaptı bile...");
-        this.step++;
-        this.runStep();
-    }
+    analyze() {
+        let correct = 0;
+        const inputs = document.querySelectorAll('.exam-in');
+        inputs.forEach((input, i) => { if(parseInt(input.value) === this.examData[i]) correct++; });
+        
+        this.show('results');
+        document.getElementById('final-score').innerText = correct;
+        
+        let report = "";
+        if(correct === 20) report = "ANALİZ: Utkan, işlem hızın ve doğruluğun kusursuz. Yapay zeka senin bir 'Nexus Master' olduğunu onayladı! Mustafa ve Arkın seninle gurur duyuyor.";
+        else if(correct >= 15) report = "ANALİZ: Harika performans. 5. sınıf MEB müfredatının çok üzerindesin. Küçük hataları Arkın'ın taktikleriyle düzeltebiliriz.";
+        else if(correct >= 5) report = "ANALİZ: Başarılı bir deneme. Kütüphaneyi biraz daha karıştırıp eksikleri kapatırsan 20'de 20 yakındır!";
+        else report = "ANALİZ: Odaklanma tespit edildi. Ama pes etmek yok, Nexus Core her zaman burada. Tekrar denemeye ne dersin?";
+        
+        document.getElementById('ai-text').innerText = report;
+    },
+
+    // SONSUZ MOD SİSTEMİ
+    genTrain() {
+        const n1 = this.rn(10,100), n2 = this.rn(2,10);
+        this.trainAns = n1 * n2;
+        document.getElementById('t-question').innerText = `${n1} x ${n2}`;
+        document.getElementById('t-input').value = "";
+        document.getElementById('t-input').focus();
+    },
+
+    checkTrain() {
+        const val = parseInt(document.getElementById('t-input').value);
+        const f = document.getElementById('t-feedback');
+        if(val === this.trainAns) { f.innerHTML = "✅ MÜKEMMEL!"; f.style.color = varName('--neon'); setTimeout(()=> {f.innerHTML=""; this.genTrain();}, 600); }
+        else { f.innerHTML = "❌ TEKRAR DENE"; f.style.color = "red"; }
+    },
+
+    rn(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 };
+
+function varName(name) { return getComputedStyle(document.documentElement).getPropertyValue(name); }
+window.onload = () => Core.init();
 </script>
 </body>
 </html>
-
