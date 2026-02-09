@@ -3,213 +3,477 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>NEXUS INFINITY | UTKAN'IN DÜNYASI</title>
+    <title>NEXUS CHRONICLES | UTKAN'IN SERÜVENİ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --gold: #ffca2c; --danger: #ff4757; --glass: rgba(255,255,255,0.1); }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; user-select: none; }
+        :root { --neon: #00f2ff; --gold: #ffca2c; --danger: #ff4757; --glass: rgba(255,255,255,0.15); }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; user-select: none; }
         body { background: #000; color: white; overflow: hidden; position: fixed; width: 100%; height: 100%; }
 
-        /* --- DİNAMİK ARKA PLANLAR --- */
-        #game-stage { 
-            width: 100vw; height: 100vh; transition: 1s filter, 1s background-image;
-            background-size: cover; background-position: center; position: relative;
+        /* --- ANA OYUN EKRANI --- */
+        #game-view {
+            width: 100vw; height: 100vh;
+            background-size: cover; background-position: center;
+            position: relative; transition: background-image 1.5s ease-in-out;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
 
-        /* --- KARAKTER (MODERN TASARIM) --- */
-        #player { 
-            width: 50px; height: 80px; position: absolute; z-index: 1000;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .char-body { width: 30px; height: 50px; background: var(--neon); border-radius: 10px; border: 3px solid #fff; box-shadow: 0 0 20px var(--neon); }
-        .char-head { width: 25px; height: 25px; background: #ffe0bd; border-radius: 50%; margin-bottom: -5px; z-index: 2; }
+        /* --- KARAKTERLER --- */
+        .char-container { position: absolute; display: flex; flex-direction: column; align-items: center; transition: 0.5s; }
+        .char-container img { height: 150px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
+        .char-label { background: var(--glass); backdrop-filter: blur(5px); padding: 5px 15px; border-radius: 20px; font-size: 0.85rem; margin-bottom: 5px; border: 1px solid rgba(255,255,255,0.2); }
 
-        /* --- NPC TASARIMLARI --- */
-        .npc { position: absolute; display: flex; flex-direction: column; align-items: center; transition: 0.5s; }
-        .npc img { height: 120px; filter: drop-shadow(0 0 10px rgba(0,0,0,0.5)); }
-        .npc-label { background: var(--glass); backdrop-filter: blur(5px); padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 5px; border: 1px solid rgba(255,255,255,0.2); }
-
-        /* --- KONTROLLER (ULTRA MODERN) --- */
-        #joystick-area { position: absolute; bottom: 40px; left: 40px; width: 140px; height: 140px; background: var(--glass); border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(5px); }
-        #joystick-knob { position: absolute; top: 45px; left: 45px; width: 50px; height: 50px; background: #fff; border-radius: 50%; box-shadow: 0 0 30px var(--neon); }
+        /* ÖZEL KARAKTER STİLLERİ */
+        .sinsi-mustafa img { filter: brightness(0.8) sepia(0.3) hue-rotate(200deg); }
+        .dahi-arkin img { filter: saturate(1.5) contrast(1.2); }
         
-        #action-btn { 
-            position: fixed; bottom: 40px; right: 40px; width: 100px; height: 100px; 
-            background: linear-gradient(45deg, var(--gold), #ff9f43); border-radius: 50%; 
-            border: 4px solid #fff; color: #000; font-weight: 900; display: none; 
-            align-items: center; justify-content: center; z-index: 2000; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        /* --- DİALOG SİSTEMİ --- */
+        #dialog-box {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(0,0,0,0.9); border-top: 3px solid var(--neon);
+            padding: 25px; z-index: 10000; text-align: center;
+            transition: 0.3s ease-out; transform: translateY(100%);
         }
-
-        /* --- SOHBET ARAYÜZÜ (WHATSAPP TARZI) --- */
-        #chat-ui { 
-            position: fixed; bottom: -100%; left: 0; width: 100%; height: 50%; 
-            background: rgba(15,15,15,0.95); border-top: 3px solid var(--neon); 
-            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 5000; padding: 25px;
-            border-radius: 30px 30px 0 0; backdrop-filter: blur(10px);
+        #dialog-box.active { transform: translateY(0%); }
+        .dialog-name { font-family: 'Orbitron', sans-serif; color: var(--gold); margin-bottom: 10px; font-size: 1.2rem; }
+        .dialog-text { font-size: 1.1rem; line-height: 1.5; margin-bottom: 20px; }
+        .dialog-choices button {
+            background: var(--neon); color: black; border: none; padding: 12px 25px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; margin: 5px;
+            transition: 0.2s;
         }
-        #chat-ui.active { bottom: 0; }
-        .chat-bubble { background: var(--glass); padding: 15px; border-radius: 15px; margin-bottom: 20px; font-size: 1.1rem; line-height: 1.5; }
-        .choice-btn { width: 100%; padding: 15px; background: var(--neon); color: #000; border: none; border-radius: 12px; font-weight: bold; margin-bottom: 10px; cursor: pointer; }
-        .exit-btn { background: var(--danger); color: white; }
+        .dialog-choices button:hover { background: #fff; box-shadow: 0 0 15px var(--neon); }
 
-        /* --- HUD --- */
-        #hud { position: fixed; top: 20px; left: 20px; display: flex; gap: 15px; z-index: 1000; }
-        .stat { background: var(--glass); padding: 10px 20px; border-radius: 15px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); font-weight: bold; }
+        /* --- HUD (Üst Bilgi Paneli) --- */
+        #hud { position: fixed; top: 15px; left: 15px; display: flex; gap: 10px; z-index: 9000; }
+        .hud-item { background: var(--glass); backdrop-filter: blur(5px); padding: 8px 15px; border-radius: 12px; font-weight: bold; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.1); }
+        #day-counter { color: var(--neon); }
+
+        /* --- OYUNCU --- */
+        #player {
+            width: 50px; height: 90px; position: absolute; z-index: 5000;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/3429/3429444.png'); /* Ana karakter resmi */
+            background-size: contain; background-repeat: no-repeat;
+            transform: scaleX(1); /* Yön için */
+        }
+        #player.moving { animation: player-walk 0.8s steps(4) infinite; }
+        /* Player hareket animasyonu (eğer sprite sheet olursa) */
+        /* @keyframes player-walk { from { background-position: 0px; } to { background-position: -200px; } } */
+        
+        /* --- EKRAN GEÇİŞLERİ --- */
+        #transition-overlay {
+            position: fixed; inset: 0; background: black; z-index: 20000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 1s ease-in-out;
+        }
+        #transition-overlay.active { opacity: 1; pointer-events: auto; }
+        #transition-text { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; color: var(--neon); text-shadow: 0 0 20px var(--neon); }
+
+        /* --- GİRİŞ EKRANI --- */
+        #start-screen {
+            position: fixed; inset: 0; background: #000; z-index: 30000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .start-btn { padding: 15px 30px; background: var(--neon); color: black; border: none; border-radius: 10px; font-weight: bold; font-size: 1.2rem; cursor: pointer; }
+
     </style>
 </head>
 <body>
 
-<div id="hud">
-    <div class="stat" id="location-text">📍 EV</div>
-    <div class="stat" id="time-text">⏰ 08:00</div>
+<div id="start-screen">
+    <h1 style="font-family:'Orbitron'; color:var(--neon); font-size:3rem; margin-bottom:30px;">UTKAN'IN HİKAYESİ</h1>
+    <button class="start-btn" onclick="Game.init()">HİKAYEYE BAŞLA</button>
 </div>
 
-<div id="game-stage">
-    <div id="player">
-        <div class="char-head"></div>
-        <div class="char-body"></div>
+<div id="transition-overlay">
+    <h2 id="transition-text">GÜN GEÇİYOR...</h2>
+</div>
+
+<div id="hud">
+    <div class="hud-item" id="day-counter">GÜN 1</div>
+    <div class="hud-item" id="location-display">Ev</div>
+</div>
+
+<div id="game-view">
     </div>
 
-    <div id="objects-layer"></div>
-
-    <div id="joystick-area"><div id="joystick-knob"></div></div>
-    <div id="action-btn" onclick="Game.handleAction()">ETKİLEŞİM</div>
-</div>
-
-<div id="chat-ui">
-    <h3 id="chat-name" style="color: var(--gold); margin-bottom: 10px;">İSİM</h3>
-    <div class="chat-bubble" id="chat-text">...</div>
-    <div id="chat-options"></div>
-    <button class="choice-btn exit-btn" onclick="Game.closeChat()">SOHBETTEN ÇIK</button>
+<div id="dialog-box">
+    <div class="dialog-name" id="speaker-name"></div>
+    <p class="dialog-text" id="dialog-content"></p>
+    <div class="dialog-choices" id="dialog-options"></div>
 </div>
 
 <script>
 const Game = {
-    x: 100, y: 100, jx: 0, jy: 0,
-    scene: 'HOME',
-    contact: null,
-
-    config: {
-        HOME: {
-            bg: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200',
-            name: '📍 EV',
-            npcs: [
-                { id:'abla', name:'Abla', x:300, y:200, img:'https://cdn-icons-png.flaticon.com/512/3429/3429433.png', chat:'Utkan, geç kalıyorsun! Mustafa kapıda seni bekliyor.' },
-                { id:'door', name:'OKULA GİT', x:700, y:400, img:'https://cdn-icons-png.flaticon.com/512/59/59801.png', portal:'SCHOOL' }
-            ]
-        },
-        SCHOOL: {
-            bg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200',
-            name: '📍 OKUL KORİDORU',
-            npcs: [
-                { id:'mustafa', name:'Mustafa', x:200, y:350, img:'https://cdn-icons-png.flaticon.com/512/3429/3429435.png', chat:'Selam kanka! Murat Hoca içeride coşmuş yine. Kaçalım mı kantine?' },
-                { id:'arkin', name:'Arkın', x:500, y:400, img:'https://cdn-icons-png.flaticon.com/512/3429/3429440.png', chat:'Utkan, ödevi yaptın mı? Gel kütüphanede bir bakalım.' },
-                { id:'class', name:'DERSE GİR', x:800, y:200, img:'https://cdn-icons-png.flaticon.com/512/167/167707.png', portal:'CLASSROOM' }
-            ]
-        },
-        CLASSROOM: {
-            bg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200',
-            name: '📍 MATEMATİK SINIFI',
-            npcs: [
-                { id:'murat', name:'Murat Hoca', x:400, y:150, img:'https://www.pngarts.com/files/1/Cartoon-Teacher-Transparent-Background-PNG.png', quiz:true },
-                { id:'exit', name:'SINIFTAN KAÇ', x:50, y:450, img:'https://cdn-icons-png.flaticon.com/512/59/59801.png', portal:'SCHOOL' }
-            ]
-        }
+    currentDay: 1,
+    currentScene: 'home_morning',
+    playerX: window.innerWidth / 2,
+    playerY: window.innerHeight * 0.7,
+    dialogActive: false,
+    
+    // NPC'ler ve dersler için global tanımlar
+    npcs: {
+        ANNE: { img: 'https://cdn-icons-png.flaticon.com/512/3429/3429433.png' },
+        BABA: { img: 'https://cdn-icons-png.flaticon.com/512/3429/3429440.png' },
+        MURAT_HOCA: { img: 'https://www.pngarts.com/files/1/Cartoon-Teacher-Transparent-Background-PNG.png' },
+        SELIN_HOCA: { img: 'https://cdn-icons-png.flaticon.com/512/3429/3429433.png' }, // Bayan öğretmen
+        HAKAN_HOCA: { img: 'https://cdn-icons-png.flaticon.com/512/3429/3429440.png' }, // Erkek öğretmen
+        MUSTAFA: { img: 'https://cdn-icons-png.flaticon.com/512/3429/3429435.png', class: 'sinsi-mustafa' },
+        ARKIN: { img: 'https://cdn-icons-png.flaticon.com/512/4333/4333609.png', class: 'dahi-arkin' },
+        RANDOM_FRIEND_1: { img: 'https://cdn-icons-png.flaticon.com/512/3429/3429433.png' },
+        RANDOM_FRIEND_2: { img: 'https://cdn-icons-png.flaticon.com/512/3429/3429440.png' },
     },
+    teachers: ['MURAT_HOCA', 'SELIN_HOCA', 'HAKAN_HOCA'],
+    currentTeacher: 'MURAT_HOCA',
+    
+    // OYUNUN SAHNELERİ VE HİKAYE ADIMLARI
+    storyline: {
+        day_1: {
+            home_morning: {
+                bg: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200',
+                loc: 'Ev (Sabah)',
+                chars: [{ name: 'ANNE', x: '20%', y: '40%' }],
+                dialog: {
+                    speaker: 'ANNE',
+                    text: "Utkan! Hadi uyan geç kalacaksın!",
+                    options: [{ text: "Tamam Anne öfff...", action: 'advanceStory' }]
+                }
+            },
+            car_ride: {
+                bg: 'https://images.unsplash.com/photo-1449960232330-413952726a0d?w=1200',
+                loc: 'Arabada',
+                chars: [{ name: 'BABA', x: '40%', y: '40%' }],
+                dialog: {
+                    speaker: 'BABA',
+                    text: "Kemerini bağla Utkan, okula gidiyoruz.",
+                    options: [{ text: "Okula Geldik", action: 'advanceStory' }]
+                }
+            },
+            school_corridor_morning: {
+                bg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200',
+                loc: 'Okul Koridoru',
+                dialog: {
+                    speaker: 'SİSTEM',
+                    text: "Sınıfa girdin. Bir dakika ders işlendi...",
+                    options: [{ text: "Ders Bitti (Öğle Arası)", action: 'advanceStory' }]
+                }
+            },
+            school_corridor_lunch: {
+                bg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200',
+                loc: 'Koridor (Öğle Arası)',
+                chars: [
+                    { name: 'MUSTAFA', x: '20%', y: '50%' },
+                    { name: 'ARKIN', x: '70%', y: '50%' }
+                ],
+                dialog: {
+                    speaker: 'MUSTAFA',
+                    text: "Psst, Utkan! Kantine kaçıp enerji depolayalım mı?",
+                    options: [{ text: "Hadi Mustafa!", action: 'mustafaAction' }, { text: "Arkın'a sorayım.", action: 'talkToArkin' }]
+                }
+            },
+            school_corridor_lunch_arkin: { // Mustafa'dan sonra Arkın'la konuşma
+                bg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200',
+                loc: 'Koridor (Öğle Arası)',
+                chars: [
+                    { name: 'MUSTAFA', x: '20%', y: '50%' },
+                    { name: 'ARKIN', x: '70%', y: '50%' }
+                ],
+                dialog: {
+                    speaker: 'ARKIN',
+                    text: "Utkan, öğle arası matematik çalışacaktık. Kaçıp enerjiyi ne yapacağız?",
+                    options: [{ text: "Haklısın Arkın, çalışalım.", action: 'arkinAction' }, { text: "Amaçsızca dolanalım.", action: 'advanceStory' }]
+                }
+            },
+            street_evening: {
+                bg: 'https://images.unsplash.com/photo-1524143878510-e3b8d6312402?w=1200',
+                loc: 'Sokak (Akşam)',
+                chars: [
+                    { name: 'MUSTAFA', x: '20%', y: '50%' },
+                    { name: 'ARKIN', x: '70%', y: '50%' },
+                    { name: 'MURAT_HOCA', x: '45%', y: '30%' }
+                ],
+                dialog: {
+                    speaker: 'MURAT_HOCA',
+                    text: "Merhaba çocuklar! Topu ne güzel sektiriyorsunuz. Utkan, 5. Sınıf sorusu: 12 x 5 kaçtır? Bilene çikolata!",
+                    options: [
+                        { text: "60", action: 'answerQuiz', value: 60 },
+                        { text: "50", action: 'answerQuiz', value: 50 }
+                    ]
+                }
+            },
+            home_night: {
+                bg: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200',
+                loc: 'Ev (Gece)',
+                dialog: {
+                    speaker: 'SİSTEM',
+                    text: "Akşam oldu. Yatağına girip uyudun. Yarın yeni bir gün...",
+                    options: [{ text: "Yeni Güne Başla", action: 'nextDay' }]
+                }
+            }
+        },
+        day_2: { // Örnek Gün 2 - Farklı Öğretmen, Farklı Hikaye
+            home_morning: {
+                bg: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200',
+                loc: 'Ev (Sabah)',
+                chars: [{ name: 'ANNE', x: '20%', y: '40%' }],
+                dialog: {
+                    speaker: 'ANNE',
+                    text: "Utkan! Bugün Fen dersi var, Hakan Hoca deney yapacakmış!",
+                    options: [{ text: "Deney mi? Harika!", action: 'advanceStory' }]
+                }
+            },
+            car_ride: { bg: 'https://images.unsplash.com/photo-1449960232330-413952726a0d?w=1200', loc: 'Arabada', chars: [{ name: 'BABA', x: '40%', y: '40%' }], dialog: { speaker: 'BABA', text: "Fen dersini seviyor musun?", options: [{ text: "Evet!", action: 'advanceStory' }]}},
+            school_corridor_morning: { bg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200', loc: 'Okul Koridoru', dialog: { speaker: 'SİSTEM', text: "Hakan Hoca ile çok ilginç bir deney yaptınız.", options: [{ text: "Teneffüs", action: 'advanceStory' }]}},
+            school_corridor_lunch: {
+                bg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200',
+                loc: 'Koridor (Öğle Arası)',
+                chars: [
+                    { name: 'MUSTAFA', x: '20%', y: '50%' },
+                    { name: 'ARKIN', x: '70%', y: '50%' }
+                ],
+                dialog: {
+                    speaker: 'ARKIN',
+                    text: "Hakan Hoca'nın deneyi harikaydı, değil mi Utkan? Notlarını kontrol ettim, eksiklerin var.",
+                    options: [{ text: "Teşekkürler Arkın.", action: 'arkinAction' }, { text: "Mustafa ile konuş.", action: 'talkToMustafa' }]
+                }
+            },
+            school_corridor_lunch_mustafa: {
+                bg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200',
+                loc: 'Koridor (Öğle Arası)',
+                chars: [
+                    { name: 'MUSTAFA', x: '20%', y: '50%' },
+                    { name: 'ARKIN', x: '70%', y: '50%' }
+                ],
+                dialog: {
+                    speaker: 'MUSTAFA',
+                    text: "Arkın yine ders mi diyor? Boşver onu, gel kantinden patates alalım.",
+                    options: [{ text: "Hadi patates alalım!", action: 'mustafaAction' }, { text: "Ders çalışmalıyım.", action: 'advanceStory' }]
+                }
+            },
+            street_evening: {
+                bg: 'https://images.unsplash.com/photo-1524143878510-e3b8d6312402?w=1200',
+                loc: 'Sokak (Akşam)',
+                chars: [
+                    { name: 'MUSTAFA', x: '20%', y: '50%' },
+                    { name: 'ARKIN', x: '70%', y: '50%' },
+                    { name: 'HAKAN_HOCA', x: '45%', y: '30%' }
+                ],
+                dialog: {
+                    speaker: 'HAKAN_HOCA',
+                    text: "Akşam topunuzu bırakın da bir Fen sorusu: Ağaçlar havaya ne verir? Bilene Fen rozeti!",
+                    options: [
+                        { text: "Oksijen", action: 'answerQuiz', value: 'oksijen' },
+                        { text: "Karbondioksit", action: 'answerQuiz', value: 'karbondioksit' }
+                    ]
+                }
+            },
+            home_night: { bg: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200', loc: 'Ev (Gece)', dialog: { speaker: 'SİSTEM', text: "Yorucu bir gündü. Yarın yeni maceralar seni bekliyor...", options: [{ text: "Yeni Güne Başla", action: 'nextDay' }]}}
+        },
+        // --- 10. GÜNE KADAR GARİP OLAYLAR BURAYA EKLENECEK ---
+        // ÖRNEK GÜN 3: Sınıfta Sınıf Başkanı Seçimi
+        day_3: {
+            home_morning: {
+                bg: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200',
+                loc: 'Ev (Sabah)',
+                chars: [{ name: 'ANNE', x: '20%', y: '40%' }],
+                dialog: {
+                    speaker: 'ANNE',
+                    text: "Utkan, bugün okulda sınıf başkanı seçimi varmış, adını yazdıracak mısın?",
+                    options: [{ text: "Evet, ben başkan olmalıyım!", action: 'advanceStory' }, { text: "Hayır, Arkın daha iyi yapar.", action: 'advanceStory' }]
+                }
+            },
+            car_ride: { bg: 'https://images.unsplash.com/photo-1449960232330-413952726a0d?w=1200', loc: 'Arabada', chars: [{ name: 'BABA', x: '40%', y: '40%' }], dialog: { speaker: 'BABA', text: "Başkan olursan sorumluluğun artar, hazır mısın?", options: [{ text: "Hazırım!", action: 'advanceStory' }]}},
+            school_corridor_morning: {
+                bg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200',
+                loc: 'Sınıf (Seçim)',
+                chars: [
+                    { name: 'MUSTAFA', x: '20%', y: '50%' },
+                    { name: 'ARKIN', x: '70%', y: '50%' }
+                ],
+                dialog: {
+                    speaker: 'SELIN_HOCA',
+                    text: "Bugün sınıf başkanını seçeceğiz. Adaylar kimler?",
+                    options: [
+                        { text: "Ben adayım!", action: 'alert', msg: "Selin Hoca: Tebrikler Utkan!" },
+                        { text: "Arkın aday olsun.", action: 'alert', msg: "Selin Hoca: Arkın, tebrikler!" }
+                    ]
+                }
+            },
+            school_corridor_lunch: { // Teneffüste Başkanlık Yorumları
+                bg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200',
+                loc: 'Koridor (Öğle Arası)',
+                chars: [
+                    { name: 'MUSTAFA', x: '20%', y: '50%' },
+                    { name: 'ARKIN', x: '70%', y: '50%' }
+                ],
+                dialog: {
+                    speaker: 'MUSTAFA',
+                    text: "Başkan olmasan da sorun değil, Utkan. Zaten zor işler bunlar. Gel kantine gidelim.",
+                    options: [{ text: "Haklısın Mustafa.", action: 'advanceStory' }]
+                }
+            },
+            street_evening: {
+                bg: 'https://images.unsplash.com/photo-1524143878510-e3b8d6312402?w=1200',
+                loc: 'Sokak (Akşam)',
+                chars: [
+                    { name: 'MUSTAFA', x: '20%', y: '50%' },
+                    { name: 'ARKIN', x: '70%', y: '50%' }
+                ],
+                dialog: {
+                    speaker: 'ARKIN',
+                    text: "Başkan olsan da olmasan da önemli olan derslere odaklanmak, Utkan. Unutma: 'Bilgi güçtür!'",
+                    options: [{ text: "Haklısın Arkın.", action: 'advanceStory' }]
+                }
+            },
+            home_night: { bg: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200', loc: 'Ev (Gece)', dialog: { speaker: 'SİSTEM', text: "Başkanlık yarışı seni yordu. Tatlı rüyalar...", options: [{ text: "Yeni Güne Başla", action: 'nextDay' }]}}
+        },
+        // Devam eden günler için benzer yapılar eklenecek.
+        // GÜN 4: Türkçe dersinde şiir okuma yarışması.
+        // GÜN 5: Fen laboratuvarında beklenmedik bir kaza (komik, korkunç değil).
+        // GÜN 6: Kütüphanede gizli bir kitap bulma.
+        // GÜN 7: Okul bahçesinde yeni bir arkadaşla tanışma.
+        // GÜN 8: Öğretmenler odasından gelen gizemli sesler (koridorda).
+        // GÜN 9: Okulun çatısında unutulmuş bir uçurtma bulma.
+        // GÜN 10: Final: Yıl sonu gösterisi hazırlıkları veya büyük bir sınav.
+        // Bu günlerin içeriği day_2 ve day_3'teki gibi detaylandırılacak.
+    },
+    
+    // Geçerli günün hikaye akışı (örneğin day_1 için home_morning -> car_ride -> ...)
+    currentStoryPath: [],
+    currentStoryIndex: 0,
 
     init() {
-        this.loadScene('HOME');
-        this.initControls();
-        this.loop();
+        document.getElementById('start-screen').style.display = 'none';
+        this.loadDay();
     },
 
-    loadScene(s) {
-        this.scene = s;
-        const data = this.config[s];
-        const stage = document.getElementById('game-stage');
-        const layer = document.getElementById('objects-layer');
-        const locTxt = document.getElementById('location-text');
+    loadDay() {
+        if (this.currentDay > 10) {
+            alert("10 Günlük hikaye sona erdi! Teşekkürler Utkan!");
+            location.reload(); // Oyun bittiğinde yeniden başla
+            return;
+        }
 
-        stage.style.backgroundImage = `url('${data.bg}')`;
-        locTxt.innerText = data.name;
-        layer.innerHTML = '';
-
-        data.npcs.forEach(n => {
-            layer.innerHTML += `
-                <div class="npc" id="npc-${n.id}" style="left:${n.x}px; top:${n.y}px">
-                    <div class="npc-label">${n.name}</div>
-                    <img src="${n.img}">
-                </div>`;
-        });
-        this.x = 100; this.y = 400;
-    },
-
-    loop() {
-        this.x += this.jx * 8; this.y += this.jy * 8;
-        this.x = Math.max(20, Math.min(window.innerWidth-50, this.x));
-        this.y = Math.max(window.innerHeight*0.3, Math.min(window.innerHeight-80, this.y));
-
-        const p = document.getElementById('player');
-        p.style.left = this.x + 'px'; p.style.top = this.y + 'px';
-        if(this.jx !== 0) p.style.transform = `scaleX(${this.jx > 0 ? 1 : -1})`;
-
-        this.checkProximity();
-        requestAnimationFrame(() => this.loop());
-    },
-
-    checkProximity() {
-        const npcs = this.config[this.scene].npcs;
-        let found = null;
-        npcs.forEach(n => {
-            const d = Math.hypot(this.x - n.x, this.y - n.y);
-            if(d < 100) found = n;
-        });
-        this.contact = found;
-        document.getElementById('action-btn').style.display = found ? 'flex' : 'none';
-    },
-
-    handleAction() {
-        const n = this.contact;
-        if(n.portal) { this.loadScene(n.portal); return; }
-
-        const ui = document.getElementById('chat-ui');
-        const options = document.getElementById('chat-options');
-        ui.classList.add('active');
-        document.getElementById('chat-name').innerText = n.name;
-        document.getElementById('chat-text').innerText = n.chat || "Selam Utkan, ne haber?";
+        document.getElementById('day-counter').innerText = `GÜN ${this.currentDay}`;
+        this.currentTeacher = this.teachers[Math.floor(Math.random() * this.teachers.length)]; // Her gün rastgele öğretmen
         
-        options.innerHTML = '';
-        if(n.id === 'mustafa') {
-            options.innerHTML += `<button class="choice-btn" onclick="alert('Mustafa: Tamam kanka, hoca bakmazken kaçıyoruz!')">Hadi Kantine Kaçalım</button>`;
+        const dayKey = `day_${this.currentDay}`;
+        if (!this.storyline[dayKey]) {
+            // Eğer bir gün için hikaye tanımlı değilse, önceki günün son sahnesinden devam et veya default bir gün yükle
+            alert(`Hata: Gün ${this.currentDay} için hikaye bulunamadı. Lütfen geliştiriciye bildirin.`);
+            this.currentDay++;
+            this.loadDay();
+            return;
         }
-        if(n.quiz) {
-            document.getElementById('chat-text').innerText = "Murat Hoca: Utkan! 5.000 / 50 kaçtır? Çabuk cevap ver!";
-            options.innerHTML += `<button class="choice-btn" onclick="alert('Aferin doğru cevap!')">100</button>`;
-            options.innerHTML += `<button class="choice-btn" onclick="alert('Yanlış! Sözlüye 0!')">10</button>`;
-        }
+
+        this.currentStoryPath = Object.keys(this.storyline[dayKey]);
+        this.currentStoryIndex = 0;
+        this.playScene(this.currentStoryPath[this.currentStoryIndex]);
     },
 
-    closeChat() { document.getElementById('chat-ui').classList.remove('active'); },
+    playScene(sceneId) {
+        const dayKey = `day_${this.currentDay}`;
+        const sceneData = this.storyline[dayKey][sceneId];
+        if (!sceneData) {
+            console.error(`Sahne ${sceneId} bulunamadı.`);
+            return;
+        }
 
-    initControls() {
-        const b = document.getElementById('joystick-area'), k = document.getElementById('joystick-knob');
-        let act = false;
-        const move = (e) => {
-            if(!act) return;
-            const t = e.touches ? e.touches[0] : e;
-            const r = b.getBoundingClientRect();
-            let dx = t.clientX - (r.left + 70), dy = t.clientY - (r.top + 70);
-            const d = Math.sqrt(dx*dx + dy*dy);
-            if(d > 50) { dx *= 50/d; dy *= 50/d; }
-            k.style.transform = `translate(${dx}px, ${dy}px)`;
-            this.jx = dx/50; this.jy = dy/50;
-        };
-        b.onmousedown = b.ontouchstart = () => act = true;
-        window.onmousemove = window.ontouchmove = move;
-        window.onmouseup = window.ontouchend = () => { act = false; k.style.transform = ''; this.jx=0; this.jy=0; };
-    }
-};
+        const gameView = document.getElementById('game-view');
+        const locationDisplay = document.getElementById('location-display');
+        
+        // Geçiş efekti
+        document.getElementById('transition-text').innerText = sceneData.loc;
+        document.getElementById('transition-overlay').classList.add('active');
+        gameView.style.filter = 'grayscale(100%) blur(5px)'; // Geçiş sırasında bulanıklaştır
 
-window.onload = () => Game.init();
-</script>
-</body>
-</html>
+        setTimeout(() => {
+            gameView.style.backgroundImage = `url('${sceneData.bg}')`;
+            locationDisplay.innerText = sceneData.loc;
+            
+            this.renderCharacters(sceneData.chars || []);
+            this.showDialog(sceneData.dialog);
+            
+            gameView.style.filter = 'none'; // Normal hale getir
+            document.getElementById('transition-overlay').classList.remove('active');
+        }, 1000); // 1 saniye sonra sahneyi yükle
+    },
+
+    renderCharacters(chars) {
+        const gameView = document.getElementById('game-view');
+        // Oyuncu karakteri her zaman en üstte duracak ve hareketliymiş gibi duracak.
+        let playerElem = document.getElementById('player');
+        if (!playerElem) {
+            playerElem = document.createElement('div');
+            playerElem.id = 'player';
+            gameView.appendChild(playerElem);
+        }
+        playerElem.style.left = this.playerX + 'px';
+        playerElem.style.top = this.playerY + 'px';
+        // Player animasyonu (eğer player sprite sheet olursa)
+        // playerElem.classList.add('moving'); 
+
+        // Diğer NPC'leri temizle ve yeniden yükle
+        document.querySelectorAll('.char-container').forEach(e => e.remove());
+        chars.forEach(char => {
+            const npcData = this.npcs[char.name];
+            if (npcData) {
+                const charDiv = document.createElement('div');
+                charDiv.className = `char-container ${npcData.class || ''}`;
+                charDiv.style.left = char.x;
+                charDiv.style.top = char.y;
+                charDiv.innerHTML = `<div class="char-label">${char.name.replace('_', ' ')}</div><img src="${npcData.img}">`;
+                gameView.appendChild(charDiv);
+            } else {
+                console.warn(`NPC ${char.name} bulunamadı.`);
+            }
+        });
+    },
+
+    showDialog(dialog) {
+        this.dialogActive = true;
+        document.getElementById('speaker-name').innerText = dialog.speaker.replace('_', ' ');
+        document.getElementById('dialog-content').innerText = dialog.text;
+        
+        const optionsDiv = document.getElementById('dialog-options');
+        optionsDiv.innerHTML = '';
+        dialog.options.forEach(option => {
+            const btn = document.createElement('button');
+            btn.innerText = option.text;
+            btn.onclick = () => this.handleDialogAction(option.action, option.value);
+            optionsDiv.appendChild(btn);
+        });
+        document.getElementById('dialog-box').classList.add('active');
+    },
+
+    closeDialog() {
+        this.dialogActive = false;
+        document.getElementById('dialog-box').classList.remove('active');
+    },
+
+    handleDialogAction(action, value) {
+        this.closeDialog();
+        if (action === 'advanceStory') {
+            this.currentStoryIndex++;
+            if (this.currentStoryIndex < this.currentStoryPath.length) {
+                this.playScene(this.currentStoryPath[this.currentStoryIndex]);
+            } else {
+                console.warn("Hikaye adımı kalmadı, sonraki güne geçiliyor.");
+                this.nextDay();
+            }
+        } else if (action === 'nextDay') {
+            this.nextDay();
+        } else if (action === 'mustafaAction') {
+            alert("MUSTAFA: Tamam kanka, hoca bakmazken kantine kaçıyoruz!");
+            // Buraya kantin sahnesi veya kantine kaçış animasyonu eklenebilir
+            this.currentStoryIndex++;
+            if (this.currentStoryIndex < this.currentStoryPath.length) {
+                this.playScene(this.currentStoryPath[this.currentStoryIndex]);
+            } else {
+                this.nextDay();
+            }
+        } else if (action === 'talkToArkin') {
+            // Mustafa ile konuşup Arkın'a yönlendirme
+            const dayKey = `day_${this.currentDay}`;
+            const arkinSceneId = `${this.currentStoryPath[this.currentStoryIndex]}_arkin`; // Öğle arası Arkın ile
+
