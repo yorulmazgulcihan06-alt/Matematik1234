@@ -3,167 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NEXUS INFINITY | MURAT HOCA VERSİYON</title>
+    <title>NEXUS INFINITY | MATEMATİK DERSİ</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --neon: #00f2ff; --gold: #ffca2c; --danger: #ff4757; --bg: #0a0a0c; --murat: #2c3e50; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; user-select: none; }
-        body { background: var(--bg); color: white; overflow: hidden; touch-action: manipulation; }
+        :root { --neon: #00f2ff; --interact: #ffca2c; --bg: #050505; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: white; overflow: hidden; position: fixed; width: 100%; height: 100%; }
 
-        /* --- BAŞLATICI --- */
-        #launcher { position: fixed; inset: 0; background: black; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .logo { font-family: 'Orbitron'; font-size: 3rem; color: var(--neon); text-shadow: 0 0 20px var(--neon); margin-bottom: 30px; }
-        
-        /* --- OYUN DÜNYASI --- */
-        #game-world { width: 100vw; height: 100vh; display: none; flex-direction: column; background-size: cover; background-position: center; transition: 0.8s; }
-        
-        /* HUD */
-        #hud { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; pointer-events: none; z-index: 50; }
-        .stat-box { background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 10px; border: 1px solid var(--neon); font-family: 'Orbitron'; font-size: 0.7rem; }
+        /* OYUN SAHNESİ */
+        #stage { 
+            width: 100vw; height: 100vh; 
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200') center/cover;
+            position: relative; display: none;
+        }
 
-        /* ETKİLEŞİM KATMANI */
-        #interaction-layer { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .teacher-sprite { position: absolute; bottom: 0; height: 85%; transition: 0.5s; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); }
-        
-        /* TAHTA */
-        #blackboard { display: none; position: absolute; top: 10%; width: 85%; height: 45%; background: #064e3b; border: 10px solid #451a03; border-radius: 10px; padding: 20px; text-align: center; z-index: 100; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); }
-        .chalk { font-family: 'Orbitron'; color: #fff; font-size: 1.2rem; line-height: 1.5; text-shadow: 2px 2px 0px #000; }
+        /* MURAT HOCA VE OYUNCU */
+        #player { width: 30px; height: 30px; position: absolute; top: 75%; left: 50%; border-radius: 50%; background: var(--neon); box-shadow: 0 0 15px var(--neon); z-index: 10; }
+        .entity { position: absolute; display: flex; flex-direction: column; align-items: center; }
+        #murat-hoca { top: 25%; left: 45%; }
+        #murat-hoca img { height: 250px; filter: drop-shadow(0 0 10px black); }
 
-        /* AKSİYON BARI */
-        #action-bar { height: 220px; background: rgba(15, 15, 20, 0.95); border-top: 3px solid var(--neon); padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        #speaker-name { color: var(--gold); font-family: 'Orbitron'; font-weight: 900; margin-bottom: 5px; font-size: 0.9rem; }
-        #dialog-text { font-size: 1rem; text-align: center; margin-bottom: 20px; color: #eee; min-height: 3em; }
-        .btn-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
-        .btn { padding: 12px 20px; border: 1px solid var(--neon); background: rgba(0, 242, 255, 0.1); color: white; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
-        .btn:hover { background: var(--neon); color: black; }
+        /* ETKİLEŞİM BUTONU */
+        #interact-btn {
+            position: fixed; bottom: 150px; right: 50px; width: 100px; height: 100px;
+            background: var(--interact); border-radius: 50%; border: 5px solid white;
+            color: black; font-weight: 900; display: none; align-items: center; justify-content: center;
+            box-shadow: 0 0 30px var(--interact); z-index: 1000; cursor: pointer;
+        }
 
-        /* AI ANALİZ */
-        #ai-wait { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .radar { width: 100px; height: 100px; border: 5px solid #111; border-top-color: var(--neon); border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        /* TAHTA VE KLAVYE GİRİŞİ */
+        #blackboard {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 5000; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .board-content {
+            width: 80%; max-width: 600px; background: #064e3b; border: 15px solid #451a03;
+            border-radius: 10px; padding: 40px; text-align: center; box-shadow: 0 0 50px black;
+        }
+        .chalk-text { font-family: 'Orbitron'; font-size: 1.5rem; margin-bottom: 30px; color: white; }
+        #answer-input {
+            width: 100%; padding: 15px; font-size: 2rem; text-align: center;
+            background: transparent; border: none; border-bottom: 4px dashed white;
+            color: var(--neon); outline: none; font-family: 'Orbitron';
+        }
+
+        /* JOYSTICK */
+        #joy-base { position: absolute; bottom: 40px; left: 40px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; border: 2px solid var(--neon); }
+        #joy-stick { position: absolute; top: 35px; left: 35px; width: 50px; height: 50px; background: var(--neon); border-radius: 50%; }
+
+        #start-screen { position: fixed; inset: 0; background: #000; z-index: 9000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-<div id="launcher">
-    <div class="logo">NEXUS INFINITY</div>
-    <p style="color: #888; margin-bottom: 20px;">Matematik Hocası: Murat Hoca Eklendi</p>
-    <div style="display:flex; gap:10px;">
-        <button class="btn" onclick="Game.start('PC')">PC BAŞLAT</button>
-        <button class="btn" onclick="Game.start('MOBILE')">MOBİL BAŞLAT</button>
-    </div>
+<div id="start-screen">
+    <button style="padding: 20px 40px; background: var(--neon); border: none; font-weight: 900; border-radius: 10px;" onclick="Game.start()">DERSE GİR (MURAT HOCA)</button>
 </div>
 
-<div id="ai-wait">
-    <div class="radar"></div>
-    <h2 style="margin-top:20px; font-family:'Orbitron'">MURAT HOCA ANALİZ EDİYOR...</h2>
-    <div id="ai-timer" style="font-size:4rem; color:var(--neon); font-family:'Orbitron'">30</div>
-</div>
-
-<div id="game-world">
-    <div id="hud">
-        <div class="stat-box">🔋 ENERJİ: <span id="val-energy">100</span></div>
-        <div class="stat-box">🕒 SAAT: <span id="val-time">08:45</span></div>
-        <div class="stat-box">🎒 DURUM: <span id="val-inv">Hazır</span></div>
+<div id="stage">
+    <div id="murat-hoca" class="entity">
+        <div style="background: rgba(0,0,0,0.7); padding: 5px 10px; border-radius: 5px; margin-bottom: 5px;">Murat Hoca (Matematik)</div>
+        <img src="https://www.pngarts.com/files/1/Cartoon-Teacher-Transparent-Background-PNG.png">
     </div>
 
-    <div id="interaction-layer">
-        <div id="blackboard">
-            <div class="chalk" id="chalk-q">MURAT HOCA TAHTAYA SORUYU YAZIYOR...</div>
+    <div id="player"></div>
+
+    <div id="joy-base"><div id="joy-stick"></div></div>
+
+    <div id="interact-btn" onclick="Game.openBoard()">TAHTAYA KALK</div>
+
+    <div id="blackboard">
+        <div class="board-content">
+            <p style="color: #ffca2c; margin-bottom: 10px;">MURAT HOCA SORUYOR:</p>
+            <div class="chalk-text" id="question-text">800.000 + 45.000 = ?</div>
+            <input type="number" id="answer-input" placeholder="Cevabı yaz..." autocomplete="off">
+            <button onclick="Game.checkAnswer()" style="margin-top: 30px; padding: 10px 30px; background: white; color: black; font-weight: 900; border: none; cursor: pointer;">CEVAPLA</button>
+            <p style="margin-top: 20px; font-size: 0.8rem; color: #ccc;">(Klavyeden Enter'a basabilirsin)</p>
         </div>
-        <img id="murat-sprite" class="teacher-sprite" src="https://www.pngarts.com/files/1/Cartoon-Teacher-Transparent-Background-PNG.png" style="display:none;">
-    </div>
-
-    <div id="action-bar">
-        <div id="speaker-name">BİLGİ</div>
-        <div id="dialog-text">Nexus Dünyasına hoş geldin Utkan. Murat Hoca derse girmek üzere!</div>
-        <div class="btn-grid" id="action-btns"></div>
     </div>
 </div>
 
 <script>
 const Game = {
-    energy: 100,
-    time: 525, // 08:45
-    scene: "SCHOOL",
-    userName: "Utkan",
+    px: window.innerWidth / 2, py: window.innerHeight * 0.7,
+    jx: 0, jy: 0,
+    currentQuestion: 0,
+    questions: [
+        { q: "450.000 / 1000 kaçtır?", a: "450" },
+        { q: "5'in karesi (5²) kaçtır?", a: "25" },
+        { q: "En küçük geniş açı kaç derecedir?", a: "91" },
+        { q: "1.000.000 - 1 kaçtır?", a: "999999" }
+    ],
 
-    start(p) {
-        document.getElementById('launcher').style.display = 'none';
-        document.getElementById('game-world').style.display = 'flex';
-        this.changeScene("SCHOOL");
-    },
-
-    changeScene(s) {
-        this.scene = s;
-        const bar = document.getElementById('action-btns');
-        const text = document.getElementById('dialog-text');
-        const speaker = document.getElementById('speaker-name');
-        const sprite = document.getElementById('murat-sprite');
-        const world = document.getElementById('game-world');
-
-        bar.innerHTML = '';
-        sprite.style.display = 'none';
-
-        if(s === "SCHOOL") {
-            world.style.backgroundImage = "url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200')";
-            speaker.innerText = "SİSTEM";
-            text.innerText = "Okul koridorundasın. Murat Hoca'nın Matematik dersi başlamak üzere. Hazır mısın?";
-            this.addBtn("Derse Gir", () => Game.changeScene("CLASS"));
-            this.addBtn("Kantine Git (Vur/Kavga)", () => { alert("Kavgaya karıştın! Enerji -20"); Game.energy -= 20; Game.updateHUD(); });
-        } 
-        else if(s === "CLASS") {
-            world.style.backgroundImage = "url('https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200')";
-            sprite.style.display = 'block';
-            speaker.innerText = "MURAT HOCA";
-            text.innerText = "Günaydın çocuklar! Bugün 5. sınıfın en önemli konusu olan 'Milyonlar' ve 'Açılar'ı işleyeceğiz. Utkan, neden konuşuyorsun bakayım?";
-            this.addBtn("Özür Dile", () => { text.innerText = "Murat Hoca: Tamam, dikkatli ol. Kim tahtaya kalkmak ister?"; Game.addBtn("Parmak Kaldır", () => Game.startOral()); });
-            this.addBtn("Not Gönder (Riskli)", () => { 
-                if(Math.random() > 0.5) { alert("Murat Hoca yakaladı! Sözlüden 0 aldın."); Game.changeScene("SCHOOL"); }
-                else { alert("Başarıyla not gönderdin!"); }
-            });
-        }
-    },
-
-    startOral() {
-        const board = document.getElementById('blackboard');
-        const qText = document.getElementById('chalk-q');
-        board.style.display = 'block';
-        qText.innerText = "SORU: 5'in karesi ile 2'nin küpünün toplamı kaçtır?\n(5² + 2³ = ?)";
+    start() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('stage').style.display = 'block';
+        this.initJoystick();
+        this.loop();
         
-        const bar = document.getElementById('action-btns');
-        bar.innerHTML = '';
-        this.addBtn("33", () => Game.analyze(true));
-        this.addBtn("17", () => Game.analyze(false));
-        this.addBtn("29", () => Game.analyze(false));
+        // Enter tuşu desteği
+        document.getElementById('answer-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.checkAnswer();
+        });
     },
 
-    analyze(isCorrect) {
+    initJoystick() {
+        const base = document.getElementById('joy-base'), stick = document.getElementById('joy-stick');
+        let active = false;
+        const handle = (e) => {
+            if (!active) return;
+            const t = e.touches ? e.touches[0] : e;
+            const r = base.getBoundingClientRect();
+            let dx = t.clientX - (r.left + 60), dy = t.clientY - (r.top + 60);
+            const d = Math.sqrt(dx*dx + dy*dy);
+            if (d > 40) { dx *= 40/d; dy *= 40/d; }
+            stick.style.transform = `translate(${dx}px, ${dy}px)`;
+            this.jx = dx/40; this.jy = dy/40;
+        };
+        base.addEventListener('touchstart', () => active = true);
+        window.addEventListener('touchmove', handle);
+        window.addEventListener('touchend', () => { active = false; stick.style.transform = ''; this.jx = 0; this.jy = 0; });
+        // PC
+        base.addEventListener('mousedown', () => active = true);
+        window.addEventListener('mousemove', handle);
+        window.addEventListener('mouseup', () => { active = false; stick.style.transform = ''; this.jx = 0; this.jy = 0; });
+    },
+
+    loop() {
+        this.px += this.jx * 6; this.py += this.jy * 6;
+        this.px = Math.max(20, Math.min(window.innerWidth-20, this.px));
+        this.py = Math.max(window.innerHeight*0.3, Math.min(window.innerHeight-20, this.py));
+        
+        const p = document.getElementById('player');
+        p.style.left = this.px + 'px'; p.style.top = this.py + 'px';
+
+        // Yakınlık Kontrolü
+        const hoca = document.getElementById('murat-hoca').getBoundingClientRect();
+        const dist = Math.hypot(this.px - (hoca.left + 50), this.py - (hoca.top + 125));
+        document.getElementById('interact-btn').style.display = dist < 120 ? 'flex' : 'none';
+
+        requestAnimationFrame(() => this.loop());
+    },
+
+    openBoard() {
+        const q = this.questions[this.currentQuestion];
+        document.getElementById('question-text').innerText = q.q;
+        document.getElementById('blackboard').style.display = 'flex';
+        const input = document.getElementById('answer-input');
+        input.value = '';
+        setTimeout(() => input.focus(), 100); // Klavyeyi tetiklemek için odakla
+    },
+
+    checkAnswer() {
+        const userAns = document.getElementById('answer-input').value;
+        const correctAns = this.questions[this.currentQuestion].a;
+
+        if (userAns === correctAns) {
+            alert("MURAT HOCA: Aferin Utkan! Doğru cevap.");
+            this.currentQuestion = (this.currentQuestion + 1) % this.questions.length;
+        } else {
+            alert("MURAT HOCA: Yanlış! " + correctAns + " olmalıydı. Yerine geç!");
+        }
         document.getElementById('blackboard').style.display = 'none';
-        document.getElementById('ai-wait').style.display = 'flex';
-        let time = 30;
-        const it = setInterval(() => {
-            time--;
-            document.getElementById('ai-timer').innerText = time;
-            if(time <= 0) {
-                clearInterval(it);
-                document.getElementById('ai-wait').style.display = 'none';
-                alert(isCorrect ? "MURAT HOCA: Aferin Utkan! Gözüme girdin. Sözlü Notun: 100" : "MURAT HOCA: Bu olmadı Utkan, daha çok çalışmalısın. Sözlü: 40");
-                Game.changeScene("SCHOOL");
-            }
-        }, 1000);
-    },
-
-    addBtn(t, f) {
-        const b = document.createElement('button');
-        b.className = 'btn';
-        b.innerText = t;
-        b.onclick = f;
-        document.getElementById('action-btns').appendChild(b);
-    },
-
-    updateHUD() {
-        document.getElementById('val-energy').innerText = this.energy;
     }
 };
 </script>
