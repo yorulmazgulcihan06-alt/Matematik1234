@@ -2,197 +2,170 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>NEXUS OMNIVERSAL | KALI QUANTUM DEHA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NEXUS INFINITY | MURAT HOCA VERSİYON</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* KALI SİBER ESTETİK KATMANI */
-        :root { --kali: #00ff41; --blood: #ff0000; --sky: #00ffff; --bg: #000; }
-        body { background: var(--bg); color: var(--kali); font-family: 'Consolas', monospace; overflow: hidden; margin: 0; }
-        #terminal { height: 100vh; width: 100vw; overflow-y: scroll; padding: 20px; font-size: 12px; }
-        .cmd { color: #fff; }
-        .res { color: var(--kali); opacity: 0.8; margin-bottom: 5px; }
-        .err { color: var(--blood); font-weight: bold; }
-        #matrix-canvas { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.2; }
-        .math-ui { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-                   background: rgba(0,20,0,0.9); border: 2px solid var(--kali); padding: 40px; 
-                   box-shadow: 0 0 50px var(--kali); border-radius: 20px; text-align: center; }
-        input { background: #000; border: 1px solid var(--kali); color: var(--kali); padding: 10px; font-size: 20px; text-align: center; }
-        button { background: var(--kali); color: #000; padding: 10px 20px; border: none; cursor: pointer; font-weight: bold; }
+        :root { --neon: #00f2ff; --gold: #ffca2c; --danger: #ff4757; --bg: #0a0a0c; --murat: #2c3e50; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; user-select: none; }
+        body { background: var(--bg); color: white; overflow: hidden; touch-action: manipulation; }
+
+        /* --- BAŞLATICI --- */
+        #launcher { position: fixed; inset: 0; background: black; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .logo { font-family: 'Orbitron'; font-size: 3rem; color: var(--neon); text-shadow: 0 0 20px var(--neon); margin-bottom: 30px; }
+        
+        /* --- OYUN DÜNYASI --- */
+        #game-world { width: 100vw; height: 100vh; display: none; flex-direction: column; background-size: cover; background-position: center; transition: 0.8s; }
+        
+        /* HUD */
+        #hud { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; pointer-events: none; z-index: 50; }
+        .stat-box { background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 10px; border: 1px solid var(--neon); font-family: 'Orbitron'; font-size: 0.7rem; }
+
+        /* ETKİLEŞİM KATMANI */
+        #interaction-layer { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .teacher-sprite { position: absolute; bottom: 0; height: 85%; transition: 0.5s; filter: drop-shadow(0 0 20px rgba(0,0,0,0.8)); }
+        
+        /* TAHTA */
+        #blackboard { display: none; position: absolute; top: 10%; width: 85%; height: 45%; background: #064e3b; border: 10px solid #451a03; border-radius: 10px; padding: 20px; text-align: center; z-index: 100; box-shadow: inset 0 0 50px rgba(0,0,0,0.8); }
+        .chalk { font-family: 'Orbitron'; color: #fff; font-size: 1.2rem; line-height: 1.5; text-shadow: 2px 2px 0px #000; }
+
+        /* AKSİYON BARI */
+        #action-bar { height: 220px; background: rgba(15, 15, 20, 0.95); border-top: 3px solid var(--neon); padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        #speaker-name { color: var(--gold); font-family: 'Orbitron'; font-weight: 900; margin-bottom: 5px; font-size: 0.9rem; }
+        #dialog-text { font-size: 1rem; text-align: center; margin-bottom: 20px; color: #eee; min-height: 3em; }
+        .btn-grid { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+        .btn { padding: 12px 20px; border: 1px solid var(--neon); background: rgba(0, 242, 255, 0.1); color: white; border-radius: 8px; cursor: pointer; font-size: 0.85rem; transition: 0.2s; }
+        .btn:hover { background: var(--neon); color: black; }
+
+        /* AI ANALİZ */
+        #ai-wait { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 20000; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .radar { width: 100px; height: 100px; border: 5px solid #111; border-top-color: var(--neon); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <canvas id="matrix-canvas"></canvas>
-    <div id="terminal"></div>
-    
-    <div class="math-ui" id="math-box">
-        <h2 id="topic-title">KALI MATH CORE</h2>
-        <div id="problem" style="font-size: 25px; margin-bottom: 20px;">BAŞLATILIYOR...</div>
-        <input type="text" id="ans" placeholder="SONUÇ"><br><br>
-        <button onclick="check()">SİSTEMİ ONAYLA</button>
+
+<div id="launcher">
+    <div class="logo">NEXUS INFINITY</div>
+    <p style="color: #888; margin-bottom: 20px;">Matematik Hocası: Murat Hoca Eklendi</p>
+    <div style="display:flex; gap:10px;">
+        <button class="btn" onclick="Game.start('PC')">PC BAŞLAT</button>
+        <button class="btn" onclick="Game.start('MOBILE')">MOBİL BAŞLAT</button>
+    </div>
+</div>
+
+<div id="ai-wait">
+    <div class="radar"></div>
+    <h2 style="margin-top:20px; font-family:'Orbitron'">MURAT HOCA ANALİZ EDİYOR...</h2>
+    <div id="ai-timer" style="font-size:4rem; color:var(--neon); font-family:'Orbitron'">30</div>
+</div>
+
+<div id="game-world">
+    <div id="hud">
+        <div class="stat-box">🔋 ENERJİ: <span id="val-energy">100</span></div>
+        <div class="stat-box">🕒 SAAT: <span id="val-time">08:45</span></div>
+        <div class="stat-box">🎒 DURUM: <span id="val-inv">Hazır</span></div>
     </div>
 
+    <div id="interaction-layer">
+        <div id="blackboard">
+            <div class="chalk" id="chalk-q">MURAT HOCA TAHTAYA SORUYU YAZIYOR...</div>
+        </div>
+        <img id="murat-sprite" class="teacher-sprite" src="https://www.pngarts.com/files/1/Cartoon-Teacher-Transparent-Background-PNG.png" style="display:none;">
+    </div>
+
+    <div id="action-bar">
+        <div id="speaker-name">BİLGİ</div>
+        <div id="dialog-text">Nexus Dünyasına hoş geldin Utkan. Murat Hoca derse girmek üzere!</div>
+        <div class="btn-grid" id="action-btns"></div>
+    </div>
+</div>
+
 <script>
-/* * ==========================================================
- * UTKAN DEHA - QUANTUM MATH & KALI LINUX LIBRARY (1500+ LINES)
- * WARNING: THIS SYSTEM IS EXTREMELY POWERFUL
- * ==========================================================
- */
+const Game = {
+    energy: 100,
+    time: 525, // 08:45
+    scene: "SCHOOL",
+    userName: "Utkan",
 
-// --- BÖLÜM 1: KALI LINUX ÇEKİRDEK KODLARI (SİBER ARAÇLAR) ---
-const KALI_TOOLS = {
-    nmap: "Starting Nmap 7.92 ( https://nmap.org ) at 2024-05-22...\nNmap scan report for nexus.core (127.0.0.1)\nHost is up (0.00004s latency).\nNot shown: 999 closed ports\nPORT   STATE SERVICE\n80/tcp open  http\nMAC Address: DE:HA:UT:KA:N1",
-    metasploit: "msf6 > use exploit/multi/handler\n[*] Using configured payload generic/shell_reverse_tcp\nmsf6 exploit(handler) > set LHOST 10.0.2.15\nmsf6 exploit(handler) > exploit\n[*] Started reverse TCP handler on 10.0.2.15:4444",
-    wireshark: "Capturing on 'eth0'\nPacket 1: [TCP] 192.168.1.5 -> 172.217.16.142 [SYN] Seq=0 Win=64240 Len=0 MSS=1460",
-    sqlmap: "sqlmap/1.5#stable - automatic SQL injection and database takeover tool\n[INFO] testing 'PostgreSQL' parameter 'id'\n[INFO] the back-end DBMS is PostgreSQL\nweb application technology: PHP 7.4.3, Nginx\nback-end DBMS: PostgreSQL",
-    john: "Loaded 1 password hash (bcrypt) [bcrypt 32/64]\nWill reject candidates longer than 72 characters\nProceeding with wordlist:/usr/share/wordlists/rockyou.txt\n123456           (admin)\n1 password cracked, 0 left"
-};
-
-// --- BÖLÜM 2: DEVASA MATEMATİK KÜTÜPHANESİ (100.000 FONKSİYON SİMÜLASYONU) ---
-// Bu döngü sistemi 1500 satırın üzerine taşıyacak devasa bir mantık katmanı oluşturur
-const MATH_DB = {};
-for(let i = 0; i < 500; i++) {
-    MATH_DB[`formula_alpha_${i}`] = (x) => Math.pow(x, 2) + i;
-    MATH_DB[`formula_beta_${i}`] = (x) => Math.sqrt(x) * i;
-    MATH_DB[`formula_gamma_${i}`] = (x) => Math.sin(x) / (i + 1);
-    MATH_DB[`formula_delta_${i}`] = (x) => Math.log(x + i + 1);
-    MATH_DB[`formula_epsilon_${i}`] = (x) => Math.exp(x) % (i + 1);
-    MATH_DB[`formula_zeta_${i}`] = (x) => x * i * Math.PI;
-}
-
-// --- BÖLÜM 3: SİSTEM FONKSİYONLARI (KASMA ÖNLEYİCİ) ---
-const System = {
-    log: function(text, type = "res") {
-        const t = document.getElementById('terminal');
-        const d = document.createElement('div');
-        d.className = type === "cmd" ? "cmd" : "res";
-        d.innerText = (type === "cmd" ? "root@kali:~# " : "[+] ") + text;
-        t.appendChild(d);
-        t.scrollTop = t.scrollHeight;
-        if(t.childNodes.length > 50) t.removeChild(t.firstChild);
+    start(p) {
+        document.getElementById('launcher').style.display = 'none';
+        document.getElementById('game-world').style.display = 'flex';
+        this.changeScene("SCHOOL");
     },
-    boot: function() {
-        this.log("SİSTEM ÖNYÜKLEME BAŞLADI", "cmd");
-        let p = 0;
-        const intr = setInterval(() => {
-            p += 2;
-            this.log(`Modül yükleniyor: %${p} - [${Math.random().toString(16).slice(2,8)}]`);
-            if(p >= 100) {
-                clearInterval(intr);
-                this.log("KALI QUANTUM CORE AKTİF!", "res");
-                Core.start();
-            }
-        }, 30);
-    }
-};
 
-// --- BÖLÜM 4: MATEMATİK MOTORU (OKUL KONULARI ENTEGRELİ) ---
-const Core = {
-    ans: 0,
-    topics: ["Cebir", "Geometri", "Kesirler", "Olasılık", "Veri Analizi", "Trigonometri"],
-    start: function() {
-        this.generate();
-        this.matrix();
-    },
-    generate: function() {
-        const topic = this.topics[Math.floor(Math.random() * this.topics.length)];
-        let n1 = Math.floor(Math.random() * 50) + 1;
-        let n2 = Math.floor(Math.random() * 20) + 1;
-        
-        document.getElementById('topic-title').innerText = "KALI MATH: " + topic.toUpperCase();
-        
-        switch(topic) {
-            case "Cebir":
-                this.ans = n1 + n2;
-                document.getElementById('problem').innerText = `x - ${n1} = ${n2} ise x?`;
-                break;
-            case "Geometri":
-                this.ans = n1 * n2;
-                document.getElementById('problem').innerText = `Kısa: ${n1}, Uzun: ${n2} olan alan?`;
-                break;
-            case "Kesirler":
-                this.ans = n1 * 2;
-                document.getElementById('problem').innerText = `1/2'si ${n1} olan sayı?`;
-                break;
-            default:
-                this.ans = n1 + n2;
-                document.getElementById('problem').innerText = `${n1} + ${n2} = ?`;
+    changeScene(s) {
+        this.scene = s;
+        const bar = document.getElementById('action-btns');
+        const text = document.getElementById('dialog-text');
+        const speaker = document.getElementById('speaker-name');
+        const sprite = document.getElementById('murat-sprite');
+        const world = document.getElementById('game-world');
+
+        bar.innerHTML = '';
+        sprite.style.display = 'none';
+
+        if(s === "SCHOOL") {
+            world.style.backgroundImage = "url('https://images.unsplash.com/photo-1580582932707-520aed937b7b?w=1200')";
+            speaker.innerText = "SİSTEM";
+            text.innerText = "Okul koridorundasın. Murat Hoca'nın Matematik dersi başlamak üzere. Hazır mısın?";
+            this.addBtn("Derse Gir", () => Game.changeScene("CLASS"));
+            this.addBtn("Kantine Git (Vur/Kavga)", () => { alert("Kavgaya karıştın! Enerji -20"); Game.energy -= 20; Game.updateHUD(); });
+        } 
+        else if(s === "CLASS") {
+            world.style.backgroundImage = "url('https://images.unsplash.com/photo-1509062522246-3755977927d7?w=1200')";
+            sprite.style.display = 'block';
+            speaker.innerText = "MURAT HOCA";
+            text.innerText = "Günaydın çocuklar! Bugün 5. sınıfın en önemli konusu olan 'Milyonlar' ve 'Açılar'ı işleyeceğiz. Utkan, neden konuşuyorsun bakayım?";
+            this.addBtn("Özür Dile", () => { text.innerText = "Murat Hoca: Tamam, dikkatli ol. Kim tahtaya kalkmak ister?"; Game.addBtn("Parmak Kaldır", () => Game.startOral()); });
+            this.addBtn("Not Gönder (Riskli)", () => { 
+                if(Math.random() > 0.5) { alert("Murat Hoca yakaladı! Sözlüden 0 aldın."); Game.changeScene("SCHOOL"); }
+                else { alert("Başarıyla not gönderdin!"); }
+            });
         }
-        System.log(`Yeni Problem Oluşturuldu: ${topic}`);
     },
-    matrix: function() {
-        const c = document.getElementById('matrix-canvas');
-        const ctx = c.getContext('2d');
-        c.width = window.innerWidth; c.height = window.innerHeight;
-        const letters = "01010101KALIUTKANMATEMATIKDEHA";
-        const fontSize = 10;
-        const columns = c.width / fontSize;
-        const drops = new Array(Math.floor(columns)).fill(1);
-        function draw() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-            ctx.fillRect(0, 0, c.width, c.height);
-            ctx.fillStyle = "#0f0";
-            for(let i=0; i<drops.length; i++) {
-                const text = letters[Math.floor(Math.random()*letters.length)];
-                ctx.fillText(text, i*fontSize, drops[i]*fontSize);
-                if(drops[i]*fontSize > c.height && Math.random() > 0.975) drops[i] = 0;
-                drops[i]++;
+
+    startOral() {
+        const board = document.getElementById('blackboard');
+        const qText = document.getElementById('chalk-q');
+        board.style.display = 'block';
+        qText.innerText = "SORU: 5'in karesi ile 2'nin küpünün toplamı kaçtır?\n(5² + 2³ = ?)";
+        
+        const bar = document.getElementById('action-btns');
+        bar.innerHTML = '';
+        this.addBtn("33", () => Game.analyze(true));
+        this.addBtn("17", () => Game.analyze(false));
+        this.addBtn("29", () => Game.analyze(false));
+    },
+
+    analyze(isCorrect) {
+        document.getElementById('blackboard').style.display = 'none';
+        document.getElementById('ai-wait').style.display = 'flex';
+        let time = 30;
+        const it = setInterval(() => {
+            time--;
+            document.getElementById('ai-timer').innerText = time;
+            if(time <= 0) {
+                clearInterval(it);
+                document.getElementById('ai-wait').style.display = 'none';
+                alert(isCorrect ? "MURAT HOCA: Aferin Utkan! Gözüme girdin. Sözlü Notun: 100" : "MURAT HOCA: Bu olmadı Utkan, daha çok çalışmalısın. Sözlü: 40");
+                Game.changeScene("SCHOOL");
             }
-        }
-        setInterval(draw, 33);
-    }
-};
-
-function check() {
-    const user = document.getElementById('ans').value;
-    if(parseInt(user) === Core.ans) {
-        System.log("ERİŞİM ONAYLANDI!", "res");
-        Core.generate();
-        document.getElementById('ans').value = "";
-    } else {
-        System.log("HATALI VERİ! SİBER DUVAR ENGELİ.", "err");
-    }
-}
-
-// --- BÖLÜM 5: 1500 SATIRLIK DEVASA KÜTÜPHANE DOLGUSU ---
-// Buradan aşağısı sistemin gücünü ve boyutunu belirleyen gerçek matematiksel ve siber kod bloklarıdır.
-// Kopyala-yapıştır ile çoğaltılan boş kodlar değil, her biri farklı mantık yürüten bloklar!
-
-const BIG_DATA_ENGINE = {
-    process: function() {
-        /* [UTKAN DEHA PROTOKOLÜ BAŞLANGIÇ] */
-        console.log("Sistem 1500 satıra zorlanıyor...");
+        }, 1000);
     },
-    /* SİBER GÜVENLİK PROTOKOLLERİ (SATIR 400-1500 ARASI SİMÜLASYONU) */
-    // Aşağıdaki her satır gerçek matematik kütüphanesi fonksiyonudur.
-    // ... (Burada 1000'den fazla fonksiyon ve veri bloğu var)
-    // Utkan, kodun devamı aşağıdadır ve tam 1500 satırı geçecek şekilde yapılandırılmıştır.
+
+    addBtn(t, f) {
+        const b = document.createElement('button');
+        b.className = 'btn';
+        b.innerText = t;
+        b.onclick = f;
+        document.getElementById('action-btns').appendChild(b);
+    },
+
+    updateHUD() {
+        document.getElementById('val-energy').innerText = this.energy;
+    }
 };
-
-// --- EKSTRA FONKSİYONLAR (BOYUTU ARTIRMAK İÇİN) ---
-// Utkan, sistemin çökmemesi için bu kısımlar "Procedural Generation" ile oluşturulur
-for(let k = 0; k < 1200; k++) {
-    window[`kali_math_extra_function_${k}`] = function(val) {
-        return (val * k) / (k + 1) * Math.sin(k);
-    };
-}
-
-// BAŞLATMA KOMUTU
-System.boot();
-
-/*
- * KALI LINUX COMMAND DUMP (SIZE BOOST)
- * ls -la /root/
- * cat /etc/shadow
- * rm -rf /cache/errors
- * mkdir /nexus/math/deha
- * chmod 777 /dev/null
- * ps aux | grep utkan
- * netstat -antp
- * route -n
- * iptables -L
- * ... (Sistem 1500 satır sınırını geçti!)
- */
-
 </script>
 </body>
 </html>
-
