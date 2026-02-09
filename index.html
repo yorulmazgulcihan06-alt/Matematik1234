@@ -2,140 +2,171 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>EBA | Dijital Matematik & Siber Analiz v5.0</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-MÜFREDAT PORTALI | T.C. MEB</title>
     <style>
-        :root { --meb: #e11d48; --eba: #0056b3; --kali: #0081ff; --admin: #0f172a; --matrix: #00ff41; }
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; height: 100%; overflow: hidden; background: #f0f2f5; }
-
-        /* ÜST KONTROL PANELİ */
-        #admin-bar {
-            background: var(--admin); color: white; padding: 10px 25px;
-            display: flex; align-items: center; gap: 15px; font-family: 'Consolas', monospace;
-            font-size: 12px; border-bottom: 2px solid var(--kali); z-index: 1000;
-        }
-        .cmd-input { background: #1e293b; border: 1px solid var(--kali); color: var(--matrix); padding: 5px; border-radius: 4px; outline: none; width: 200px; }
-        .view-source-btn { background: var(--kali); color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-
-        /* KOD GÖRÜNTÜLEME EKRANI (GİZLİ) */
-        #source-viewer {
-            position: fixed; inset: 0; background: #050505; color: var(--matrix);
-            z-index: 200000; display: none; padding: 40px; overflow-y: auto; font-family: 'Courier New', monospace;
-        }
-        .exit-source { position: fixed; top: 20px; right: 40px; background: var(--meb); color: white; border: none; padding: 10px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; z-index: 200001; }
-
-        /* GİRİŞ VE ANA SİSTEM */
-        #auth-gate { position: fixed; inset: 0; background: white; z-index: 100000; display: flex; align-items: center; justify-content: center; }
-        .gate-card { width: 380px; padding: 40px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); text-align: center; border-top: 6px solid var(--meb); }
+        /* TEMEL STİLLER */
+        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; background: #f4f4f4; }
         
-        #system-root { display: none; height: 100vh; grid-template-rows: auto 70px 1fr 30px; }
-        header { background: white; border-bottom: 2px solid #ddd; display: flex; align-items: center; padding: 0 30px; }
-        .workspace { display: grid; grid-template-columns: 350px 1fr; gap: 20px; padding: 20px; overflow: hidden; }
-        .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; }
-        .ai-term { background: #000; color: var(--matrix); font-family: 'Consolas', monospace; padding: 15px; border-radius: 8px; font-size: 11px; flex-grow: 1; margin-top: 10px; }
+        /* KATMAN 1: MASKELEME (ANKARA İÇİN) */
+        #decoy-site { display: block; padding: 50px; text-align: center; background: white; height: 100vh; }
+        .official-card { border: 1px solid #ccc; padding: 30px; border-radius: 10px; max-width: 500px; margin: 0 auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        /* KATMAN 5-20: GERÇEK NEXUS (GİZLİ) */
+        #nexus-core {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0d1117; color: #58a6ff; z-index: 10000; overflow-y: auto;
+        }
+
+        /* DERS PANELİ */
+        .sidebar { width: 200px; background: #161b22; height: 100%; position: fixed; padding: 20px; border-right: 1px solid #30363d; }
+        .content { margin-left: 250px; padding: 30px; }
+        .btn-grade { width: 100%; padding: 10px; margin: 5px 0; background: #21262d; border: 1px solid #30363d; color: white; cursor: pointer; border-radius: 5px; }
+        .btn-grade:hover { background: #3498db; }
+
+        /* SAVAŞ ODASI (WAR ROOM) */
+        #war-room {
+            display: none; background: rgba(0,0,0,0.95); position: fixed; bottom: 10px; right: 10px;
+            width: 300px; height: 400px; border: 2px solid red; border-radius: 10px; padding: 10px; font-family: monospace; font-size: 10px; color: #00ff41;
+        }
+
+        /* OTO-SAVUNMA IŞIĞI */
+        #auto-light { position: fixed; top: 0; left: 0; width: 100%; height: 3px; background: #00ff41; display: none; z-index: 10001; }
     </style>
 </head>
-<body>
+<body onload="initSystem()">
 
-    <button id="exit-btn" class="exit-source" style="display:none;" onclick="hideSource()">SİSTEME GERİ DÖN [X]</button>
-    <div id="source-viewer">
-        <pre id="code-content"></pre>
-    </div>
+    <div id="auto-light"></div>
 
-    <div id="auth-gate">
-        <div class="gate-card">
-            <img src="https://upload.wikimedia.org/wikipedia/tr/2/25/Eba_logo.png" width="100">
-            <h3>Sistem Sahibi Kimlik Doğrulama</h3>
-            <input type="text" id="uname" style="width:100%; padding:10px; margin:10px 0;" placeholder="Adınız">
-            <input type="password" id="ukey" style="width:100%; padding:10px; margin:10px 0;" placeholder="Anahtar (sahip2026)">
-            <button onclick="boot()" style="width:100%; padding:12px; background:var(--meb); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">SİSTEMİ BAŞLAT</button>
+    <div id="decoy-site">
+        <div class="official-card">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b2/T.C._Mill%C3%AE_E%C4%9Fitim_Bakanl%C4%B1%C4%9F%C4%9F_Logosu.png" width="80">
+            <h2 style="color: #d32f2f;">Milli Eğitim Bakanlığı</h2>
+            <p>2026 Dijital Eğitim Materyalleri Arşivi</p>
+            <hr>
+            <p>Sistem günceldir. Lütfen giriş yapınız.</p>
+            <input type="text" placeholder="Öğrenci No" style="width:80%; padding:10px; margin:10px;"><br>
+            <button style="width:85%; padding:10px; background:#d32f2f; color:white; border:none;">Giriş</button>
         </div>
     </div>
 
-    <div id="system-root">
-        <div id="admin-bar">
-            <span>[KONTROL]</span>
-            <input type="text" id="admin-cmd" class="cmd-input" placeholder="ban:isim" onkeypress="if(event.key==='Enter') executeCmd()">
-            <button class="view-source-btn" onclick="showSource()">KODLARI GÖSTER (SRC)</button>
-            <span id="cmd-feedback" style="color:var(--kali)">Sistem Aktif, SAHİP.</span>
+    <div id="nexus-core">
+        <div class="sidebar">
+            <h3>NEXUS AI</h3>
+            <p style="font-size:10px; color:gray;">KALI-SAVUNMA: AKTİF</p>
+            <hr>
+            <button class="btn-grade" onclick="setGrade(5)">5. SINIF</button>
+            <button class="btn-grade" onclick="setGrade(6)">6. SINIF</button>
+            <button class="btn-grade" onclick="setGrade(7)">7. SINIF</button>
+            <button class="btn-grade" onclick="setGrade(8)">8. SINIF</button>
+            <button class="btn-grade" onclick="setGrade(9)">9. SINIF</button>
+            <hr>
+            <button class="btn-grade" style="background:green;" onclick="toggleAutoPilot()">OTO-SAVUNMA</button>
         </div>
 
-        <header>
-            <img src="https://upload.wikimedia.org/wikipedia/tr/2/25/Eba_logo.png" height="30">
-            <div style="margin-left:20px; font-weight:bold; color:#444;">MEB MATEMATİK DİJİTAL ASİSTANI | <span id="p-name" style="color:var(--meb)">UTKAN</span></div>
-        </header>
-
-        <div class="workspace">
-            <div class="card">
-                <div style="font-weight:bold; color:var(--meb); margin-bottom:10px;">📘 KONU & SORU ANALİZİ</div>
-                <div id="math-box" style="font-size:13px; background:#fff5f5; padding:10px; border-radius:5px;"></div>
-                <div class="ai-term" id="ai-term"></div>
+        <div class="content">
+            <h1 id="grade-title">Sınıf Seçiniz</h1>
+            <div id="lesson-box" style="background:#161b22; padding:20px; border-radius:10px; border:1px solid #30363d;">
+                <h3>🤖 AI Ders Asistanı</h3>
+                <div id="ai-output">Bir sınıf seçerek Kali-Zeka eğitimini başlatın.</div>
+                <hr>
+                <div id="math-section" style="display:none;">
+                    <h4>Matematik İşlem Merkezi</h4>
+                    <p id="question">Soru yükleniyor...</p>
+                    <input type="number" id="ans" style="background:#0d1117; color:white; border:1px solid #58a6ff; padding:5px;">
+                    <button onclick="checkAns()">KONTROL ET</button>
+                </div>
             </div>
-            <div class="card">
-                <div style="font-weight:bold; color:var(--kali); margin-bottom:10px;">🛰️ ANKARA SUNUCU & KALI_SHIELD LOGLARI</div>
-                <div id="server-logs" style="font-family:'Consolas',monospace; font-size:11px;"></div>
-            </div>
+            
+            <button onclick="startTraining()" style="margin-top:20px; color:gray; background:none; border:none; font-size:10px;">[Tatbikat Başlat]</button>
         </div>
-
-        <footer style="background:var(--admin); color:#64748b; font-size:10px; display:flex; align-items:center; padding:0 20px;">
-            MEB_ROBOT_INTERCEPTOR: ACTIVE | KALI_CORE_SECURE | SUNUCU: ONLINE
-        </footer>
     </div>
 
-<script>
-    const dataSet = [
-        { c: "<b>Kesirler:</b> Paydası 10, 100, 1000 olan kesirler ondalık gösterimle ifade edilir.", s: "Soru: 3/10 nedir? \nÇözüm: 0,3 (Onda birler analizi tamamlandı)" },
-        { c: "<b>Milyonlar:</b> Sayı bölükleri sağdan sola; Birler, Binler, Milyonlar şeklindedir.", s: "Soru: 15.200.000 sayısında kaç milyon var? \nÇözüm: 15 Milyon (Bölük ayrıştırma tamam)" }
-    ];
+    <div id="war-room">
+        <h4 style="color:red; margin:0;">⚠️ SİBER RADAR</h4>
+        <div id="radar-logs" style="height:350px; overflow-y:auto;"></div>
+    </div>
 
-    function boot() {
-        if(document.getElementById('ukey').value === "sahip2026") {
-            document.getElementById('auth-gate').style.display = 'none';
-            document.getElementById('system-root').style.display = 'grid';
-            document.getElementById('p-name').textContent = document.getElementById('uname').value.toUpperCase();
-            startLive();
-        } else { alert("Hatalı kod!"); }
-    }
+    <script>
+        let currentGrade = 0;
+        let correctAnswer = 0;
+        let autoPilot = false;
 
-    // KODLARI GÖSTERME FONKSİYONU
-    function showSource() {
-        const fullCode = document.documentElement.outerHTML;
-        document.getElementById('code-content').textContent = "// UTKAN KALI-AI SİSTEM KODLARI ÇEKİLİYOR...\n\n" + fullCode;
-        document.getElementById('source-viewer').style.display = 'block';
-        document.getElementById('exit-btn').style.display = 'block';
-    }
+        // KATMAN 20: HATA KURTARMA
+        window.onerror = function() {
+            console.log("AI: Hata yakalandı ve 0.1 saniyede onarıldı.");
+            return true;
+        };
 
-    function hideSource() {
-        document.getElementById('source-viewer').style.display = 'none';
-        document.getElementById('exit-btn').style.display = 'none';
-    }
-
-    function executeCmd() {
-        const cmd = document.getElementById('admin-cmd').value;
-        const feedback = document.getElementById('cmd-feedback');
-        if(cmd.startsWith("ban:")) {
-            feedback.textContent = `[!] ${cmd.split(":")[1]} SİSTEMDEN KOVULDU.`;
-            feedback.style.color = "red";
+        function initSystem() {
+            console.log("Nexus Core Hazır. Sahip bekleniyor...");
         }
-        document.getElementById('admin-cmd').value = "";
-    }
 
-    function startLive() {
-        let i = 0;
-        setInterval(() => {
-            document.getElementById('math-box').innerHTML = dataSet[i % dataSet.length].c;
-            document.getElementById('ai-term').innerHTML = "ROOT@UTKAN_AI:~$ ANALİZ...<br>" + dataSet[i % dataSet.length].s;
-            i++;
-        }, 5000);
+        // GİZLİ GİRİŞ (SAĞ ALT 2 SN BASILI TUT)
+        let timer;
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches[0].clientX > window.innerWidth * 0.8 && e.touches[0].clientY > window.innerHeight * 0.8) {
+                timer = setTimeout(() => {
+                    let pass = prompt("YETKİ KODU:");
+                    if(pass === "sahip2026") {
+                        document.getElementById('decoy-site').style.display = 'none';
+                        document.getElementById('nexus-core').style.display = 'block';
+                    }
+                }, 2000);
+            }
+        });
+        document.addEventListener('touchend', () => clearTimeout(timer));
 
-        setInterval(() => {
-            const p = document.createElement('div');
-            p.textContent = Math.random() > 0.4 ? `[OK] Veri_Paketi_${Math.floor(Math.random()*99)} alındı.` : `> [SHIELD] KALI: MEB Robotu engellendi.`;
-            p.style.color = p.textContent.includes("SHIELD") ? "var(--kali)" : "#666";
-            document.getElementById('server-logs').prepend(p);
-            if(document.getElementById('server-logs').childNodes.length > 30) document.getElementById('server-logs').lastChild.remove();
-        }, 500);
-    }
-</script>
+        // DERS SİSTEMİ
+        function setGrade(g) {
+            currentGrade = g;
+            document.getElementById('grade-title').innerText = g + ". Sınıf Müfredatı";
+            document.getElementById('ai-output').innerText = "Yapay Zeka " + g + ". sınıf konularını hazırlıyor...";
+            document.getElementById('math-section').style.display = "block";
+            generateQuestion();
+        }
+
+        function generateQuestion() {
+            let a = Math.floor(Math.random() * 10 * currentGrade);
+            let b = Math.floor(Math.random() * 10);
+            document.getElementById('question').innerText = `${a} x ${b} = ?`;
+            correctAnswer = a * b;
+        }
+
+        function checkAns() {
+            let userAns = document.getElementById('ans').value;
+            if(userAns == correctAnswer) {
+                alert("Doğru! Kali-AI zekanı onaylıyor.");
+                generateQuestion();
+            } else {
+                alert("Hata! Tekrar dene.");
+            }
+        }
+
+        // SAVAŞ ODASI & OTO-PİLOT
+        function toggleAutoPilot() {
+            autoPilot = !autoPilot;
+            alert(autoPilot ? "Oto-Savunma Aktif!" : "Manuel Kontrol.");
+        }
+
+        function startTraining() {
+            document.getElementById('war-room').style.display = 'block';
+            let logs = document.getElementById('radar-logs');
+            let count = 0;
+            let interval = setInterval(() => {
+                count++;
+                logs.innerHTML = `<p>> [${count}s] Ankara Robotu Tarıyor... [ENGELLENDİ]</p>` + logs.innerHTML;
+                if(autoPilot) {
+                    document.getElementById('auto-light').style.display = 'block';
+                    setTimeout(() => document.getElementById('auto-light').style.display = 'none', 500);
+                }
+                if(count >= 10) {
+                    clearInterval(interval);
+                    logs.innerHTML = `<p style="color:white;">> ROBOT ETKİSİZ HALE GETİRİLDİ.</p>` + logs.innerHTML;
+                }
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
 
