@@ -3,150 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EBA | Nexus VISUAL-AI</title>
+    <title>Nexus Extreme | Utkan Edition</title>
     <style>
-        :root { --meb: #d32f2f; --nexus: #00ff41; --dark: #050505; }
-        body { margin: 0; background: #f0f2f5; font-family: sans-serif; overflow: hidden; }
+        :root { --nexus: #00ff41; --dark: #050505; --warn: #ffcc00; }
+        body { margin: 0; background: var(--dark); color: var(--nexus); font-family: 'Courier New', monospace; overflow: hidden; }
 
-        /* --- MASKE --- */
-        #mask { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* ANA PANEL */
+        #main-ui { height: 100vh; display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; }
 
-        /* --- NEXUS CORE --- */
-        #nexus { display: none; position: fixed; inset: 0; background: var(--dark); color: var(--nexus); z-index: 10000; padding: 20px; overflow-y: auto; }
-
-        /* --- VISUAL AI ROBOT --- */
-        .ai-display-frame {
-            width: 120px; height: 120px; background: #000; border: 3px solid var(--nexus);
-            border-radius: 15px; position: relative; margin: 0 auto 20px auto;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            box-shadow: 0 0 30px var(--nexus);
-            overflow: hidden; /* Gözlerin ve ağzın dışarı taşmasını engeller */
+        /* ROBOT GÖRSELİ */
+        .ai-visual {
+            width: 100px; height: 100px; border: 2px solid var(--nexus); border-radius: 20px;
+            margin: 0 auto 15px auto; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            box-shadow: 0 0 20px var(--nexus); position: relative;
         }
-        .ai-eye-line { width: 80%; height: 8px; background: #222; margin-bottom: 10px; border-radius: 4px; display: flex; justify-content: space-around; align-items: center; }
-        .ai-eye { width: 20px; height: 20px; background: var(--nexus); border-radius: 50%; box-shadow: 0 0 10px var(--nexus); transition: 0.2s; }
-        
-        .ai-mouth-line { width: 60%; height: 6px; background: #222; border-radius: 3px; }
-        .ai-mouth {
-            width: 40px; height: 6px; background: var(--nexus); position: absolute; bottom: 15px;
-            transition: 0.1s; border-radius: 3px;
-        }
-        /* Konuşma Animasyonları */
-        .talking .ai-mouth { height: 18px; border-radius: 50%; width: 30px; }
-        .talking .ai-eye { transform: scale(1.1); animation: eyePulse 0.8s infinite alternate; }
+        .eye { width: 15px; height: 15px; background: var(--nexus); border-radius: 50%; display: inline-block; margin: 5px; }
+        .mouth { width: 40px; height: 4px; background: var(--nexus); margin-top: 10px; transition: 0.1s; }
+        .talking .mouth { height: 15px; border-radius: 50%; }
 
-        @keyframes eyePulse {
-            from { opacity: 1; }
-            to { opacity: 0.7; transform: scale(0.9); }
+        /* BUTONLAR */
+        .btn-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .action-btn { 
+            background: transparent; border: 1px solid var(--nexus); color: var(--nexus); 
+            padding: 15px; cursor: pointer; font-weight: bold; font-size: 12px;
         }
+        .action-btn:active { background: var(--nexus); color: #000; }
 
-        .bubble {
-            background: #1a1a1a; padding: 15px; border-radius: 10px; border-left: 4px solid var(--nexus);
-            font-size: 14px; line-height: 1.6; margin-top: 10px; min-height: 50px; width: 100%;
+        /* HESAP MAKİNESİ (GÖRSELDEKİ GİBİ) */
+        #calc-overlay {
+            display: none; position: fixed; inset: 0; background: #fff; z-index: 20000;
+            flex-direction: column; color: #000; font-family: sans-serif;
         }
+        .calc-display { height: 30%; background: #f4f4f4; text-align: right; padding: 40px 20px; font-size: 48px; }
+        .calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); height: 70%; }
+        .calc-btn { border: 1px solid #eee; display: flex; justify-content: center; align-items: center; font-size: 24px; background: #fff; }
+        .calc-btn.orange { color: #ff9500; }
 
-        .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .btn {
-            background: transparent; border: 1px solid var(--nexus); color: var(--nexus);
-            padding: 12px; cursor: pointer; border-radius: 5px; font-weight: bold; font-size: 11px;
+        /* SORU ALANI */
+        #quest-box { 
+            flex-grow: 1; border: 1px dashed var(--nexus); margin: 15px 0; 
+            padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; font-size: 18px;
         }
-        .btn:active { background: var(--nexus); color: #000; }
-
-        #fix { position: fixed; top: 0; width: 100%; height: 3px; background: var(--nexus); display: none; z-index: 10001; }
+        #ans-input { 
+            background: #000; border: 1px solid var(--warn); color: var(--warn); 
+            padding: 10px; width: 100%; text-align: center; font-size: 20px; margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-<div id="fix"></div>
-
-<div id="mask">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b2/T.C._Mill%C3%AE_E%C4%9Fitim_Bakanl%C4%B1%C4%9F%C4%9F_Logosu.png" width="80">
-    <h2 style="color:#333">EBA Giriş</h2>
-    <button onclick="alert('Lütfen dokunmatik şifreyi giriniz.')" style="background:var(--meb); color:white; border:none; padding:15px 40px; border-radius:8px;">SİSTEMİ AÇ</button>
-</div>
-
-<div id="nexus">
-    <div class="ai-display-frame" id="ai-frame">
-        <div class="ai-eye-line">
-            <div class="ai-eye"></div>
-            <div class="ai-eye"></div>
+<div id="main-ui">
+    <div class="ai-visual" id="robot">
+        <div style="display:flex;">
+            <div class="eye"></div>
+            <div class="eye"></div>
         </div>
-        <div class="ai-mouth-line"></div>
-        <div id="ai-mouth" class="ai-mouth"></div>
+        <div class="mouth" id="mouth"></div>
     </div>
-    <div id="ai-status" style="font-size: 10px; margin-top: 5px; color: #555; text-align: center;">SİSTEM: ÇEVRİMİÇİ</div>
-    <div id="chat-bubble" class="bubble">Merhaba Utkan! Bugün hangi konuyu öğrenmek istersin?</div>
+
+    <div id="quest-box">
+        <div id="q-text">Soru üretmek için bir konuya tıkla Utkan!</div>
+        <input type="number" id="ans-input" placeholder="Cevabın?">
+    </div>
 
     <div class="btn-grid">
-        <button class="btn" onclick="aiTeach('cebir')">CEBİRSEL İFADELER</button>
-        <button class="btn" onclick="aiTeach('geo')">GEOMETRİ VE ALAN</button>
-        <button class="btn" onclick="aiTeach('frac')">KESİRLER MANTIĞI</button>
-        <button class="btn" onclick="aiTeach('stat')">VERİ ANALİZİ</button>
+        <div class="btn-container">
+            <button class="action-btn" onclick="generateProblem('cebir')">CEBİR SINAVI</button>
+            <button class="action-btn" onclick="openCalc()">HESAP MAKİNESİ</button>
+            <button class="action-btn" onclick="generateProblem('geo')">GEOMETRİ PROB.</button>
+            <button class="action-btn" onclick="generateProblem('prob')">OLASILIK TESTİ</button>
+        </div>
+        <button class="action-btn" style="width:100%; margin-top:10px; border-color:var(--warn); color:var(--warn);" onclick="checkAns()">CEVABI KONTROL ET</button>
     </div>
+</div>
 
-    <div style="margin-top:20px; font-size: 10px; color: #333; text-align: center;">
-        [SECURITY: KALI-CORE] [MODE: VISUAL_ENABLED]
+<div id="calc-overlay">
+    <div style="padding: 10px; font-weight: bold; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between;">
+        <span>Hesaplayıcı</span>
+        <span onclick="closeCalc()" style="color:red; cursor:pointer;">KAPAT [X]</span>
+    </div>
+    <div class="calc-display">0</div>
+    <div class="calc-grid">
+        <div class="calc-btn orange">AC</div><div class="calc-btn orange">⌫</div><div class="calc-btn orange">%</div><div class="calc-btn orange">÷</div>
+        <div class="calc-btn">7</div><div class="calc-btn">8</div><div class="calc-btn">9</div><div class="calc-btn orange">×</div>
+        <div class="calc-btn">4</div><div class="calc-btn">5</div><div class="calc-btn">6</div><div class="calc-btn orange">-</div>
+        <div class="calc-btn">1</div><div class="calc-btn">2</div><div class="calc-btn">3</div><div class="calc-btn orange">+</div>
+        <div class="calc-btn">π</div><div class="calc-btn">0</div><div class="calc-btn">,</div><div class="calc-btn" style="background:#ff9500; color:#fff;">=</div>
     </div>
 </div>
 
 <script>
-    let combo = "";
-    const aiFrame = document.getElementById('ai-frame');
-    const aiMouth = document.getElementById('ai-mouth');
-    const chatBubble = document.getElementById('chat-bubble');
-
-    // GİZLİ GİRİŞ: 3 SAĞ ÜST + 1 SOL ALT
-    document.addEventListener('touchstart', (e) => {
-        const x = e.touches[0].clientX; const y = e.touches[0].clientY;
-        if(x > window.innerWidth*0.7 && y < 200) combo += "1";
-        if(x < 200 && y > window.innerHeight*0.7) combo += "2";
-        if(combo === "1112") {
-            document.getElementById('mask').style.display = 'none';
-            document.getElementById('nexus').style.display = 'block';
-            speak("Sistem aktif. Hoş geldin Utkan.");
-            combo = ""; // Giriş sonrası sıfırla
-        }
-        setTimeout(() => { if(combo.length > 0 && combo !== "1112") combo = ""; }, 5000);
-    });
-
-    const data = {
-        'cebir': "Cebirsel ifadeler, bilinmeyen değerleri harflerle temsil etme sanatıdır. Örneğin iki x artı beş ifadesinde, x her şey olabilir. Denklemi çözerken x'i yalnız bırakmalısın.",
-        'geo': "Geometri dünyayı ölçmektir. Dikdörtgenin alanı, taban ile yüksekliğin çarpımıdır. Unutma, her kapalı şeklin bir alanı ve bir çevresi vardır. Üçgenin alanı ise taban çarpı yükseklik bölü ikidir.",
-        'frac': "Kesirler, bir bütünün parçalarını gösterir. Pay, elimizdeki parça sayısını; payda ise bütünün kaça bölündüğünü gösterir. Pasta dilimleri gibi düşünebilirsin!",
-        'stat': "Veri analizi, sayıların dilini anlamaktır. Aritmetik ortalama bulmak için tüm sayıları topla ve sayı adetine böl. Grafikler ise verileri görselleştirmek için kullanılır."
-    };
-
-    function aiTeach(topic) {
-        const text = data[topic];
-        chatBubble.innerText = text;
-        speak(text);
-    }
+    let currentAns = 0;
+    const robot = document.getElementById('robot');
+    const mouth = document.getElementById('mouth');
 
     function speak(text) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'tr-TR';
-        utterance.rate = 1.0;
-
-        utterance.onstart = () => {
-            aiFrame.classList.add('talking'); // Çerçeveye konuşma sınıfını ekle
-            document.getElementById('ai-status').innerText = "SİSTEM: KONUŞUYOR...";
-        };
-
-        utterance.onend = () => {
-            aiFrame.classList.remove('talking'); // Konuşma bitince sınıfı kaldır
-            document.getElementById('ai-status').innerText = "SİSTEM: DİNLİYOR...";
-        };
-
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.lang = 'tr-TR';
+        msg.onstart = () => robot.classList.add('talking');
+        msg.onend = () => robot.classList.remove('talking');
         window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(utterance);
+        window.speechSynthesis.speak(msg);
     }
 
-    // 0.1 SN HATA ONARIM IŞIĞI
-    window.onerror = function() {
-        const f = document.getElementById('fix');
-        f.style.display = 'block';
-        setTimeout(() => f.style.display = 'none', 100);
-        return true;
-    };
+    function generateProblem(type) {
+        let q = "";
+        let a = Math.floor(Math.random() * 20) + 5;
+        let b = Math.floor(Math.random() * 10) + 2;
+
+        if(type === 'cebir') {
+            q = `Denklem: 4x - ${a} = ${4 * b - a}. x kaçtır?`;
+            currentAns = b;
+        } else if(type === 'geo') {
+            q = `Bir dikdörtgenin alanı ${a * b} ve kısa kenarı ${b} ise uzun kenarı kaçtır?`;
+            currentAns = a;
+        } else if(type === 'prob') {
+            q = `Bir torbada 3 kırmızı, ${b} mavi top var. Rastgele çekilen topun mavi olma olasılığı paydası kaçtır?`;
+            currentAns = 3 + b;
+        }
+        
+        document.getElementById('q-text').innerText = q;
+        speak("Yeni problem oluşturuldu: " + q);
+    }
+
+    function checkAns() {
+        const user = document.getElementById('ans-input').value;
+        if(user == currentAns) {
+            speak("Harika Utkan! Doğru cevap.");
+            document.getElementById('q-text').innerText = "DOĞRU! Yeni soruya geçebilirsin.";
+        } else {
+            speak("Hatalı sonuç. Tekrar dene.");
+        }
+    }
+
+    function openCalc() { document.getElementById('calc-overlay').style.display = 'flex'; }
+    function closeCalc() { document.getElementById('calc-overlay').style.display = 'none'; }
 </script>
 </body>
 </html>
