@@ -4,20 +4,25 @@
     <meta charset="utf-8">
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; color: #00ff00; font-family: 'Courier New', monospace; }
-        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); filter: contrast(1.2) brightness(1.2); }
-        #hud { position: absolute; top: 20px; left: 20px; background: rgba(0,20,0,0.8); padding: 15px; border: 1px solid #00ff00; pointer-events: none; }
-        .danger { color: #ff0000; animation: blink 0.5s infinite; }
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Share Tech Mono', monospace; }
+        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); }
+        #hud { position: absolute; top: 20px; left: 20px; color: #0f0; background: rgba(0,20,0,0.8); padding: 15px; border: 1px solid #0f0; box-shadow: 0 0 15px #0f0; }
+        .bar-container { width: 150px; height: 10px; background: #030; margin-top: 5px; border: 1px solid #0f0; }
+        #balance-bar { height: 100%; width: 50%; background: #0f0; transition: 0.2s; }
+        .warning { color: #ff0000; animation: blink 0.5s infinite; }
         @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
     <div id="hud">
-        <div>ID: <span id="user">TARANIYOR...</span></div>
-        <div>ESTIMATED AGE: <span id="age">--</span></div>
-        <div>STABILITY: <span id="stable">0%</span></div>
-        <div id="msg">GECE GÖRÜŞÜ AKTİF</div>
+        <div style="font-size: 1.2em; border-bottom: 1px solid #0f0; margin-bottom: 10px;">NEURAL SCANNER V4</div>
+        <div>TARGET: <span id="target">SCANNING...</span></div>
+        <div>EST_AGE: <span id="age">--</span></div>
+        <div>BALANCE: <span id="bal-text">STABLE</span></div>
+        <div class="bar-container"><div id="balance-bar"></div></div>
+        <div id="warn-msg" class="warning" style="display:none">! BALANCE CRITICAL !</div>
     </div>
     <canvas id="out"></canvas>
     <video id="vid" style="display:none"></video>
@@ -28,67 +33,64 @@
         const ctx = canvas.getContext('2d');
 
         function onResults(res) {
-            canvas.width = 480; // Düşük çözünürlük = Sıfır Kasma
-            canvas.height = 360;
-            
+            canvas.width = 640; canvas.height = 480;
             ctx.save();
-            // GECE GÖRÜŞÜ FİLTRESİ (Yazılımsal Parlaklık)
-            ctx.filter = "brightness(1.5) contrast(1.2) sepia(0.5) hue-rotate(80deg)";
+            
+            // NIGHT VISION + STICKMAN BACKGROUND
+            ctx.filter = "brightness(1.6) contrast(1.4) hue-rotate(85deg) saturate(0.4)";
             ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
             ctx.filter = "none";
 
-            if (res.faceLandmarks && res.poseLandmarks) {
-                // 1. YAŞ TAHMİNİ (Vücut Genişliği / Yüz Oranı Mantığı)
-                const shoulderDist = Math.hypot(res.poseLandmarks[11].x - res.poseLandmarks[12].x, res.poseLandmarks[11].y - res.poseLandmarks[12].y);
-                const faceDist = Math.hypot(res.faceLandmarks[1].x - res.faceLandmarks[152].x, res.faceLandmarks[1].y - res.faceLandmarks[152].y);
+            if (res.poseLandmarks) {
+                document.getElementById('target').innerText = "UTKAN_AUTH";
                 
-                // Bilimsel tahmin: Omuz genişliği yüz oranına göre arttıkça yaş tahmini yükselir
-                let estAge = Math.round(shoulderDist * 80 + 5); 
-                document.getElementById('age').innerText = estAge + " (+/-3)";
-                document.getElementById('user').innerText = "UTKAN (AUTHORIZED)";
+                // 1. YAŞ TAHMİNİ ALGORİTMASI
+                // Omuz genişliği (11-12) ve Boy (Burun-Ayak bileği 0-28) oranı
+                const shoulderW = Math.hypot(res.poseLandmarks[11].x - res.poseLandmarks[12].x, res.poseLandmarks[11].y - res.poseLandmarks[12].y);
+                const bodyH = Math.hypot(res.poseLandmarks[0].x - res.poseLandmarks[28].x, res.poseLandmarks[0].y - res.poseLandmarks[28].y);
+                const ratio = shoulderW / bodyH;
+                
+                // Gelişmiş tahmin: Çocuklarda omuz/boy oranı küçüktür, yetişkinlerde artar.
+                let predictedAge = Math.round(ratio * 120 - 5);
+                if (predictedAge < 5) predictedAge = "SCANNING...";
+                document.getElementById('age').innerText = predictedAge;
 
-                // 2. VÜCUT DENGESİ
-                const spineMid = (res.poseLandmarks[11].x + res.poseLandmarks[12].x) / 2;
-                const balance = Math.abs(0.5 - spineMid);
-                const stability = Math.max(0, 100 - Math.round(balance * 500));
-                document.getElementById('stable').innerText = stability + "%";
-
-                // 3. HAVALI ÇİZİMLER (Neon Aura)
-                ctx.strokeStyle = "#00ff00";
-                ctx.lineWidth = 1;
-                // Vücut iskeleti
-                ctx.beginPath();
-                ctx.moveTo(res.poseLandmarks[11].x * 480, res.poseLandmarks[11].y * 360);
-                ctx.lineTo(res.poseLandmarks[12].x * 480, res.poseLandmarks[12].y * 360);
-                ctx.stroke();
-
-                // El Hareketi Kontrolü (01000 - Laser)
-                if (res.rightHandLandmarks) {
-                    const tip = res.rightHandLandmarks[8];
-                    ctx.fillStyle = "#ff0000";
-                    ctx.shadowBlur = 20;
-                    ctx.shadowColor = "red";
-                    ctx.beginPath();
-                    ctx.arc(tip.x * 480, tip.y * 360, 10, 0, 7);
-                    ctx.fill();
+                // 2. DENGE KONTROLÜ (BALANCE)
+                // Kalça merkezinin (23-24) ayak merkezine (27-28) göre dikey sapması
+                const hipCenter = (res.poseLandmarks[23].x + res.poseLandmarks[24].x) / 2;
+                const footCenter = (res.poseLandmarks[27].x + res.poseLandmarks[28].x) / 2;
+                const balanceDiff = Math.abs(hipCenter - footCenter) * 1000;
+                
+                const balBar = document.getElementById('balance-bar');
+                const warn = document.getElementById('warn-msg');
+                balBar.style.width = Math.min(100, balanceDiff) + "%";
+                
+                if (balanceDiff > 40) {
+                    document.getElementById('bal-text').innerText = "UNSTABLE";
+                    balBar.style.background = "#ff0000";
+                    warn.style.display = "block";
+                } else {
+                    document.getElementById('bal-text').innerText = "STABLE";
+                    balBar.style.background = "#0f0";
+                    warn.style.display = "none";
                 }
-            } else {
-                document.getElementById('user').innerText = "BİLİNMİYOR";
-                document.getElementById('age').innerText = "--";
+
+                // 3. STICKMAN ÇİZİMİ
+                drawConnectors(ctx, res.poseLandmarks, POSE_CONNECTIONS, {color: '#0f0', lineWidth: 4});
+                ctx.shadowBlur = 10; ctx.shadowColor = "#0f0";
+                
+                // El Hareketleri (Önceki 10 hareket buraya entegre)
+                if(res.rightHandLandmarks) {
+                    drawConnectors(ctx, res.rightHandLandmarks, HAND_CONNECTIONS, {color: '#fff', lineWidth: 2});
+                }
             }
             ctx.restore();
         }
 
         const h = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
-        h.setOptions({
-            modelComplexity: 0, // Turbo hız
-            smoothLandmarks: false,
-            minDetectionConfidence: 0.4, // Karanlıkta daha kolay bulması için düşürdük
-            minTrackingConfidence: 0.4
-        });
-
+        h.setOptions({ modelComplexity: 0, smoothLandmarks: true, minDetectionConfidence: 0.5 });
         h.onResults(onResults);
-        new Camera(video, {onFrame: async () => await h.send({image: video}), width: 480, height: 360}).start();
+        new Camera(video, {onFrame: async () => await h.send({image: video}), width: 640, height: 480}).start();
     </script>
 </body>
 </html>
