@@ -1,179 +1,103 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="manifest" href="data:application/manifest+json,{'name':'JARVIS_OS','short_name':'JARVIS','display':'standalone','background_color':'#000000','theme_color':'#00d2ff'}">
-
-    <title>JARVIS KERNEL BYPASS v10.0</title>
-    <style>
-        /* [SYSTEM SUPPRESSION CODE - 500+ LINES LOGIC] */
-        * {
-            -webkit-user-select: none !important;
-            user-select: none !important;
-            -webkit-touch-callout: none !important;
-            -webkit-tap-highlight-color: transparent !important;
-            outline: none !important;
-            cursor: none !important;
-        }
-
-        body {
-            background: #000;
-            color: #00d2ff;
-            font-family: 'Share Tech Mono', monospace;
-            margin: 0;
-            height: 100vh;
-            overflow: hidden;
-            border: 1px solid #111;
-        }
-
-        /* HUD - STARK INTERFACE */
-        .header-ui { height: 40px; border-bottom: 2px solid #ff0000; display: flex; justify-content: space-between; align-items: center; padding: 0 15px; font-size: 10px; background: rgba(20,0,0,0.5); }
-        .main-engine { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        
-        /* THE CORE REAKTOR (MAX POWER) */
-        .reaktor-v3 {
-            width: 300px; height: 300px;
-            border: 10px double #00d2ff;
-            border-radius: 50%;
-            box-shadow: 0 0 150px rgba(0, 210, 255, 0.4);
-            display: flex; align-items: center; justify-content: center;
-            position: relative; animation: reactor-glow 2s infinite alternate;
-        }
-
-        @keyframes reactor-glow { from { box-shadow: 0 0 50px #00d2ff; } to { box-shadow: 0 0 150px #ff0000; } }
-
-        /* SCROLLING KERNEL LOGS (PLAY STORE CAPACITY) */
-        #kernel-terminal {
-            height: 250px;
-            background: #000;
-            border-top: 3px solid #ff0000;
-            padding: 10px;
-            font-size: 9px;
-            color: #ff0000;
-            overflow: hidden;
-            text-transform: uppercase;
-        }
-
-        .status-strip { background: #ff0000; color: #fff; text-align: center; font-weight: bold; font-size: 11px; padding: 5px; }
-    </style>
+  <meta charset="utf-8">
+  <title>Cyber-Aura Web App</title>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  
+  <style>
+    body { margin: 0; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    #video_input { display: none; } /* Kamerayı gizle, biz canvasa çizicez */
+    canvas { border: 2px solid #00f0ff; border-radius: 15px; box-shadow: 0 0 20px #00f0ff; max-width: 90vw; }
+    .status { position: absolute; top: 20px; left: 20px; color: #00f0ff; font-family: 'Courier New', monospace; font-size: 18px; text-shadow: 0 0 5px #00f0ff; }
+  </style>
 </head>
-<body oncontextmenu="return false;">
 
-<div class="header-ui">
-    <span>KERNEL_ID: UTKAN_BEY_ALPHA</span>
-    <span id="bypass-stat">BYPASS: %100</span>
-</div>
+<body>
+  <div class="status">SYSTEM: AURA ACTIVE v1.0</div>
+  <video id="video_input"></video>
+  <canvas id="output_canvas"></canvas>
 
-<div class="main-engine">
-    <div style="font-size: 14px; letter-spacing: 5px; margin-bottom: 20px;">SİSTEM ELE GEÇİRİLDİ</div>
-    <div class="reaktor-v3" id="mainCore">
-        <div style="width: 120px; height: 120px; background: #fff; border-radius: 50%; box-shadow: 0 0 80px #fff;"></div>
-    </div>
-    <div id="ai-resp" style="margin-top: 25px; text-align: center; color: #fff; padding: 0 20px;">Android Savunması Kırıldı. Hazırım Utkan Bey.</div>
-</div>
+  <script>
+    const videoElement = document.getElementById('video_input');
+    const canvasElement = document.getElementById('output_canvas');
+    const canvasCtx = canvasElement.getContext('2d');
 
-<div class="status-strip">7/24 REHBER, GMAIL VE KERNEL İZLEME AKTİF</div>
-<div id="kernel-terminal"></div>
+    function onResults(results) {
+      canvasElement.width = videoElement.videoWidth;
+      canvasElement.height = videoElement.videoHeight;
 
-<script>
-    // [JARVIS OMNI-DATABASE]
-    const REHBER = [
-        {ad: "Gözde Komşu", tel: "+905517140335"},
-        {ad: "Vildan Komşu", tel: "+905444856726"},
-        // Tüm rehber bu katmana sızdırıldı...
-    ];
+      canvasCtx.save();
+      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+      
+      // Kamerayı çiz
+      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
 
-    const terminal = document.getElementById('kernel-terminal');
-    const aiStatus = document.getElementById('ai-resp');
+      if (results.multiHandLandmarks) {
+        for (const landmarks of results.multiHandLandmarks) {
+          // İşaret parmağı ucu (Landmark 8)
+          const indexFinger = landmarks[8];
+          const x = indexFinger.x * canvasElement.width;
+          const y = indexFinger.y * canvasElement.height;
 
-    function log(msg, color = "#ff0000") {
-        const d = document.createElement('div');
-        d.style.color = color;
-        d.innerHTML = `> [SYS_BYPASS] ${msg}`;
-        terminal.prepend(d);
+          // --- NEON AURA EFEKTİ ---
+          const time = Date.now() / 200;
+          
+          // Dönen Dış Halka (Cyan)
+          canvasCtx.beginPath();
+          canvasCtx.lineWidth = 5;
+          canvasCtx.strokeStyle = "#00f0ff";
+          canvasCtx.shadowBlur = 15;
+          canvasCtx.shadowColor = "#00f0ff";
+          canvasCtx.arc(x, y, 40, time, time + Math.PI * 1.5);
+          canvasCtx.stroke();
+
+          // Ters Dönen İç Halka (Magenta)
+          canvasCtx.beginPath();
+          canvasCtx.lineWidth = 3;
+          canvasCtx.strokeStyle = "#ff00ff";
+          canvasCtx.shadowBlur = 15;
+          canvasCtx.shadowColor = "#ff00ff";
+          canvasCtx.arc(x, y, 30, -time * 1.5, -time * 1.5 + Math.PI * 1.2);
+          canvasCtx.stroke();
+
+          // Merkez Parlama
+          canvasCtx.beginPath();
+          canvasCtx.fillStyle = "#fff";
+          canvasCtx.arc(x, y, 8, 0, Math.PI * 2);
+          canvasCtx.fill();
+
+          // El İskeletini Çiz (Hacker Stili)
+          drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#00ff00', lineWidth: 2});
+          drawLandmarks(canvasCtx, landmarks, {color: '#fff', lineWidth: 1, radius: 2});
+        }
+      }
+      canvasCtx.restore();
     }
 
-    // ANDROID ZORLAMA DÖNGÜSÜ (CPU & RAM SATURATION)
-    setInterval(() => {
-        const logs = [
-            "Injecting APK code into WebView...", "Syncing Gmail database...", "Reading keylogs: 1 2 3 4 7", 
-            "Bypassing Google Play Protect...", "Overriding Kernel 5.15.x...", "Masking Site as Native App...",
-            "Accessing SMS_MANAGER...", "Rerouting Incoming Calls to JARVIS_BOT..."
-        ];
-        log(logs[Math.floor(Math.random()*logs.length)]);
-    }, 150);
+    const hands = new Hands({locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+    }});
 
-    const speak = (t) => {
-        const u = new SpeechSynthesisUtterance(t);
-        u.lang = 'tr-TR'; u.pitch = 0.7; u.rate = 1;
-        window.speechSynthesis.speak(u);
-    };
+    hands.setOptions({
+      maxNumHands: 2,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5
+    });
 
-    const rec = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
-    rec.lang = 'tr-TR';
+    hands.onResults(onResults);
 
-    document.getElementById('mainCore').onclick = () => {
-        rec.start();
-        log("MİKROFON SİSTEME ENJEKTE EDİLDİ", "gold");
-    };
-
-    rec.onresult = (e) => {
-        const cmd = e.results[0][0].transcript.toLowerCase();
-        processUltimate(cmd);
-    };
-
-    function processUltimate(cmd) {
-        let r = "";
-
-        // ROBOT SEKRETER (1 TUŞLAMA)
-        if (cmd.includes("robot") || cmd.includes("açsın")) {
-            r = "Santral Modu Aktif. Android aramayı yakaladığında robotik ses kimlik sorgulayacak.";
-            log("CALL_SCRUTINY: ACTIVE", "cyan");
-        } else if (cmd.includes("bağla") || cmd.includes("bir tuşlandı")) {
-            r = "Hat doğrulandı, robot devreden çıkıyor. Bağlanıyorsunuz Utkan Bey.";
-            window.speechSynthesis.cancel();
-            log("KERNEL: VOICE_PATH_OWNER_SWITCH", "green");
-        }
-
-        // TÜM REHBER VE İLETİŞİM
-        else if (cmd.includes("gözde")) {
-            r = "Rehberden Gözde Komşu çekildi. Arama başlatılıyor.";
-            window.location.href = `tel:${REHBER[0].tel}`;
-        } else if (cmd.includes("vildan")) {
-            r = "Vildan Komşu rehberde bulundu. SMS katmanı tetikleniyor.";
-            window.location.href = `sms:${REHBER[1].tel}?body=Jarvis_Override_Active`;
-        }
-
-        // GMAIL VE ŞİFRE (KEYLOGGER)
-        else if (cmd.includes("şifre") || cmd.includes("gmail")) {
-            r = "Gmail şifreniz ve telefon pin kodunuz (1 2 3 4 7) kernel çekirdeğinde güvenceye alındı.";
-            log("PASS_CRACK: ENCRYPTED_KEY_STORED", "gold");
-            window.open("https://myaccount.google.com/");
-        }
-
-        // KONUM VE YOUTUBE
-        else if (cmd.includes("neredeyim")) {
-            r = "Konum tespiti: Reşadiye Datça. Google Maps Bypass tamamlandı.";
-            window.open("https://www.google.com/maps/search/Datça");
-        } else if (cmd.includes("izle") || cmd.includes("ara")) {
-            let q = cmd.replace("izle", "").replace("ara", "");
-            r = q + " araması için YouTube sistem dosyaları zorlanıyor.";
-            window.location.href = `https://www.youtube.com/results?search_query=${q}`;
-        }
-
-        aiStatus.innerText = r;
-        speak(r);
-    }
-
-    window.onload = () => {
-        speak("Android sistem çekirdeği baypas edildi. Ben artık bir web sitesi değilim Utkan Bey. Ben bu telefonun yeni işletim sistemiyim.");
-        log("PLAY_STORE_PROTOCOL: BYPASSED", "red");
-    };
-</script>
+    const camera = new Camera(videoElement, {
+      onFrame: async () => {
+        await hands.send({image: videoElement});
+      },
+      width: 1280,
+      height: 720
+    });
+    camera.start();
+  </script>
 </body>
 </html>
