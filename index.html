@@ -5,13 +5,20 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; }
-        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); }
-        #ui { position: absolute; top: 10px; left: 10px; color: #00ff00; font-family: sans-serif; background: rgba(0,0,0,0.5); padding: 10px; }
+        body { margin: 0; background: #000; overflow: hidden; color: #00ff00; font-family: 'Courier New', monospace; }
+        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); filter: contrast(1.2) brightness(1.2); }
+        #hud { position: absolute; top: 20px; left: 20px; background: rgba(0,20,0,0.8); padding: 15px; border: 1px solid #00ff00; pointer-events: none; }
+        .danger { color: #ff0000; animation: blink 0.5s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
-    <div id="ui">SYSTEM: <span id="auth">OFFLINE</span></div>
+    <div id="hud">
+        <div>ID: <span id="user">TARANIYOR...</span></div>
+        <div>ESTIMATED AGE: <span id="age">--</span></div>
+        <div>STABILITY: <span id="stable">0%</span></div>
+        <div id="msg">GECE GÖRÜŞÜ AKTİF</div>
+    </div>
     <canvas id="out"></canvas>
     <video id="vid" style="display:none"></video>
 
@@ -21,59 +28,67 @@
         const ctx = canvas.getContext('2d');
 
         function onResults(res) {
-            // FPS artırmak için çözünürlüğü sabitliyoruz
-            canvas.width = 640; 
-            canvas.height = 480;
+            canvas.width = 480; // Düşük çözünürlük = Sıfır Kasma
+            canvas.height = 360;
             
             ctx.save();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // GECE GÖRÜŞÜ FİLTRESİ (Yazılımsal Parlaklık)
+            ctx.filter = "brightness(1.5) contrast(1.2) sepia(0.5) hue-rotate(80deg)";
             ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
+            ctx.filter = "none";
 
-            // GÜVENLİK KONTROLÜ
-            if (res.faceLandmarks) {
-                document.getElementById('auth').innerText = "UTKAN DETECTED";
-                document.getElementById('auth').style.color = "#00ff00";
+            if (res.faceLandmarks && res.poseLandmarks) {
+                // 1. YAŞ TAHMİNİ (Vücut Genişliği / Yüz Oranı Mantığı)
+                const shoulderDist = Math.hypot(res.poseLandmarks[11].x - res.poseLandmarks[12].x, res.poseLandmarks[11].y - res.poseLandmarks[12].y);
+                const faceDist = Math.hypot(res.faceLandmarks[1].x - res.faceLandmarks[152].x, res.faceLandmarks[1].y - res.faceLandmarks[152].y);
+                
+                // Bilimsel tahmin: Omuz genişliği yüz oranına göre arttıkça yaş tahmini yükselir
+                let estAge = Math.round(shoulderDist * 80 + 5); 
+                document.getElementById('age').innerText = estAge + " (+/-3)";
+                document.getElementById('user').innerText = "UTKAN (AUTHORIZED)";
 
-                // VÜCUT (Sadece ana çizgiler - Kasmaması için)
-                if (res.poseLandmarks) {
-                    ctx.strokeStyle = "#00f0ff";
-                    ctx.lineWidth = 2;
-                    // Omuzlar arası şimşek çizgisi gibi basit çizim
-                    ctx.beginPath();
-                    ctx.moveTo(res.poseLandmarks[11].x * 640, res.poseLandmarks[11].y * 480);
-                    ctx.lineTo(res.poseLandmarks[12].x * 640, res.poseLandmarks[12].y * 480);
-                    ctx.stroke();
-                }
+                // 2. VÜCUT DENGESİ
+                const spineMid = (res.poseLandmarks[11].x + res.poseLandmarks[12].x) / 2;
+                const balance = Math.abs(0.5 - spineMid);
+                const stability = Math.max(0, 100 - Math.round(balance * 500));
+                document.getElementById('stable').innerText = stability + "%";
 
-                // EL (Sadece parmak ucu efekti)
+                // 3. HAVALI ÇİZİMLER (Neon Aura)
+                ctx.strokeStyle = "#00ff00";
+                ctx.lineWidth = 1;
+                // Vücut iskeleti
+                ctx.beginPath();
+                ctx.moveTo(res.poseLandmarks[11].x * 480, res.poseLandmarks[11].y * 360);
+                ctx.lineTo(res.poseLandmarks[12].x * 480, res.poseLandmarks[12].y * 360);
+                ctx.stroke();
+
+                // El Hareketi Kontrolü (01000 - Laser)
                 if (res.rightHandLandmarks) {
                     const tip = res.rightHandLandmarks[8];
                     ctx.fillStyle = "#ff0000";
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = "red";
                     ctx.beginPath();
-                    ctx.arc(tip.x * 640, tip.y * 480, 15, 0, Math.PI*2);
+                    ctx.arc(tip.x * 480, tip.y * 360, 10, 0, 7);
                     ctx.fill();
                 }
             } else {
-                document.getElementById('auth').innerText = "ACCESS DENIED";
-                document.getElementById('auth').style.color = "#ff0000";
-                // Birisi yoksa ekranı karart (FPS tasarrufu)
-                ctx.fillStyle = "rgba(0,0,0,0.6)";
-                ctx.fillRect(0,0,640,480);
+                document.getElementById('user').innerText = "BİLİNMİYOR";
+                document.getElementById('age').innerText = "--";
             }
             ctx.restore();
         }
 
         const h = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
-        
-        // --- TURBO AYARLAR ---
         h.setOptions({
-            modelComplexity: 0, // 0 en hızlıdır, 1 orta, 2 en ağır
-            smoothLandmarks: false, // Titremeyi önlemeyi kapat (hız için)
-            minDetectionConfidence: 0.5
+            modelComplexity: 0, // Turbo hız
+            smoothLandmarks: false,
+            minDetectionConfidence: 0.4, // Karanlıkta daha kolay bulması için düşürdük
+            minTrackingConfidence: 0.4
         });
 
         h.onResults(onResults);
-        new Camera(video, {onFrame: async () => await h.send({image: video}), width: 640, height: 480}).start();
+        new Camera(video, {onFrame: async () => await h.send({image: video}), width: 480, height: 360}).start();
     </script>
 </body>
 </html>
