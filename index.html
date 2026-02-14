@@ -6,24 +6,37 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Share Tech Mono', monospace; }
-        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); }
-        #hud { position: absolute; top: 20px; left: 20px; color: #0f0; background: rgba(0,20,0,0.8); padding: 15px; border: 1px solid #0f0; box-shadow: 0 0 15px #0f0; }
-        .bar-container { width: 150px; height: 10px; background: #030; margin-top: 5px; border: 1px solid #0f0; }
-        #balance-bar { height: 100%; width: 50%; background: #0f0; transition: 0.2s; }
-        .warning { color: #ff0000; animation: blink 0.5s infinite; }
-        @keyframes blink { 50% { opacity: 0; } }
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Share Tech Mono', monospace; color: #0f0; }
+        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); transition: filter 0.5s; }
+        
+        /* ÜST PANEL - MODLAR */
+        #top-bar { position: absolute; top: 0; width: 100%; background: rgba(0,20,0,0.9); display: flex; justify-content: center; gap: 20px; padding: 10px; border-bottom: 2px solid #0f0; z-index: 100; }
+        .mode-btn { background: none; border: 1px solid #0f0; color: #0f0; padding: 5px 15px; cursor: pointer; text-transform: uppercase; }
+        .mode-btn.active { background: #0f0; color: #000; font-weight: bold; }
+
+        /* YAN PANEL - VERİLER */
+        #side-hud { position: absolute; top: 70px; right: 20px; width: 180px; background: rgba(0,0,0,0.7); border: 1px solid #0f0; padding: 15px; text-align: left; }
+        .data-label { font-size: 10px; color: #0a0; }
+        .data-val { font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #030; }
+        
+        /* EL HAREKETİ GÖSTERGESİ */
+        #gesture-box { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 30px; text-shadow: 0 0 10px #0f0; }
     </style>
 </head>
 <body>
-    <div id="hud">
-        <div style="font-size: 1.2em; border-bottom: 1px solid #0f0; margin-bottom: 10px;">NEURAL SCANNER V4</div>
-        <div>TARGET: <span id="target">SCANNING...</span></div>
-        <div>EST_AGE: <span id="age">--</span></div>
-        <div>BALANCE: <span id="bal-text">STABLE</span></div>
-        <div class="bar-container"><div id="balance-bar"></div></div>
-        <div id="warn-msg" class="warning" style="display:none">! BALANCE CRITICAL !</div>
+    <div id="top-bar">
+        <button id="normal-btn" class="mode-btn active" onclick="setMode('normal')">Normal Mode</button>
+        <button id="night-btn" class="mode-btn" onclick="setMode('night')">Night Vision</button>
     </div>
+
+    <div id="side-hud">
+        <div class="data-label">IDENTITY</div><div id="user" class="data-val">SCANNING</div>
+        <div class="data-label">ESTIMATED AGE</div><div id="age" class="data-val">--</div>
+        <div class="data-label">STABILITY</div><div id="stable" class="data-val">0%</div>
+        <div class="data-label">SYSTEM STATUS</div><div class="data-val" style="font-size:12px">ACTIVE / SECURE</div>
+    </div>
+
+    <div id="gesture-box">READY</div>
     <canvas id="out"></canvas>
     <video id="vid" style="display:none"></video>
 
@@ -31,64 +44,66 @@
         const video = document.getElementById('vid');
         const canvas = document.getElementById('out');
         const ctx = canvas.getContext('2d');
+        let currentMode = 'normal';
+
+        function setMode(m) {
+            currentMode = m;
+            document.getElementById('normal-btn').className = m === 'normal' ? 'mode-btn active' : 'mode-btn';
+            document.getElementById('night-btn').className = m === 'night' ? 'mode-btn active' : 'mode-btn';
+        }
 
         function onResults(res) {
             canvas.width = 640; canvas.height = 480;
             ctx.save();
             
-            // NIGHT VISION + STICKMAN BACKGROUND
-            ctx.filter = "brightness(1.6) contrast(1.4) hue-rotate(85deg) saturate(0.4)";
+            // MOD SEÇİMİ VE FİLTRELEME
+            if (currentMode === 'night') {
+                ctx.filter = "brightness(1.8) contrast(1.4) hue-rotate(85deg) saturate(0.3)";
+            } else {
+                ctx.filter = "brightness(1.1) contrast(1.1)";
+            }
             ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
             ctx.filter = "none";
 
             if (res.poseLandmarks) {
-                document.getElementById('target').innerText = "UTKAN_AUTH";
+                document.getElementById('user').innerText = "UTKAN_AUTH";
                 
-                // 1. YAŞ TAHMİNİ ALGORİTMASI
-                // Omuz genişliği (11-12) ve Boy (Burun-Ayak bileği 0-28) oranı
+                // YAŞ TAHMİNİ (OMUZ / BOY ORANI)
                 const shoulderW = Math.hypot(res.poseLandmarks[11].x - res.poseLandmarks[12].x, res.poseLandmarks[11].y - res.poseLandmarks[12].y);
                 const bodyH = Math.hypot(res.poseLandmarks[0].x - res.poseLandmarks[28].x, res.poseLandmarks[0].y - res.poseLandmarks[28].y);
                 const ratio = shoulderW / bodyH;
-                
-                // Gelişmiş tahmin: Çocuklarda omuz/boy oranı küçüktür, yetişkinlerde artar.
-                let predictedAge = Math.round(ratio * 120 - 5);
-                if (predictedAge < 5) predictedAge = "SCANNING...";
-                document.getElementById('age').innerText = predictedAge;
+                document.getElementById('age').innerText = Math.round(ratio * 125 - 2);
 
-                // 2. DENGE KONTROLÜ (BALANCE)
-                // Kalça merkezinin (23-24) ayak merkezine (27-28) göre dikey sapması
-                const hipCenter = (res.poseLandmarks[23].x + res.poseLandmarks[24].x) / 2;
-                const footCenter = (res.poseLandmarks[27].x + res.poseLandmarks[28].x) / 2;
-                const balanceDiff = Math.abs(hipCenter - footCenter) * 1000;
-                
-                const balBar = document.getElementById('balance-bar');
-                const warn = document.getElementById('warn-msg');
-                balBar.style.width = Math.min(100, balanceDiff) + "%";
-                
-                if (balanceDiff > 40) {
-                    document.getElementById('bal-text').innerText = "UNSTABLE";
-                    balBar.style.background = "#ff0000";
-                    warn.style.display = "block";
-                } else {
-                    document.getElementById('bal-text').innerText = "STABLE";
-                    balBar.style.background = "#0f0";
-                    warn.style.display = "none";
-                }
+                // DENGE KONTROLÜ
+                const hip = (res.poseLandmarks[23].x + res.poseLandmarks[24].x) / 2;
+                const foot = (res.poseLandmarks[27].x + res.poseLandmarks[28].x) / 2;
+                const stability = Math.max(0, 100 - Math.round(Math.abs(hip - foot) * 800));
+                document.getElementById('stable').innerText = stability + "%";
 
-                // 3. STICKMAN ÇİZİMİ
-                drawConnectors(ctx, res.poseLandmarks, POSE_CONNECTIONS, {color: '#0f0', lineWidth: 4});
-                ctx.shadowBlur = 10; ctx.shadowColor = "#0f0";
-                
-                // El Hareketleri (Önceki 10 hareket buraya entegre)
-                if(res.rightHandLandmarks) {
-                    drawConnectors(ctx, res.rightHandLandmarks, HAND_CONNECTIONS, {color: '#fff', lineWidth: 2});
+                // STICKMAN ÇİZİMİ
+                drawConnectors(ctx, res.poseLandmarks, POSE_CONNECTIONS, {color: currentMode === 'night' ? '#0f0' : '#0ff', lineWidth: 4});
+
+                // 10 EL HAREKETİ MOTORU
+                if (res.rightHandLandmarks) {
+                    const marks = res.rightHandLandmarks;
+                    let f = [marks[4].x < marks[3].x ? 1 : 0];
+                    [8, 12, 16, 20].forEach(tip => f.push(marks[tip].y < marks[tip-2].y ? 1 : 0));
+                    const code = f.join('');
+                    
+                    const moves = {
+                        "11111": "🛡️ SHIELD", "01000": "🎯 LASER", "01100": "✌️ VICTORY",
+                        "00000": "👥 STEALTH", "10001": "🕸️ SPIDER", "11000": "🔥 FIRE",
+                        "01110": "🌊 WATER", "00100": "⚡ STRIKE", "00001": "🍃 WIND", "11110": "🏋️ HEAVY"
+                    };
+                    document.getElementById('gesture-box').innerText = moves[code] || "WAITING";
+                    drawConnectors(ctx, marks, HAND_CONNECTIONS, {color: '#fff', lineWidth: 2});
                 }
             }
             ctx.restore();
         }
 
         const h = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
-        h.setOptions({ modelComplexity: 0, smoothLandmarks: true, minDetectionConfidence: 0.5 });
+        h.setOptions({ modelComplexity: 0, minDetectionConfidence: 0.5 });
         h.onResults(onResults);
         new Camera(video, {onFrame: async () => await h.send({image: video}), width: 640, height: 480}).start();
     </script>
