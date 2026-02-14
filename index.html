@@ -4,21 +4,14 @@
     <meta charset="utf-8">
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+        body { margin: 0; background: #000; overflow: hidden; }
         canvas { width: 100vw; height: 100vh; transform: scaleX(-1); }
-        #overlay { position: absolute; top: 20px; left: 20px; color: #00f0ff; z-index: 10; }
-        .auth-status { font-size: 24px; padding: 10px; border: 2px solid; }
-        .yes { color: #00ff00; border-color: #00ff00; }
-        .no { color: #ff0000; border-color: #ff0000; }
+        #ui { position: absolute; top: 10px; left: 10px; color: #00ff00; font-family: sans-serif; background: rgba(0,0,0,0.5); padding: 10px; }
     </style>
 </head>
 <body>
-    <div id="overlay">
-        <div id="status" class="auth-status no">ACCESS DENIED - UNKNOWN USER</div>
-        <div id="info">Sistem: Yüz ve Vücut Taraması Aktif...</div>
-    </div>
+    <div id="ui">SYSTEM: <span id="auth">OFFLINE</span></div>
     <canvas id="out"></canvas>
     <video id="vid" style="display:none"></video>
 
@@ -26,72 +19,61 @@
         const video = document.getElementById('vid');
         const canvas = document.getElementById('out');
         const ctx = canvas.getContext('2d');
-        const statusDiv = document.getElementById('status');
-
-        // GÜVENLİK AYARI: Buraya kendi yüz özelliklerini tanımlayacağız (şimdilik basit bir kontrol)
-        let isAuthorized = false;
 
         function onResults(res) {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            // FPS artırmak için çözünürlüğü sabitliyoruz
+            canvas.width = 640; 
+            canvas.height = 480;
+            
             ctx.save();
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
 
-            // 1. YÜZ KONTROLÜ (GÜVENLİK)
+            // GÜVENLİK KONTROLÜ
             if (res.faceLandmarks) {
-                // Burada yüzün genişliği/yüksekliği gibi oranlarla "sen" olup olmadığını anlarız
-                // Gerçek FaceID için daha fazla veri lazım ama biz efektleri "Yüz varken" açıyoruz
-                isAuthorized = true; 
-                statusDiv.innerText = "ACCESS GRANTED: UTKAN";
-                statusDiv.className = "auth-status yes";
-            } else {
-                isAuthorized = false;
-                statusDiv.innerText = "ACCESS DENIED - NO USER";
-                statusDiv.className = "auth-status no";
-            }
+                document.getElementById('auth').innerText = "UTKAN DETECTED";
+                document.getElementById('auth').style.color = "#00ff00";
 
-            // 2. EFEKTLER (SADECE SEN VARKEN ÇALIŞIR)
-            if (isAuthorized) {
-                // Vücut Çizgileri (Mavi Şimşek Efekti)
+                // VÜCUT (Sadece ana çizgiler - Kasmaması için)
                 if (res.poseLandmarks) {
-                    drawConnectors(ctx, res.poseLandmarks, POSE_CONNECTIONS, {color: '#00f0ff', lineWidth: 2});
-                    ctx.shadowBlur = 15;
-                    ctx.shadowColor = "#00f0ff";
-                }
-
-                // El Aurası (Kırmızı/Mavi)
-                if (res.rightHandLandmarks) {
-                    const hand = res.rightHandLandmarks[8];
-                    const x = hand.x * canvas.width;
-                    const y = hand.y * canvas.height;
-                    
-                    // Aura Halkası
+                    ctx.strokeStyle = "#00f0ff";
+                    ctx.lineWidth = 2;
+                    // Omuzlar arası şimşek çizgisi gibi basit çizim
                     ctx.beginPath();
-                    ctx.arc(x, y, 60, 0, Math.PI * 2);
-                    ctx.strokeStyle = "#ff0000";
-                    ctx.lineWidth = 5;
+                    ctx.moveTo(res.poseLandmarks[11].x * 640, res.poseLandmarks[11].y * 480);
+                    ctx.lineTo(res.poseLandmarks[12].x * 640, res.poseLandmarks[12].y * 480);
                     ctx.stroke();
                 }
 
-                // Yüz Matrix Efekti
-                if (res.faceLandmarks) {
-                    drawConnectors(ctx, res.faceLandmarks, FACEMESH_TESSELATION, {color: '#00ff0033', lineWidth: 1});
+                // EL (Sadece parmak ucu efekti)
+                if (res.rightHandLandmarks) {
+                    const tip = res.rightHandLandmarks[8];
+                    ctx.fillStyle = "#ff0000";
+                    ctx.beginPath();
+                    ctx.arc(tip.x * 640, tip.y * 480, 15, 0, Math.PI*2);
+                    ctx.fill();
                 }
             } else {
-                // Yetkisiz birisi gelirse ekranı boz (Glitch efekti gibi)
-                ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                document.getElementById('auth').innerText = "ACCESS DENIED";
+                document.getElementById('auth').style.color = "#ff0000";
+                // Birisi yoksa ekranı karart (FPS tasarrufu)
+                ctx.fillStyle = "rgba(0,0,0,0.6)";
+                ctx.fillRect(0,0,640,480);
             }
-
             ctx.restore();
         }
 
-        const holistic = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
-        holistic.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.5 });
-        holistic.onResults(onResults);
+        const h = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
+        
+        // --- TURBO AYARLAR ---
+        h.setOptions({
+            modelComplexity: 0, // 0 en hızlıdır, 1 orta, 2 en ağır
+            smoothLandmarks: false, // Titremeyi önlemeyi kapat (hız için)
+            minDetectionConfidence: 0.5
+        });
 
-        new Camera(video, {onFrame: async () => await holistic.send({image: video}), width: 1280, height: 720}).start();
+        h.onResults(onResults);
+        new Camera(video, {onFrame: async () => await h.send({image: video}), width: 640, height: 480}).start();
     </script>
 </body>
 </html>
