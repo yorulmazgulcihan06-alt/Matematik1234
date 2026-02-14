@@ -1,134 +1,271 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>IRON MAN - STARK OS v6</title>
+    <meta charset="UTF-8">
+    <title>STARK: GOD MODE HUD</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Share Tech Mono', 'Courier New', monospace; }
-        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); }
+        /* SİNEMATİK ARAYÜZ TASARIMI */
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+        canvas { display: block; width: 100vw; height: 100vh; transform: scaleX(-1); }
         
-        /* JARVIS HUD ARAYÜZÜ */
-        #hud-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-        .panel { position: absolute; background: rgba(0, 50, 80, 0.4); border: 2px solid #0ff; color: #0ff; padding: 15px; box-shadow: 0 0 15px rgba(0, 255, 255, 0.5); border-radius: 5px; }
-        #left-hud { top: 40px; left: 40px; border-left: 5px solid #0ff; }
-        #right-hud { top: 40px; right: 40px; text-align: right; border-right: 5px solid #0ff; }
-        #bottom-hud { bottom: 40px; left: 50%; transform: translateX(-50%); font-size: 24px; border-bottom: 3px solid #0ff; min-width: 300px; text-align: center; }
-        
-        .loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #0ff; display: flex; align-items: center; justify-content: center; z-index: 9999; }
+        /* EKRAN TARAMA ÇİZGİLERİ (SCANLINES) */
+        .scanlines {
+            position: fixed; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px; z-index: 10; opacity: 0.6;
+        }
+
+        /* HUD PANELLERİ */
+        .hud-panel {
+            position: absolute; border: 1px solid rgba(0, 255, 255, 0.5); 
+            background: rgba(0, 20, 40, 0.6); color: #0ff; padding: 15px; 
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); font-weight: bold;
+            backdrop-filter: blur(5px);
+        }
+        #top-left { top: 30px; left: 30px; border-left: 5px solid #0ff; }
+        #top-right { top: 30px; right: 30px; text-align: right; border-right: 5px solid #0ff; }
+        #bottom-center { 
+            bottom: 40px; left: 50%; transform: translateX(-50%); 
+            font-size: 24px; letter-spacing: 5px; text-shadow: 0 0 10px #0ff;
+            background: transparent; border: none; box-shadow: none;
+        }
+
+        /* YÜKLENİYOR EKRANI */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000;
+            display: flex; justify-content: center; align-items: center; color: #0ff; font-size: 20px; z-index: 9999;
+        }
     </style>
 </head>
 <body>
+    <div id="loader">SYSTEM INITIALIZING... / STARK_OS V.9.0</div>
+    <div class="scanlines"></div>
 
-    <div id="loading" class="loading-screen">SYSTEM BOOTING... JARVIS INITIALIZING...</div>
-
-    <div id="hud-container">
-        <div id="left-hud" class="panel">
-            <div style="font-size: 10px; opacity: 0.7;">BIOMETRIC SCANNER</div>
-            <div id="age-ui">AGE: CALCULATING...</div>
-            <div id="bal-ui">STABILITY: SCANNING</div>
-        </div>
-        
-        <div id="right-hud" class="panel">
-            <div>POWER: 100%</div>
-            <div id="status-ui">SYSTEM: ONLINE</div>
-        </div>
-
-        <div id="bottom-hud" class="panel">STANDBY MODE</div>
+    <div id="top-left" class="hud-panel">
+        <div>BIO-SCAN: ACTIVE</div>
+        <div id="age-disp">AGE: CALCULATING...</div>
+        <div id="stab-disp">STABILITY: --</div>
     </div>
 
-    <canvas id="out"></canvas>
-    <video id="vid" style="display:none" playsinline></video>
+    <div id="top-right" class="hud-panel">
+        <div>CPU: OPTIMAL</div>
+        <div>SYS: CONNECTED</div>
+    </div>
+
+    <div id="bottom-center" class="hud-panel">STANDBY</div>
+
+    <canvas id="output"></canvas>
+    <video id="video" style="display:none" playsinline></video>
 
     <script>
-        const video = document.getElementById('vid');
-        const canvas = document.getElementById('out');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('output');
         const ctx = canvas.getContext('2d');
-        const loading = document.getElementById('loading');
+        const loader = document.getElementById('loader');
+        
+        let width = window.innerWidth;
+        let height = window.innerHeight;
 
-        // Hata korumalı onResults fonksiyonu
-        function onResults(res) {
-            if (loading) loading.style.display = 'none'; // İlk veri gelince yükleme ekranını kaldır
-            
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        // EFEKT DEĞİŞKENLERİ
+        let particles = []; 
+        let hue = 0;
+
+        function resize() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+        window.onresize = resize;
+        resize();
+
+        // --- ANA ÇİZİM DÖNGÜSÜ ---
+        function onResults(results) {
+            loader.style.display = 'none'; // Yükleme bitince ekranı aç
             
             ctx.save();
-            // Iron Man Görsel Filtresi (Karanlıkta bile net)
-            ctx.filter = "brightness(1.2) contrast(1.3) saturate(0.9) hue-rotate(170deg)";
-            ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
-            ctx.filter = "none";
+            ctx.clearRect(0, 0, width, height);
 
-            // VÜCUT TAKİBİ (Çubuk Adam + Yaş + Denge)
-            if (res.poseLandmarks) {
-                try {
-                    const sW = Math.hypot(res.poseLandmarks[11].x - res.poseLandmarks[12].x, res.poseLandmarks[11].y - res.poseLandmarks[12].y);
-                    const bH = Math.hypot(res.poseLandmarks[0].x - res.poseLandmarks[28].x, res.poseLandmarks[0].y - res.poseLandmarks[28].y);
-                    const age = Math.round((sW/bH) * 132 - 4);
-                    if(age > 5) document.getElementById('age-ui').innerText = "USER_AGE: " + age;
-
-                    const stability = Math.abs(res.poseLandmarks[23].x - res.poseLandmarks[27].x);
-                    document.getElementById('bal-ui').innerText = "STABILITY: " + (stability < 0.15 ? "OPTIMAL" : "UNSTABLE");
-
-                    drawConnectors(ctx, res.poseLandmarks, POSE_CONNECTIONS, {color: '#0ff', lineWidth: 2});
-                } catch (e) { console.log("Pose error bypassed"); }
-            }
-
-            // EL HAREKETLERİ VE EFEKTLER
-            if (res.rightHandLandmarks || res.leftHandLandmarks) {
-                const hand = res.rightHandLandmarks || res.leftHandLandmarks;
-                const cx = hand[9].x * canvas.width;
-                const cy = hand[9].y * canvas.height;
+            // 1. GECE GÖRÜŞÜ & SİNEMATİK FİLTRE
+            ctx.drawImage(results.image, 0, 0, width, height);
+            // Görüntüyü hafif karartıp mavi/yeşil yap (Gece Görüşü Hissi)
+            ctx.fillStyle = "rgba(0, 20, 10, 0.4)";
+            ctx.fillRect(0, 0, width, height);
+            
+            // 2. STICKMAN (Neon İskelet)
+            if (results.poseLandmarks) {
+                drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: 'rgba(0, 255, 255, 0.4)', lineWidth: 2});
                 
-                // Parmak Durum Analizi
-                let f = [hand[4].x < hand[3].x ? 1 : 0];
-                [8,12,16,20].forEach(t => f.push(hand[t].y < hand[t-2].y ? 1 : 0));
-                const code = f.join('');
-
-                ctx.shadowBlur = 25; ctx.shadowColor = "#0ff";
-
-                if (code === "11111") { // 🖐️ REPULSOR
-                    document.getElementById('bottom-hud').innerText = "⚡ REPULSOR ACTIVATED";
-                    ctx.fillStyle = "white";
-                    ctx.beginPath(); ctx.arc(cx, cy, 50, 0, 7); ctx.fill();
-                    ctx.strokeStyle = "#0ff"; ctx.lineWidth = 8;
-                    ctx.beginPath(); ctx.arc(cx, cy, 70 + (Math.sin(Date.now()/50)*10), 0, 7); ctx.stroke();
-                } 
-                else if (code === "01000") { // ☝️ TARGETING
-                    document.getElementById('bottom-hud').innerText = "🎯 TARGET LOCK";
-                    const tx = hand[8].x * canvas.width; const ty = hand[8].y * canvas.height;
-                    ctx.strokeStyle = "red"; ctx.lineWidth = 2; ctx.strokeRect(tx-40, ty-40, 80, 80);
-                    ctx.beginPath(); ctx.moveTo(tx-60, ty); ctx.lineTo(tx+60, ty); ctx.stroke();
-                }
-                else if (code === "00000") { // ✊ CHARGING
-                    document.getElementById('bottom-hud').innerText = "🔥 POWER CHARGE";
-                    ctx.strokeStyle = "#f90";
-                    ctx.beginPath(); ctx.arc(cx, cy, (Date.now()%600)/6, 0, 7); ctx.stroke();
-                }
-                else {
-                    document.getElementById('bottom-hud').innerText = "ANALYZING...";
-                }
-                drawConnectors(ctx, hand, HAND_CONNECTIONS, {color: '#fff', lineWidth: 2});
-            } else {
-                document.getElementById('bottom-hud').innerText = "SEARCHING FOR USER...";
+                // Yaş ve Denge Hesabı (Basitleştirilmiş ve Hatasız)
+                const shoulders = Math.abs(results.poseLandmarks[11].x - results.poseLandmarks[12].x);
+                const heightBody = Math.abs(results.poseLandmarks[0].y - results.poseLandmarks[28].y);
+                const calcAge = Math.floor((shoulders / heightBody) * 120); 
+                if(calcAge > 10) document.getElementById('age-disp').innerText = `EST. AGE: ${calcAge}`;
+                
+                const hipCenter = results.poseLandmarks[23].x;
+                const footCenter = results.poseLandmarks[27].x;
+                const stability = Math.abs(hipCenter - footCenter) < 0.1 ? "100% STABLE" : "MOTION DETECTED";
+                document.getElementById('stab-disp').innerText = `STATUS: ${stability}`;
             }
 
+            // 3. EL HAREKETLERİ VE EFEKTLER (BÜYÜ BURADA)
+            let leftHand = results.leftHandLandmarks;
+            let rightHand = results.rightHandLandmarks;
+            let activeMode = "SCANNING...";
+
+            // EĞER İKİ EL DE VARSA -> PLEXUS AĞI (Videonuzdaki gibi)
+            if (leftHand && rightHand) {
+                activeMode = "⚠️ PLEXUS LINK";
+                drawPlexus(leftHand, rightHand);
+            }
+            
+            // SAĞ EL EFEKTLERİ
+            if (rightHand) {
+                const gesture = getGesture(rightHand);
+                const x = rightHand[9].x * width; // Avuç merkezi
+                const y = rightHand[9].y * height;
+
+                if (gesture === "OPEN_PALM") { // - REPULSOR
+                    activeMode = "🔥 REPULSOR BLAST";
+                    drawRepulsor(x, y);
+                } 
+                else if (gesture === "POINT") { // LAZER
+                    activeMode = "🎯 TARGET LOCK";
+                    drawLaser(rightHand[8]);
+                }
+                else if (gesture === "PEACE" || gesture === "L_SHAPE") { // - AURA
+                    activeMode = "🔮 AURA SYSTEM";
+                    drawAura(rightHand[8].x * width, rightHand[8].y * height);
+                }
+
+                // El iskeletini çiz
+                drawConnectors(ctx, rightHand, HAND_CONNECTIONS, {color: '#0ff', lineWidth: 1});
+                drawLandmarks(ctx, rightHand, {color: '#fff', radius: 2});
+            }
+
+            if(leftHand && !rightHand) {
+                 drawConnectors(ctx, leftHand, HAND_CONNECTIONS, {color: '#0ff', lineWidth: 1});
+            }
+
+            document.getElementById('bottom-center').innerText = activeMode;
             ctx.restore();
         }
 
+        // --- HAREKET ALGILAMA MOTORU ---
+        function getGesture(landmarks) {
+            // Parmak uçları ve boğum kıyaslaması (Basit Matematik)
+            const isThumbOpen = landmarks[4].x < landmarks[3].x; // Basit sağ el kontrolü
+            const isIndexOpen = landmarks[8].y < landmarks[6].y;
+            const isMiddleOpen = landmarks[12].y < landmarks[10].y;
+            const isRingOpen = landmarks[16].y < landmarks[14].y;
+            const isPinkyOpen = landmarks[20].y < landmarks[18].y;
+
+            if (isIndexOpen && isMiddleOpen && isRingOpen && isPinkyOpen) return "OPEN_PALM";
+            if (isIndexOpen && !isMiddleOpen && !isRingOpen && !isPinkyOpen) return "POINT";
+            if (isIndexOpen && isMiddleOpen && !isRingOpen) return "PEACE";
+            return "UNKNOWN";
+        }
+
+        // --- GÖRSEL EFEKT FONKSİYONLARI ---
+
+        // 1. REPULSOR (ENERJİ TOPU)
+        function drawRepulsor(x, y) {
+            const time = Date.now() / 200;
+            ctx.shadowBlur = 50; ctx.shadowColor = "#0ff";
+            
+            // Merkez Çekirdek
+            ctx.beginPath();
+            ctx.arc(x, y, 30 + Math.sin(time * 10) * 5, 0, Math.PI * 2);
+            ctx.fillStyle = "#fff"; ctx.fill();
+
+            // Şok Dalgaları
+            ctx.strokeStyle = `hsl(${time * 50}, 100%, 50%)`;
+            ctx.lineWidth = 5;
+            for(let i=0; i<3; i++) {
+                ctx.beginPath();
+                ctx.arc(x, y, 60 + (i*40) + Math.sin(time)*20, 0, Math.PI*2);
+                ctx.stroke();
+            }
+            
+            // Rastgele Elektrik Çizgileri
+            for(let i=0; i<10; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + (Math.random()-0.5)*300, y + (Math.random()-0.5)*300);
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.5)"; ctx.lineWidth = 2; ctx.stroke();
+            }
+        }
+
+        // 2. PLEXUS (AĞ BAĞLANTISI)
+        function drawPlexus(hand1, hand2) {
+            // İki elin parmak uçları arasındaki mesafeyi ölçüp çizgi çekiyoruz
+            const points1 = [4, 8, 12, 16, 20].map(i => hand1[i]);
+            const points2 = [4, 8, 12, 16, 20].map(i => hand2[i]);
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "rgba(0, 255, 255, 0.6)";
+            ctx.shadowBlur = 10; ctx.shadowColor = "#0ff";
+
+            points1.forEach(p1 => {
+                points2.forEach(p2 => {
+                    // Mesafe hesabı
+                    const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                    if (dist < 0.4) { // Eğer yakınlarsa bağla
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x * width, p1.y * height);
+                        ctx.lineTo(p2.x * width, p2.y * height);
+                        ctx.stroke();
+                    }
+                });
+            });
+        }
+
+        // 3. AURA (RADAR)
+        function drawAura(x, y) {
+            const time = Date.now() / 1000;
+            ctx.strokeStyle = "rgba(255, 200, 50, 0.8)";
+            ctx.lineWidth = 2;
+            
+            // Dönen halkalar
+            for(let i=1; i<5; i++) {
+                ctx.beginPath();
+                ctx.arc(x, y, i * 30, time * i, time * i + Math.PI * 1.5);
+                ctx.stroke();
+            }
+            // Rakamlar (Hologram verisi gibi)
+            ctx.fillStyle = "#0ff"; ctx.font = "12px Courier";
+            ctx.fillText(`SEC: ${Math.floor(time)}`, x + 50, y - 50);
+            ctx.fillText(`AXIS: ${Math.floor(x)}`, x + 50, y - 30);
+        }
+
+        // 4. LASER
+        function drawLaser(tip) {
+            ctx.beginPath();
+            ctx.moveTo(tip.x * width, tip.y * height);
+            ctx.lineTo(tip.x * width, 0); // Yukarı fırlat
+            ctx.strokeStyle = "#f00"; ctx.lineWidth = 4; ctx.shadowColor="red"; ctx.shadowBlur=20; 
+            ctx.stroke();
+        }
+
+        // --- SİSTEM BAŞLATMA ---
         const holistic = new Holistic({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`});
-        holistic.setOptions({ modelComplexity: 0, smoothLandmarks: true, minDetectionConfidence: 0.5 });
+        holistic.setOptions({
+            modelComplexity: 1, // Kaliteyi artırır
+            smoothLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
         holistic.onResults(onResults);
 
         const camera = new Camera(video, {
             onFrame: async () => { await holistic.send({image: video}); },
-            width: 1280, height: 720
+            width: 1280,
+            height: 720
         });
-        camera.start().catch(err => {
-            alert("Kamera başlatılamadı! Lütfen izin verdiğinizden emin olun.");
-        });
+        camera.start();
     </script>
 </body>
 </html>
