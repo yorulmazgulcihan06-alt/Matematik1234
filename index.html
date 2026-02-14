@@ -2,22 +2,25 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <title>Cyber-Aura V4.0 - 20 Movements</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
-        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); } /* Ayna modu */
-        #ui { position: absolute; top: 20px; left: 20px; color: #00f0ff; z-index: 100; pointer-events: none; }
-        .glitch { font-size: 24px; text-shadow: 2px 2px #ff00ff; animation: scan 2s infinite; }
-        @keyframes scan { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); }
+        #ui { position: absolute; top: 30px; left: 30px; color: #fff; z-index: 100; text-transform: uppercase; letter-spacing: 2px; }
+        .status-box { background: rgba(0, 240, 255, 0.1); border-left: 5px solid #00f0ff; padding: 15px; backdrop-filter: blur(5px); }
+        #gesture-name { font-size: 28px; font-weight: bold; text-shadow: 0 0 10px currentColor; }
+        #code-display { font-size: 14px; opacity: 0.7; margin-top: 5px; color: #00f0ff; }
     </style>
 </head>
 <body>
     <div id="ui">
-        <div class="glitch">SYSTEM: NEURAL LINK ACTIVE</div>
-        <div id="gesture">WAITING FOR HAND...</div>
-        <div id="stats">POWER: 0%</div>
+        <div class="status-box">
+            <div id="gesture-name">SCANNING HAND...</div>
+            <div id="code-display">BINARY: 00000</div>
+        </div>
     </div>
     <canvas id="canvas"></canvas>
     <video id="video" style="display:none"></video>
@@ -26,7 +29,8 @@
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const gestureDiv = document.getElementById('gesture');
+        const nameDiv = document.getElementById('gesture-name');
+        const codeDiv = document.getElementById('code-display');
 
         function onResults(res) {
             canvas.width = window.innerWidth;
@@ -37,96 +41,89 @@
 
             if (res.multiHandLandmarks) {
                 for (const marks of res.multiHandLandmarks) {
-                    // PARMAK DURUMLARINI HESAPLA (Açık mı kapalı mı?)
-                    const fingers = [];
-                    // Baş parmak (Özel kontrol)
-                    fingers.push(marks[4].x < marks[3].x ? 1 : 0);
-                    // Diğer 4 parmak
+                    // PARMAK MOTORU (Açık: 1, Kapalı: 0)
+                    let fingers = [];
+                    fingers.push(marks[4].x < marks[3].x ? 1 : 0); // Baş
                     [8, 12, 16, 20].forEach(tip => {
                         fingers.push(marks[tip].y < marks[tip - 2].y ? 1 : 0);
                     });
-
-                    const gestureCode = fingers.join(''); // Örn: "11111" hepsi açık
+                    const code = fingers.join('');
+                    
+                    // Efekt Merkezi (İşaret parmağı ucu)
                     const x = marks[8].x * canvas.width;
                     const y = marks[8].y * canvas.height;
 
-                    // --- 20 HAREKETLİ MANTIK MERKEZİ ---
-                    let color = "#00f0ff";
-                    let effectSize = 50;
+                    // --- 20 HAREKETLİ MANTIK VE RENK TABLOSU ---
+                    let config = { name: "STABLE", color: "#00f0ff", type: "circle" };
 
-                    if (gestureCode === "11111") { 
-                        gestureDiv.innerText = "MODE: FULL SHIELD";
-                        color = "#00ff00"; drawAura(x, y, 100, color, true);
-                    } else if (gestureCode === "01000") {
-                        gestureDiv.innerText = "MODE: LASER POINT";
-                        color = "#ff0000"; drawLaser(x, y, color);
-                    } else if (gestureCode === "01100") {
-                        gestureDiv.innerText = "MODE: VICTORY VIBE";
-                        color = "#ffff00"; drawParticles(x, y, color);
-                    } else if (gestureCode === "00000") {
-                        gestureDiv.innerText = "MODE: STEALTH (YUMRUK)";
-                        color = "#555555";
-                    } else if (gestureCode === "10001") {
-                        gestureDiv.innerText = "MODE: SPIDER SENSE";
-                        color = "#ff00ff"; drawWeb(x, y, color);
-                    } else if (gestureCode === "01111") {
-                        gestureDiv.innerText = "MODE: COMMANDER";
-                        color = "#ffa500";
-                    } else {
-                        gestureDiv.innerText = "CODE: " + gestureCode;
-                        drawAura(x, y, 50, color, false);
-                    }
+                    const moves = {
+                        "11111": { name: "FULL SHIELD", color: "#00ff00", type: "shield" },
+                        "00000": { name: "STEALTH MODE", color: "#333333", type: "none" },
+                        "01000": { name: "LASER POINT", color: "#ff0000", type: "laser" },
+                        "01100": { name: "VICTORY", color: "#ffff00", type: "particles" },
+                        "10001": { name: "SPIDER-WEB", color: "#ff00ff", type: "web" },
+                        "11000": { name: "FIREBALL", color: "#ff4500", type: "aura" },
+                        "01110": { name: "WATER FLOW", color: "#1e90ff", type: "wave" },
+                        "00100": { name: "THUNDER", color: "#ffffff", type: "bolt" },
+                        "11110": { name: "EARTHQUAKE", color: "#8b4513", type: "shake" },
+                        "00001": { name: "WIND BLADE", color: "#f0ffff", type: "aura" },
+                        "01010": { name: "MATRIX DATA", color: "#00ff41", type: "code" },
+                        "10101": { name: "REBOOT", color: "#ffffff", type: "flash" },
+                        "11001": { name: "LOADING", color: "#ffa500", type: "rotate" },
+                        "00111": { name: "ACCESS DENIED", color: "#8b0000", type: "shield" },
+                        "10000": { name: "PING", color: "#00ced1", type: "wave" },
+                        "11011": { name: "ROCK ON", color: "#ff1493", type: "particles" },
+                        "10110": { name: "SMALL POWER", color: "#7b68ee", type: "aura" },
+                        "01001": { name: "INFINITY", color: "#adff2f", type: "rotate" },
+                        "01111": { name: "COMMANDER", color: "#ff8c00", type: "aura" },
+                        "00011": { name: "MINI-SHIELD", color: "#7fffd4", type: "shield" }
+                    };
 
-                    // El iskeletini havalı çiz
-                    drawConnectors(ctx, marks, HAND_CONNECTIONS, {color: color, lineWidth: 2});
+                    if(moves[code]) config = moves[code];
+
+                    nameDiv.innerText = config.name;
+                    nameDiv.style.color = config.color;
+                    codeDiv.innerText = "BINARY: " + code;
+
+                    // --- GÖRSEL EFEKT ÇİZİMLERİ ---
+                    drawVisualEffect(x, y, config, ctx);
+                    
+                    // El İskeletini Çiz
+                    drawConnectors(ctx, marks, HAND_CONNECTIONS, {color: config.color, lineWidth: 3});
                 }
             }
             ctx.restore();
         }
 
-        // --- GÖRSEL EFEKT FONKSİYONLARI ---
-        function drawAura(x, y, r, c, rotate) {
-            ctx.beginPath();
-            ctx.lineWidth = 5;
-            ctx.strokeStyle = c;
+        function drawVisualEffect(x, y, conf, ctx) {
+            const t = Date.now() / 200;
+            ctx.strokeStyle = conf.color;
             ctx.shadowBlur = 20;
-            ctx.shadowColor = c;
-            const angle = rotate ? Date.now() / 100 : 0;
-            ctx.arc(x, y, r, angle, angle + Math.PI * 1.5);
-            ctx.stroke();
-        }
+            ctx.shadowColor = conf.color;
+            ctx.lineWidth = 5;
 
-        function drawLaser(x, y, c) {
-            ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(x, 0); // Yukarı lazer fırlat
-            ctx.strokeStyle = c;
-            ctx.lineWidth = 10;
-            ctx.shadowBlur = 30;
-            ctx.stroke();
-        }
-
-        function drawParticles(x, y, c) {
-            for(let i=0; i<5; i++) {
-                ctx.fillStyle = c;
+            if(conf.type === "shield") {
                 ctx.beginPath();
-                ctx.arc(x + Math.random()*40-20, y + Math.random()*40-20, 5, 0, 7);
-                ctx.fill();
-            }
-        }
-
-        function drawWeb(x, y, c) {
-            ctx.strokeStyle = c;
-            for(let i=0; i<8; i++) {
+                ctx.arc(x, y, 80, t, t + Math.PI * 1.6);
+                ctx.stroke();
+            } else if(conf.type === "laser") {
                 ctx.beginPath();
-                ctx.moveTo(x,y);
-                ctx.lineTo(x + Math.cos(i)*100, y + Math.sin(i)*100);
+                ctx.moveTo(x, y); ctx.lineTo(x, 0);
+                ctx.stroke();
+            } else if(conf.type === "particles") {
+                for(let i=0; i<8; i++) {
+                    ctx.fillStyle = conf.color;
+                    ctx.fillRect(x + Math.sin(t+i)*50, y + Math.cos(t+i)*50, 8, 8);
+                }
+            } else if(conf.type === "aura") {
+                ctx.beginPath();
+                ctx.arc(x, y, 40 + Math.sin(t)*10, 0, Math.PI*2);
                 ctx.stroke();
             }
         }
 
         const hands = new Hands({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
-        hands.setOptions({maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.8});
+        hands.setOptions({maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.8, minTrackingConfidence: 0.8});
         hands.onResults(onResults);
         new Camera(video, {onFrame: async () => await hands.send({image: video}), width: 1280, height: 720}).start();
     </script>
