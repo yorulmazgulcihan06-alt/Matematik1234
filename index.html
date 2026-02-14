@@ -2,41 +2,63 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <title>Cyber-Utkan Ultimate Fix</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Share Tech Mono', monospace; color: #0f0; }
-        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); transition: filter 0.5s; }
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Share Tech Mono', monospace; }
+        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); position: absolute; top: 0; left: 0; }
         
-        /* ÜST PANEL - MODLAR */
-        #top-bar { position: absolute; top: 0; width: 100%; background: rgba(0,20,0,0.9); display: flex; justify-content: center; gap: 20px; padding: 10px; border-bottom: 2px solid #0f0; z-index: 100; }
-        .mode-btn { background: none; border: 1px solid #0f0; color: #0f0; padding: 5px 15px; cursor: pointer; text-transform: uppercase; }
-        .mode-btn.active { background: #0f0; color: #000; font-weight: bold; }
+        /* HUD PANELİ - HİÇ GİTMEYEN SABİT PANEL */
+        #hud { 
+            position: absolute; top: 30px; right: 30px; 
+            background: rgba(0, 40, 0, 0.85); padding: 25px; 
+            border: 2px solid #0f0; box-shadow: 0 0 20px #0f0; 
+            z-index: 999; width: 220px; color: #0f0;
+        }
+        .stat-box { margin-bottom: 20px; border-bottom: 1px solid #030; }
+        .label { font-size: 11px; color: #0a0; text-transform: uppercase; letter-spacing: 2px; }
+        .value { font-size: 26px; font-weight: bold; padding: 5px 0; }
 
-        /* YAN PANEL - VERİLER */
-        #side-hud { position: absolute; top: 70px; right: 20px; width: 180px; background: rgba(0,0,0,0.7); border: 1px solid #0f0; padding: 15px; text-align: left; }
-        .data-label { font-size: 10px; color: #0a0; }
-        .data-val { font-size: 18px; margin-bottom: 10px; border-bottom: 1px solid #030; }
-        
-        /* EL HAREKETİ GÖSTERGESİ */
-        #gesture-box { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 30px; text-shadow: 0 0 10px #0f0; }
+        /* MOD BUTONLARI */
+        #controls { position: absolute; top: 30px; left: 30px; z-index: 1000; display: flex; gap: 10px; }
+        .btn { background: #000; color: #0f0; border: 1px solid #0f0; padding: 12px 20px; cursor: pointer; font-weight: bold; }
+        .active { background: #0f0; color: #000; }
+
+        /* EL HAREKETİ - ALT ORTA SİYAH BANT */
+        #gest-box { 
+            position: absolute; bottom: 50px; left: 50%; 
+            transform: translateX(-50%); font-size: 38px; color: #0f0;
+            background: rgba(0,0,0,0.8); padding: 15px 40px; 
+            border: 1px solid #0f0; border-radius: 10px; z-index: 1000;
+            min-width: 300px; text-align: center;
+        }
     </style>
 </head>
 <body>
-    <div id="top-bar">
-        <button id="normal-btn" class="mode-btn active" onclick="setMode('normal')">Normal Mode</button>
-        <button id="night-btn" class="mode-btn" onclick="setMode('night')">Night Vision</button>
+    <div id="controls">
+        <button id="n-btn" class="btn active" onclick="setM('normal')">NORMAL</button>
+        <button id="g-btn" class="btn" onclick="setM('night')">GECE GÖRÜŞÜ</button>
     </div>
 
-    <div id="side-hud">
-        <div class="data-label">IDENTITY</div><div id="user" class="data-val">SCANNING</div>
-        <div class="data-label">ESTIMATED AGE</div><div id="age" class="data-val">--</div>
-        <div class="data-label">STABILITY</div><div id="stable" class="data-val">0%</div>
-        <div class="data-label">SYSTEM STATUS</div><div class="data-val" style="font-size:12px">ACTIVE / SECURE</div>
+    <div id="hud">
+        <div class="stat-box">
+            <div class="label">KİMLİK:</div>
+            <div id="user-val" class="value">UTKAN_MASTER</div>
+        </div>
+        <div class="stat-box">
+            <div class="label">TAHMİNİ YAŞ:</div>
+            <div id="age-val" class="value">Taranıyor...</div>
+        </div>
+        <div class="stat-box">
+            <div class="label">DENGE ANALİZİ:</div>
+            <div id="bal-val" class="value">Stabil</div>
+        </div>
     </div>
 
-    <div id="gesture-box">READY</div>
+    <div id="gest-box">SİSTEM HAZIR</div>
+
     <canvas id="out"></canvas>
     <video id="vid" style="display:none"></video>
 
@@ -44,68 +66,65 @@
         const video = document.getElementById('vid');
         const canvas = document.getElementById('out');
         const ctx = canvas.getContext('2d');
-        let currentMode = 'normal';
+        let m = 'normal';
 
-        function setMode(m) {
-            currentMode = m;
-            document.getElementById('normal-btn').className = m === 'normal' ? 'mode-btn active' : 'mode-btn';
-            document.getElementById('night-btn').className = m === 'night' ? 'mode-btn active' : 'mode-btn';
+        function setM(mode) {
+            m = mode;
+            document.getElementById('n-btn').className = mode === 'normal' ? 'btn active' : 'btn';
+            document.getElementById('g-btn').className = mode === 'night' ? 'btn active' : 'btn';
         }
 
         function onResults(res) {
-            canvas.width = 640; canvas.height = 480;
+            canvas.width = 1280; canvas.height = 720;
             ctx.save();
             
-            // MOD SEÇİMİ VE FİLTRELEME
-            if (currentMode === 'night') {
-                ctx.filter = "brightness(1.8) contrast(1.4) hue-rotate(85deg) saturate(0.3)";
-            } else {
-                ctx.filter = "brightness(1.1) contrast(1.1)";
-            }
+            // GECE GÖRÜŞÜ AYARI
+            if(m === 'night') ctx.filter = "brightness(1.8) contrast(1.6) hue-rotate(85deg) saturate(0.5)";
             ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
             ctx.filter = "none";
 
             if (res.poseLandmarks) {
-                document.getElementById('user').innerText = "UTKAN_AUTH";
-                
-                // YAŞ TAHMİNİ (OMUZ / BOY ORANI)
-                const shoulderW = Math.hypot(res.poseLandmarks[11].x - res.poseLandmarks[12].x, res.poseLandmarks[11].y - res.poseLandmarks[12].y);
-                const bodyH = Math.hypot(res.poseLandmarks[0].x - res.poseLandmarks[28].x, res.poseLandmarks[0].y - res.poseLandmarks[28].y);
-                const ratio = shoulderW / bodyH;
-                document.getElementById('age').innerText = Math.round(ratio * 125 - 2);
+                // 1. YAŞ TAHMİNİ (OMUZ GENİŞLİĞİNE GÖRE)
+                const sW = Math.hypot(res.poseLandmarks[11].x - res.poseLandmarks[12].x, res.poseLandmarks[11].y - res.poseLandmarks[12].y);
+                const bH = Math.hypot(res.poseLandmarks[0].x - res.poseLandmarks[28].x, res.poseLandmarks[0].y - res.poseLandmarks[28].y);
+                const calcAge = Math.round((sW/bH) * 135 - 3);
+                if(calcAge > 5) document.getElementById('age-val').innerText = calcAge;
 
-                // DENGE KONTROLÜ
-                const hip = (res.poseLandmarks[23].x + res.poseLandmarks[24].x) / 2;
-                const foot = (res.poseLandmarks[27].x + res.poseLandmarks[28].x) / 2;
-                const stability = Math.max(0, 100 - Math.round(Math.abs(hip - foot) * 800));
-                document.getElementById('stable').innerText = stability + "%";
+                // 2. DENGE KONTROLÜ
+                const balance = Math.abs(res.poseLandmarks[23].x - res.poseLandmarks[27].x);
+                document.getElementById('bal-val').innerText = balance < 0.12 ? "Mükemmel" : "Dengesiz";
 
-                // STICKMAN ÇİZİMİ
-                drawConnectors(ctx, res.poseLandmarks, POSE_CONNECTIONS, {color: currentMode === 'night' ? '#0f0' : '#0ff', lineWidth: 4});
-
-                // 10 EL HAREKETİ MOTORU
-                if (res.rightHandLandmarks) {
-                    const marks = res.rightHandLandmarks;
-                    let f = [marks[4].x < marks[3].x ? 1 : 0];
-                    [8, 12, 16, 20].forEach(tip => f.push(marks[tip].y < marks[tip-2].y ? 1 : 0));
-                    const code = f.join('');
-                    
-                    const moves = {
-                        "11111": "🛡️ SHIELD", "01000": "🎯 LASER", "01100": "✌️ VICTORY",
-                        "00000": "👥 STEALTH", "10001": "🕸️ SPIDER", "11000": "🔥 FIRE",
-                        "01110": "🌊 WATER", "00100": "⚡ STRIKE", "00001": "🍃 WIND", "11110": "🏋️ HEAVY"
-                    };
-                    document.getElementById('gesture-box').innerText = moves[code] || "WAITING";
-                    drawConnectors(ctx, marks, HAND_CONNECTIONS, {color: '#fff', lineWidth: 2});
-                }
+                // 3. ÇUBUK ADAM (STICKMAN) ÇİZİMİ
+                drawConnectors(ctx, res.poseLandmarks, POSE_CONNECTIONS, {color: '#0f0', lineWidth: 5});
+                drawLandmarks(ctx, res.poseLandmarks, {color: '#fff', lineWidth: 2, radius: 2});
             }
+
+            // 4. EL HAREKETİ (10 FARKLI MOD)
+            if (res.rightHandLandmarks) {
+                const mk = res.rightHandLandmarks;
+                let f = [mk[4].x < mk[3].x ? 1 : 0];
+                [8,12,16,20].forEach(t => f.push(mk[t].y < mk[t-2].y ? 1 : 0));
+                const code = f.join('');
+                
+                const moves = {
+                    "11111": "🛡️ KALKAN MODU", "01000": "🎯 LAZER KİLİDİ", "01100": "✌️ ZAFER ONAYI",
+                    "00000": "👤 GİZLİ OPERASYON", "10001": "🕸️ ÖRÜMCEK AĞI", "11000": "🔥 ALEV TOPU",
+                    "01110": "🌊 SU DALGASI", "00100": "⚡ ŞİMŞEK ÇAKMASI", "00001": "🍃 RÜZGAR BIÇAĞI", "11110": "🏋️ AĞIR GÜÇ"
+                };
+                if(moves[code]) {
+                    document.getElementById('gest-box').innerText = moves[code];
+                    document.getElementById('gest-box').style.color = "#0f0";
+                }
+                drawConnectors(ctx, mk, HAND_CONNECTIONS, {color: '#0ff', lineWidth: 3});
+            }
+
             ctx.restore();
         }
 
         const h = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
-        h.setOptions({ modelComplexity: 0, minDetectionConfidence: 0.5 });
+        h.setOptions({ modelComplexity: 0, smoothLandmarks: true, minDetectionConfidence: 0.5 });
         h.onResults(onResults);
-        new Camera(video, {onFrame: async () => await h.send({image: video}), width: 640, height: 480}).start();
+        new Camera(video, {onFrame: async () => await h.send({image: video}), width: 1280, height: 720}).start();
     </script>
 </body>
 </html>
