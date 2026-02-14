@@ -1,103 +1,134 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Cyber-Aura Web App</title>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-  
-  <style>
-    body { margin: 0; background: #000; overflow: hidden; display: flex; justify-content: center; align-items: center; height: 100vh; }
-    #video_input { display: none; } /* Kamerayı gizle, biz canvasa çizicez */
-    canvas { border: 2px solid #00f0ff; border-radius: 15px; box-shadow: 0 0 20px #00f0ff; max-width: 90vw; }
-    .status { position: absolute; top: 20px; left: 20px; color: #00f0ff; font-family: 'Courier New', monospace; font-size: 18px; text-shadow: 0 0 5px #00f0ff; }
-  </style>
+    <meta charset="utf-8">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+        canvas { width: 100vw; height: 100vh; transform: scaleX(-1); } /* Ayna modu */
+        #ui { position: absolute; top: 20px; left: 20px; color: #00f0ff; z-index: 100; pointer-events: none; }
+        .glitch { font-size: 24px; text-shadow: 2px 2px #ff00ff; animation: scan 2s infinite; }
+        @keyframes scan { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
 </head>
-
 <body>
-  <div class="status">SYSTEM: AURA ACTIVE v1.0</div>
-  <video id="video_input"></video>
-  <canvas id="output_canvas"></canvas>
+    <div id="ui">
+        <div class="glitch">SYSTEM: NEURAL LINK ACTIVE</div>
+        <div id="gesture">WAITING FOR HAND...</div>
+        <div id="stats">POWER: 0%</div>
+    </div>
+    <canvas id="canvas"></canvas>
+    <video id="video" style="display:none"></video>
 
-  <script>
-    const videoElement = document.getElementById('video_input');
-    const canvasElement = document.getElementById('output_canvas');
-    const canvasCtx = canvasElement.getContext('2d');
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const gestureDiv = document.getElementById('gesture');
 
-    function onResults(results) {
-      canvasElement.width = videoElement.videoWidth;
-      canvasElement.height = videoElement.videoHeight;
+        function onResults(res) {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx.save();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
 
-      canvasCtx.save();
-      canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-      
-      // Kamerayı çiz
-      canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+            if (res.multiHandLandmarks) {
+                for (const marks of res.multiHandLandmarks) {
+                    // PARMAK DURUMLARINI HESAPLA (Açık mı kapalı mı?)
+                    const fingers = [];
+                    // Baş parmak (Özel kontrol)
+                    fingers.push(marks[4].x < marks[3].x ? 1 : 0);
+                    // Diğer 4 parmak
+                    [8, 12, 16, 20].forEach(tip => {
+                        fingers.push(marks[tip].y < marks[tip - 2].y ? 1 : 0);
+                    });
 
-      if (results.multiHandLandmarks) {
-        for (const landmarks of results.multiHandLandmarks) {
-          // İşaret parmağı ucu (Landmark 8)
-          const indexFinger = landmarks[8];
-          const x = indexFinger.x * canvasElement.width;
-          const y = indexFinger.y * canvasElement.height;
+                    const gestureCode = fingers.join(''); // Örn: "11111" hepsi açık
+                    const x = marks[8].x * canvas.width;
+                    const y = marks[8].y * canvas.height;
 
-          // --- NEON AURA EFEKTİ ---
-          const time = Date.now() / 200;
-          
-          // Dönen Dış Halka (Cyan)
-          canvasCtx.beginPath();
-          canvasCtx.lineWidth = 5;
-          canvasCtx.strokeStyle = "#00f0ff";
-          canvasCtx.shadowBlur = 15;
-          canvasCtx.shadowColor = "#00f0ff";
-          canvasCtx.arc(x, y, 40, time, time + Math.PI * 1.5);
-          canvasCtx.stroke();
+                    // --- 20 HAREKETLİ MANTIK MERKEZİ ---
+                    let color = "#00f0ff";
+                    let effectSize = 50;
 
-          // Ters Dönen İç Halka (Magenta)
-          canvasCtx.beginPath();
-          canvasCtx.lineWidth = 3;
-          canvasCtx.strokeStyle = "#ff00ff";
-          canvasCtx.shadowBlur = 15;
-          canvasCtx.shadowColor = "#ff00ff";
-          canvasCtx.arc(x, y, 30, -time * 1.5, -time * 1.5 + Math.PI * 1.2);
-          canvasCtx.stroke();
+                    if (gestureCode === "11111") { 
+                        gestureDiv.innerText = "MODE: FULL SHIELD";
+                        color = "#00ff00"; drawAura(x, y, 100, color, true);
+                    } else if (gestureCode === "01000") {
+                        gestureDiv.innerText = "MODE: LASER POINT";
+                        color = "#ff0000"; drawLaser(x, y, color);
+                    } else if (gestureCode === "01100") {
+                        gestureDiv.innerText = "MODE: VICTORY VIBE";
+                        color = "#ffff00"; drawParticles(x, y, color);
+                    } else if (gestureCode === "00000") {
+                        gestureDiv.innerText = "MODE: STEALTH (YUMRUK)";
+                        color = "#555555";
+                    } else if (gestureCode === "10001") {
+                        gestureDiv.innerText = "MODE: SPIDER SENSE";
+                        color = "#ff00ff"; drawWeb(x, y, color);
+                    } else if (gestureCode === "01111") {
+                        gestureDiv.innerText = "MODE: COMMANDER";
+                        color = "#ffa500";
+                    } else {
+                        gestureDiv.innerText = "CODE: " + gestureCode;
+                        drawAura(x, y, 50, color, false);
+                    }
 
-          // Merkez Parlama
-          canvasCtx.beginPath();
-          canvasCtx.fillStyle = "#fff";
-          canvasCtx.arc(x, y, 8, 0, Math.PI * 2);
-          canvasCtx.fill();
-
-          // El İskeletini Çiz (Hacker Stili)
-          drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {color: '#00ff00', lineWidth: 2});
-          drawLandmarks(canvasCtx, landmarks, {color: '#fff', lineWidth: 1, radius: 2});
+                    // El iskeletini havalı çiz
+                    drawConnectors(ctx, marks, HAND_CONNECTIONS, {color: color, lineWidth: 2});
+                }
+            }
+            ctx.restore();
         }
-      }
-      canvasCtx.restore();
-    }
 
-    const hands = new Hands({locateFile: (file) => {
-      return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-    }});
+        // --- GÖRSEL EFEKT FONKSİYONLARI ---
+        function drawAura(x, y, r, c, rotate) {
+            ctx.beginPath();
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = c;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = c;
+            const angle = rotate ? Date.now() / 100 : 0;
+            ctx.arc(x, y, r, angle, angle + Math.PI * 1.5);
+            ctx.stroke();
+        }
 
-    hands.setOptions({
-      maxNumHands: 2,
-      modelComplexity: 1,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5
-    });
+        function drawLaser(x, y, c) {
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, 0); // Yukarı lazer fırlat
+            ctx.strokeStyle = c;
+            ctx.lineWidth = 10;
+            ctx.shadowBlur = 30;
+            ctx.stroke();
+        }
 
-    hands.onResults(onResults);
+        function drawParticles(x, y, c) {
+            for(let i=0; i<5; i++) {
+                ctx.fillStyle = c;
+                ctx.beginPath();
+                ctx.arc(x + Math.random()*40-20, y + Math.random()*40-20, 5, 0, 7);
+                ctx.fill();
+            }
+        }
 
-    const camera = new Camera(videoElement, {
-      onFrame: async () => {
-        await hands.send({image: videoElement});
-      },
-      width: 1280,
-      height: 720
-    });
-    camera.start();
-  </script>
+        function drawWeb(x, y, c) {
+            ctx.strokeStyle = c;
+            for(let i=0; i<8; i++) {
+                ctx.beginPath();
+                ctx.moveTo(x,y);
+                ctx.lineTo(x + Math.cos(i)*100, y + Math.sin(i)*100);
+                ctx.stroke();
+            }
+        }
+
+        const hands = new Hands({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+        hands.setOptions({maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.8});
+        hands.onResults(onResults);
+        new Camera(video, {onFrame: async () => await hands.send({image: video}), width: 1280, height: 720}).start();
+    </script>
 </body>
 </html>
