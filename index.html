@@ -1,252 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>TITAN OS: MILITARY HUD</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHINOBI-STARK OS: GOD MODE</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-    
     <style>
-        /* SİSTEM ARAYÜZÜ - NASA/ASKERİ TASARIM DİLİ */
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; cursor: crosshair; }
-        canvas { display: block; width: 100vw; height: 100vh; transform: scaleX(-1); position: absolute; top:0; left:0; z-index: 1; }
-        
-        /* TARAMA ÇİZGİLERİ VE GÜRÜLTÜ EFEKTİ */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%;
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Share Tech Mono', monospace; }
+        canvas { display: block; width: 100vw; height: 100vh; transform: scaleX(-1); }
+        .hud-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; border: 2px solid rgba(0, 255, 0, 0.2);
+            box-shadow: inset 0 0 100px rgba(0, 255, 0, 0.1); z-index: 5;
         }
-        
-        /* HUD KATMANLARI */
-        .hud-text { position: absolute; color: #0f0; text-shadow: 0 0 5px #0f0; font-weight: bold; z-index: 20; letter-spacing: 2px; }
-        
-        #top-bar { top: 20px; left: 20px; width: 95%; display: flex; justify-content: space-between; border-bottom: 2px solid #0f0; padding-bottom: 5px; }
-        #left-panel { top: 100px; left: 20px; border-left: 4px solid #0f0; padding-left: 10px; background: rgba(0, 20, 0, 0.6); }
-        #right-panel { top: 100px; right: 20px; border-right: 4px solid #0f0; padding-right: 10px; text-align: right; background: rgba(0, 20, 0, 0.6); }
-        #center-reticle { top: 50%; left: 50%; transform: translate(-50%, -50%); border: 1px solid rgba(0, 255, 0, 0.3); width: 200px; height: 200px; border-radius: 50%; display: flex; align-items: center; justify-content: center; opacity: 0.5; }
-        
-        /* YÜKLEME EKRANI */
-        #boot-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; color: #0f0;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
-        }
-        .blink { animation: blinker 1s linear infinite; }
-        @keyframes blinker { 50% { opacity: 0; } }
+        #top-info { position: absolute; top: 20px; width: 100%; text-align: center; color: #0f0; letter-spacing: 5px; font-size: 20px; text-shadow: 0 0 10px #0f0; }
     </style>
 </head>
 <body>
-
-    <div id="boot-screen">
-        <h1 class="blink">SYSTEM INITIALIZING...</h1>
-        <p>LOADING PROTOCOLS: [██████████] 100%</p>
-        <p>NASA_SECURE_LINK: ESTABLISHED</p>
-    </div>
-
-    <div class="overlay"></div>
-    
-    <div id="top-bar" class="hud-text">
-        <span>SYS: ONLINE</span>
-        <span id="clock">00:00:00:00</span>
-        <span>MODE: COMBAT_READY</span>
-    </div>
-
-    <div id="left-panel" class="hud-text">
-        <div style="font-size: 12px; color: #0a0;">BIOMETRICS</div>
-        <div id="bio-age" style="font-size: 24px;">AGE: SCANNING</div>
-        <div id="bio-stab" style="font-size: 18px;">BAL: --</div>
-        <br>
-        <div style="font-size: 12px; color: #0a0;">TARGET DATA</div>
-        <div id="gesture-data">NO GESTURE</div>
-    </div>
-
-    <div id="right-panel" class="hud-text">
-        <div style="font-size: 12px; color: #0a0;">SYSTEM STATUS</div>
-        <div>CPU: OPTIMAL</div>
-        <div>GPU: ACTIVE</div>
-        <div>NET: SECURE</div>
-        <br>
-        <div id="fps-counter" style="color: yellow;">FPS: 60</div>
-    </div>
-
-    <div id="center-reticle" class="hud-text">+</div>
-
+    <div class="hud-overlay"></div>
+    <div id="top-info">NVG_MODE: ACTIVE // PROTOCOL: SHINOBI</div>
     <canvas id="output"></canvas>
     <video id="video" style="display:none" playsinline></video>
 
     <script>
-        // --- ASKERİ SİSTEM BAŞLATMA ---
         const video = document.getElementById('video');
         const canvas = document.getElementById('output');
         const ctx = canvas.getContext('2d');
-        const bootScreen = document.getElementById('boot-screen');
-        
-        let width, height;
-        
-        // EFEKT DEĞİŞKENLERİ
-        let frameCount = 0;
-        let particles = [];
-        
-        function resize() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-        }
-        window.onresize = resize;
-        resize();
+        let frame = 0;
 
-        // SAAT GÜNCELLEME
-        setInterval(() => {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toISOString().split('T')[1].replace('Z', '');
-        }, 100);
-
-        // --- ANA OPERASYON DÖNGÜSÜ ---
-        function onResults(results) {
-            bootScreen.style.display = 'none'; // Sistem açıldı
-
+        function onResults(res) {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             ctx.save();
-            ctx.clearRect(0, 0, width, height);
-
-            // 1. GECE GÖRÜŞÜ (TACTICAL NIGHT VISION)
-            ctx.filter = "contrast(1.4) brightness(1.2) sepia(1) hue-rotate(90deg) saturate(1.5)";
-            ctx.drawImage(results.image, 0, 0, width, height);
+            
+            // 1. ÜST SEVİYE GECE GÖRÜŞÜ (NASA GREEN FILTER)
+            ctx.filter = "brightness(1.2) contrast(1.5) sepia(1) hue-rotate(80deg) saturate(2)";
+            ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
             ctx.filter = "none";
 
-            // Izgara (Grid) Çizimi - Derinlik hissi için
-            drawTacticalGrid();
+            // 2. TAKTİKSEL IZGARA
+            ctx.strokeStyle = "rgba(0, 255, 0, 0.2)";
+            for(let i=0; i<canvas.width; i+=100) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
 
-            // 2. ISKELET TAKİBİ (SKELETON TRACKING)
-            if (results.poseLandmarks) {
-                // Askeri Yeşil Çizgiler
-                drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: 'rgba(0, 255, 0, 0.6)', lineWidth: 2});
-                drawLandmarks(ctx, results.poseLandmarks, {color: '#0f0', radius: 2, lineWidth: 1});
+            // 3. ANİME & ASKERİ EFEKTLER
+            if (res.rightHandLandmarks || res.leftHandLandmarks) {
+                const hand = res.rightHandLandmarks || res.leftHandLandmarks;
+                const cx = hand[9].x * canvas.width;
+                const cy = hand[9].y * canvas.height;
+                const code = getCode(hand);
 
-                // Yaş & Denge Hesaplama (Matematiksel Analiz)
-                calculateBiometrics(results.poseLandmarks);
+                ctx.shadowBlur = 30;
+
+                if (code === "00000") { // ✊ CHIDORI / ENERGY BALL
+                    ctx.shadowColor = "#0ff";
+                    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+                    ctx.beginPath(); ctx.arc(cx, cy, 40, 0, 7); ctx.fill();
+                    for(let i=0; i<8; i++) {
+                        ctx.strokeStyle = "#0ff"; ctx.lineWidth = 2;
+                        ctx.beginPath(); ctx.moveTo(cx, cy);
+                        ctx.lineTo(cx+(Math.random()-0.5)*200, cy+(Math.random()-0.5)*200); ctx.stroke();
+                    }
+                } 
+                else if (code === "11111") { // 🖐️ REPULSOR / SHINRA TENSEI
+                    ctx.shadowColor = "#f00";
+                    ctx.strokeStyle = "#fff"; ctx.lineWidth = 5;
+                    ctx.beginPath(); ctx.arc(cx, cy, 60 + (frame%20), 0, 7); ctx.stroke();
+                    ctx.beginPath(); ctx.arc(cx, cy, 30, 0, 7); ctx.fillStyle="white"; ctx.fill();
+                }
+                else if (code === "01100") { // ✌️ INFINITY AURA (GOJO STYLE)
+                    ctx.shadowColor = "#m0f";
+                    let t = Date.now() * 0.01;
+                    for(let i=0; i<6; i++) {
+                        ctx.strokeStyle = `hsl(${280+i*10}, 100%, 50%)`;
+                        ctx.beginPath(); ctx.arc(cx, cy, i*20, t+i, t+i+3); ctx.stroke();
+                    }
+                }
+                else if (code === "01000") { // ☝️ AMATERASU / LASER
+                    ctx.strokeStyle = "red"; ctx.lineWidth = 10; ctx.shadowColor="red";
+                    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, 0); ctx.stroke();
+                }
             }
 
-            // 3. EL HAREKETLERİ VE SİLAH SİSTEMLERİ
-            if (results.rightHandLandmarks) {
-                processHandSystems(results.rightHandLandmarks, results.image);
+            // 4. JUTSU MÜHÜRÜ (İKİ EL YAN YANA GELİNCE)
+            if (res.leftHandLandmarks && res.rightHandLandmarks) {
+                const lx = res.leftHandLandmarks[9].x * canvas.width;
+                const rx = res.rightHandLandmarks[9].y * canvas.height;
+                if (Math.abs(lx - rx) < 200) {
+                    ctx.strokeStyle = "yellow"; ctx.shadowColor = "yellow";
+                    ctx.font = "40px Courier";
+                    ctx.strokeText("JUTSU: SEAL RELEASED", canvas.width/2 - 200, canvas.height/2);
+                }
             }
 
             ctx.restore();
-            frameCount++;
+            frame++;
         }
 
-        // --- SİSTEM ALT MODÜLLERİ ---
-
-        function drawTacticalGrid() {
-            ctx.strokeStyle = "rgba(0, 50, 0, 0.3)";
-            ctx.lineWidth = 1;
-            // Dikey Çizgiler
-            for(let i=0; i<width; i+=100) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,height); ctx.stroke(); }
-            // Yatay Çizgiler
-            for(let j=0; j<height; j+=100) { ctx.beginPath(); ctx.moveTo(0,j); ctx.lineTo(width,j); ctx.stroke(); }
-        }
-
-        function calculateBiometrics(pose) {
-            // Yaş Tahmini (Omuz/Boy Oranı)
-            const shoulderDist = Math.hypot(pose[11].x - pose[12].x, pose[11].y - pose[12].y);
-            const bodyHeight = Math.hypot(pose[0].x - pose[28].x, pose[0].y - pose[28].y);
-            let estAge = Math.round((shoulderDist / bodyHeight) * 140 - 5);
-            if(estAge < 10) estAge = "CALCULATING...";
-            document.getElementById('bio-age').innerText = `AGE: ${estAge}`;
-
-            // Denge Analizi (Kalça Merkezi vs Ayak Merkezi)
-            const hipX = (pose[23].x + pose[24].x) / 2;
-            const footX = (pose[27].x + pose[28].x) / 2;
-            const balance = Math.abs(hipX - footX);
-            const status = balance < 0.05 ? "LOCKED" : "UNSTABLE";
-            const color = balance < 0.05 ? "#0f0" : "#f00";
-            
-            const balEl = document.getElementById('bio-stab');
-            balEl.innerText = `STABILITY: ${status}`;
-            balEl.style.color = color;
-        }
-
-        function processHandSystems(hand, img) {
-            const code = getGestureCode(hand);
-            const cx = hand[9].x * width;
-            const cy = hand[9].y * height;
-            const tipX = hand[8].x * width;
-            const tipY = hand[8].y * height;
-
-            drawConnectors(ctx, hand, HAND_CONNECTIONS, {color: '#0ff', lineWidth: 2});
-
-            // GESTURE: REPULSOR (AÇIK EL) [11111]
-            if (code === "11111") {
-                document.getElementById('gesture-data').innerText = "WEAPON: REPULSOR";
-                // Çekirdek
-                ctx.beginPath(); ctx.arc(cx, cy, 30, 0, Math.PI*2); 
-                ctx.fillStyle = "#fff"; ctx.fill();
-                // Şok Dalgası
-                ctx.beginPath(); ctx.arc(cx, cy, 60 + Math.sin(frameCount*0.5)*10, 0, Math.PI*2);
-                ctx.strokeStyle = "cyan"; ctx.lineWidth = 5; ctx.stroke();
-                // Parçacıklar
-                for(let i=0; i<5; i++) {
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy);
-                    ctx.lineTo(cx + (Math.random()-0.5)*200, cy + (Math.random()-0.5)*200);
-                    ctx.strokeStyle = "rgba(0,255,255,0.5)"; ctx.stroke();
-                }
-            }
-            // GESTURE: LASER (İŞARET PARMAĞI) [01000]
-            else if (code === "01000") {
-                document.getElementById('gesture-data').innerText = "WEAPON: LASER";
-                // Lazer Çizgisi
-                ctx.beginPath(); ctx.moveTo(tipX, tipY); ctx.lineTo(tipX, 0);
-                ctx.strokeStyle = "red"; ctx.lineWidth = 4; ctx.shadowBlur = 20; ctx.shadowColor = "red"; ctx.stroke();
-                // Hedef Kilidi
-                ctx.strokeStyle = "red"; ctx.lineWidth = 2; ctx.strokeRect(tipX-40, tipY-40, 80, 80);
-            }
-            // GESTURE: AURA (ZAFER) [01100]
-            else if (code === "01100") {
-                document.getElementById('gesture-data').innerText = "SYSTEM: ANALYSIS";
-                // Dönen Hologram
-                ctx.strokeStyle = "orange"; ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.arc(tipX, tipY, 50, frameCount*0.1, frameCount*0.1 + Math.PI); ctx.stroke();
-                ctx.beginPath(); ctx.arc(tipX, tipY, 40, -frameCount*0.1, -frameCount*0.1 + Math.PI); ctx.stroke();
-                // Veri Yazısı
-                ctx.fillStyle = "orange"; ctx.fillText(`X:${Math.round(tipX)} Y:${Math.round(tipY)}`, tipX+60, tipY);
-            }
-            // GESTURE: HEAVY (YUMRUK) [00000]
-            else if (code === "00000") {
-                document.getElementById('gesture-data').innerText = "SYSTEM: CHARGING";
-                ctx.beginPath(); ctx.arc(cx, cy, 10 + (frameCount%30), 0, Math.PI*2);
-                ctx.strokeStyle = "yellow"; ctx.lineWidth = 3; ctx.stroke();
-            }
-            else {
-                document.getElementById('gesture-data').innerText = "STANDBY";
-            }
-        }
-
-        function getGestureCode(landmarks) {
-            const f = [landmarks[4].x < landmarks[3].x ? 1 : 0]; // Başparmak (Sağ el için)
-            [8, 12, 16, 20].forEach(i => f.push(landmarks[i].y < landmarks[i-2].y ? 1 : 0));
+        function getCode(h) {
+            let f = [h[4].x < h[3].x ? 1 : 0];
+            [8,12,16,20].forEach(i => f.push(h[i].y < h[i-2].y ? 1 : 0));
             return f.join('');
         }
 
-        // --- BAŞLATMA PROTOKOLÜ ---
-        const holistic = new Holistic({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`});
-        holistic.setOptions({
-            modelComplexity: 1,
-            smoothLandmarks: true,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
-        });
-        holistic.onResults(onResults);
-
-        const camera = new Camera(video, {
-            onFrame: async () => { await holistic.send({image: video}); },
-            width: 1280, height: 720
-        });
-        camera.start();
+        const h = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
+        h.setOptions({ modelComplexity: 1, minDetectionConfidence: 0.5 });
+        h.onResults(onResults);
+        new Camera(video, {onFrame: async () => await h.send({image: video}), width: 1280, height: 720}).start();
     </script>
 </body>
 </html>
-
