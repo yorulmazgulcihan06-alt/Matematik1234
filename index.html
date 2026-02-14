@@ -2,35 +2,34 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Cyber-Aura V4.0 - 20 Movements</title>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
         canvas { width: 100vw; height: 100vh; transform: scaleX(-1); }
-        #ui { position: absolute; top: 30px; left: 30px; color: #fff; z-index: 100; text-transform: uppercase; letter-spacing: 2px; }
-        .status-box { background: rgba(0, 240, 255, 0.1); border-left: 5px solid #00f0ff; padding: 15px; backdrop-filter: blur(5px); }
-        #gesture-name { font-size: 28px; font-weight: bold; text-shadow: 0 0 10px currentColor; }
-        #code-display { font-size: 14px; opacity: 0.7; margin-top: 5px; color: #00f0ff; }
+        #overlay { position: absolute; top: 20px; left: 20px; color: #00f0ff; z-index: 10; }
+        .auth-status { font-size: 24px; padding: 10px; border: 2px solid; }
+        .yes { color: #00ff00; border-color: #00ff00; }
+        .no { color: #ff0000; border-color: #ff0000; }
     </style>
 </head>
 <body>
-    <div id="ui">
-        <div class="status-box">
-            <div id="gesture-name">SCANNING HAND...</div>
-            <div id="code-display">BINARY: 00000</div>
-        </div>
+    <div id="overlay">
+        <div id="status" class="auth-status no">ACCESS DENIED - UNKNOWN USER</div>
+        <div id="info">Sistem: Yüz ve Vücut Taraması Aktif...</div>
     </div>
-    <canvas id="canvas"></canvas>
-    <video id="video" style="display:none"></video>
+    <canvas id="out"></canvas>
+    <video id="vid" style="display:none"></video>
 
     <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
+        const video = document.getElementById('vid');
+        const canvas = document.getElementById('out');
         const ctx = canvas.getContext('2d');
-        const nameDiv = document.getElementById('gesture-name');
-        const codeDiv = document.getElementById('code-display');
+        const statusDiv = document.getElementById('status');
+
+        // GÜVENLİK AYARI: Buraya kendi yüz özelliklerini tanımlayacağız (şimdilik basit bir kontrol)
+        let isAuthorized = false;
 
         function onResults(res) {
             canvas.width = window.innerWidth;
@@ -39,93 +38,60 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
 
-            if (res.multiHandLandmarks) {
-                for (const marks of res.multiHandLandmarks) {
-                    // PARMAK MOTORU (Açık: 1, Kapalı: 0)
-                    let fingers = [];
-                    fingers.push(marks[4].x < marks[3].x ? 1 : 0); // Baş
-                    [8, 12, 16, 20].forEach(tip => {
-                        fingers.push(marks[tip].y < marks[tip - 2].y ? 1 : 0);
-                    });
-                    const code = fingers.join('');
-                    
-                    // Efekt Merkezi (İşaret parmağı ucu)
-                    const x = marks[8].x * canvas.width;
-                    const y = marks[8].y * canvas.height;
-
-                    // --- 20 HAREKETLİ MANTIK VE RENK TABLOSU ---
-                    let config = { name: "STABLE", color: "#00f0ff", type: "circle" };
-
-                    const moves = {
-                        "11111": { name: "FULL SHIELD", color: "#00ff00", type: "shield" },
-                        "00000": { name: "STEALTH MODE", color: "#333333", type: "none" },
-                        "01000": { name: "LASER POINT", color: "#ff0000", type: "laser" },
-                        "01100": { name: "VICTORY", color: "#ffff00", type: "particles" },
-                        "10001": { name: "SPIDER-WEB", color: "#ff00ff", type: "web" },
-                        "11000": { name: "FIREBALL", color: "#ff4500", type: "aura" },
-                        "01110": { name: "WATER FLOW", color: "#1e90ff", type: "wave" },
-                        "00100": { name: "THUNDER", color: "#ffffff", type: "bolt" },
-                        "11110": { name: "EARTHQUAKE", color: "#8b4513", type: "shake" },
-                        "00001": { name: "WIND BLADE", color: "#f0ffff", type: "aura" },
-                        "01010": { name: "MATRIX DATA", color: "#00ff41", type: "code" },
-                        "10101": { name: "REBOOT", color: "#ffffff", type: "flash" },
-                        "11001": { name: "LOADING", color: "#ffa500", type: "rotate" },
-                        "00111": { name: "ACCESS DENIED", color: "#8b0000", type: "shield" },
-                        "10000": { name: "PING", color: "#00ced1", type: "wave" },
-                        "11011": { name: "ROCK ON", color: "#ff1493", type: "particles" },
-                        "10110": { name: "SMALL POWER", color: "#7b68ee", type: "aura" },
-                        "01001": { name: "INFINITY", color: "#adff2f", type: "rotate" },
-                        "01111": { name: "COMMANDER", color: "#ff8c00", type: "aura" },
-                        "00011": { name: "MINI-SHIELD", color: "#7fffd4", type: "shield" }
-                    };
-
-                    if(moves[code]) config = moves[code];
-
-                    nameDiv.innerText = config.name;
-                    nameDiv.style.color = config.color;
-                    codeDiv.innerText = "BINARY: " + code;
-
-                    // --- GÖRSEL EFEKT ÇİZİMLERİ ---
-                    drawVisualEffect(x, y, config, ctx);
-                    
-                    // El İskeletini Çiz
-                    drawConnectors(ctx, marks, HAND_CONNECTIONS, {color: config.color, lineWidth: 3});
-                }
+            // 1. YÜZ KONTROLÜ (GÜVENLİK)
+            if (res.faceLandmarks) {
+                // Burada yüzün genişliği/yüksekliği gibi oranlarla "sen" olup olmadığını anlarız
+                // Gerçek FaceID için daha fazla veri lazım ama biz efektleri "Yüz varken" açıyoruz
+                isAuthorized = true; 
+                statusDiv.innerText = "ACCESS GRANTED: UTKAN";
+                statusDiv.className = "auth-status yes";
+            } else {
+                isAuthorized = false;
+                statusDiv.innerText = "ACCESS DENIED - NO USER";
+                statusDiv.className = "auth-status no";
             }
+
+            // 2. EFEKTLER (SADECE SEN VARKEN ÇALIŞIR)
+            if (isAuthorized) {
+                // Vücut Çizgileri (Mavi Şimşek Efekti)
+                if (res.poseLandmarks) {
+                    drawConnectors(ctx, res.poseLandmarks, POSE_CONNECTIONS, {color: '#00f0ff', lineWidth: 2});
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = "#00f0ff";
+                }
+
+                // El Aurası (Kırmızı/Mavi)
+                if (res.rightHandLandmarks) {
+                    const hand = res.rightHandLandmarks[8];
+                    const x = hand.x * canvas.width;
+                    const y = hand.y * canvas.height;
+                    
+                    // Aura Halkası
+                    ctx.beginPath();
+                    ctx.arc(x, y, 60, 0, Math.PI * 2);
+                    ctx.strokeStyle = "#ff0000";
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+                }
+
+                // Yüz Matrix Efekti
+                if (res.faceLandmarks) {
+                    drawConnectors(ctx, res.faceLandmarks, FACEMESH_TESSELATION, {color: '#00ff0033', lineWidth: 1});
+                }
+            } else {
+                // Yetkisiz birisi gelirse ekranı boz (Glitch efekti gibi)
+                ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+
             ctx.restore();
         }
 
-        function drawVisualEffect(x, y, conf, ctx) {
-            const t = Date.now() / 200;
-            ctx.strokeStyle = conf.color;
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = conf.color;
-            ctx.lineWidth = 5;
+        const holistic = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
+        holistic.setOptions({ modelComplexity: 1, smoothLandmarks: true, minDetectionConfidence: 0.5 });
+        holistic.onResults(onResults);
 
-            if(conf.type === "shield") {
-                ctx.beginPath();
-                ctx.arc(x, y, 80, t, t + Math.PI * 1.6);
-                ctx.stroke();
-            } else if(conf.type === "laser") {
-                ctx.beginPath();
-                ctx.moveTo(x, y); ctx.lineTo(x, 0);
-                ctx.stroke();
-            } else if(conf.type === "particles") {
-                for(let i=0; i<8; i++) {
-                    ctx.fillStyle = conf.color;
-                    ctx.fillRect(x + Math.sin(t+i)*50, y + Math.cos(t+i)*50, 8, 8);
-                }
-            } else if(conf.type === "aura") {
-                ctx.beginPath();
-                ctx.arc(x, y, 40 + Math.sin(t)*10, 0, Math.PI*2);
-                ctx.stroke();
-            }
-        }
-
-        const hands = new Hands({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
-        hands.setOptions({maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.8, minTrackingConfidence: 0.8});
-        hands.onResults(onResults);
-        new Camera(video, {onFrame: async () => await hands.send({image: video}), width: 1280, height: 720}).start();
+        new Camera(video, {onFrame: async () => await holistic.send({image: video}), width: 1280, height: 720}).start();
     </script>
 </body>
 </html>
