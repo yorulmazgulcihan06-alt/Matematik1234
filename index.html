@@ -3,145 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JARVIS COMMANDER V3</title>
+    <title>JARVIS TITAN-CORE</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
         
         body { 
             margin: 0; background: #000; overflow: hidden; 
-            font-family: 'Share Tech Mono', monospace; color: #00f2ff;
+            font-family: 'Orbitron', sans-serif; color: #00d9ff;
         }
 
-        /* JARVIS ANA MERKEZ */
-        #core-container {
+        /* ANA EKRAN EFEKTLERİ */
+        #bg-effect {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.05) 0%, #000 70%);
+            z-index: -1;
+        }
+
+        .container {
             display: flex; flex-direction: column; align-items: center;
-            justify-content: center; height: 100vh;
+            justify-content: center; height: 100vh; text-align: center;
         }
 
-        .arc-reactor {
-            width: 200px; height: 200px; border-radius: 50%;
-            border: 2px solid rgba(0, 242, 255, 0.2);
-            position: relative; display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 50px rgba(0, 242, 255, 0.1);
-            transition: all 0.3s ease;
+        /* REAKTÖR ÇEKİRDEĞİ */
+        .core {
+            width: 250px; height: 250px; border-radius: 50%;
+            border: 4px double #00d9ff; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.2), inset 0 0 30px rgba(0, 217, 255, 0.2);
+            animation: breathe 4s ease-in-out infinite;
         }
 
-        .ring {
-            position: absolute; border-radius: 50%;
-            border: 2px dashed #00f2ff;
-            animation: rotate 10s linear infinite;
+        .scan-circle {
+            position: absolute; width: 100%; height: 100%;
+            border: 2px solid transparent; border-top: 2px solid #00d9ff;
+            border-radius: 50%; animation: spin 2s linear infinite;
         }
-        .r1 { width: 180px; height: 180px; opacity: 0.8; }
-        .r2 { width: 150px; height: 150px; border-style: dotted; animation-direction: reverse; }
-        
-        #inner-core {
-            width: 80px; height: 80px; background: radial-gradient(#fff, #00f2ff);
-            border-radius: 50%; box-shadow: 0 0 30px #00f2ff;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        /* SES DALGASI */
-        #status-text { margin-top: 30px; font-size: 18px; text-transform: uppercase; letter-spacing: 2px; }
-        #cmd-preview { margin-top: 10px; color: rgba(0, 242, 255, 0.6); font-size: 14px; }
 
         /* HUD VERİLERİ */
-        .hud { position: fixed; padding: 15px; background: rgba(0, 20, 20, 0.5); border: 1px solid #00f2ff; font-size: 12px; }
-        .top-left { top: 20px; left: 20px; }
-        .bottom-right { bottom: 20px; right: 20px; text-align: right; }
+        .hud-overlay {
+            position: fixed; width: 100%; height: 100%; pointer-events: none;
+            display: flex; justify-content: space-between; padding: 20px; box-sizing: border-box;
+        }
 
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+        .data-panel {
+            border-left: 3px solid #00d9ff; background: rgba(0, 217, 255, 0.05);
+            padding: 15px; font-size: 10px; height: fit-content;
+        }
 
-        /* GECE GÖRÜŞÜ MODU */
-        .night-vision { color: #00ff00 !important; }
-        .night-vision .arc-reactor { border-color: #00ff00; }
-        .night-vision .ring { border-color: #00ff00; }
-        .night-vision #inner-core { background: radial-gradient(#fff, #00ff00); box-shadow: 0 0 30px #00ff00; }
+        /* ANİMASYONLAR */
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        @keyframes breathe { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.05); opacity: 1; } }
+
+        #status { font-size: 14px; margin-top: 20px; letter-spacing: 5px; text-shadow: 0 0 10px #00d9ff; }
+        #log { font-size: 10px; color: rgba(0, 217, 255, 0.5); margin-top: 10px; }
     </style>
 </head>
-<body>
+<body onclick="startSystem()">
 
-    <div class="hud top-left">
-        SİSTEM: AKTİF<br>
-        BAĞLANTI: SECURE_OS<br>
-        YETKİ: YÖNETİCİ
-    </div>
+    <div id="bg-effect"></div>
 
-    <div id="core-container">
-        <div class="arc-reactor" id="main-ui">
-            <div class="ring r1"></div>
-            <div class="ring r2"></div>
-            <div id="inner-core"></div>
+    <div class="hud-overlay">
+        <div class="data-panel">
+            SİSTEM: TITAN-V4<br>
+            İŞLEMCİ: %<span id="cpu-val">12</span><br>
+            RAM: 1.2 GB<br>
+            DURUM: GÜVENLİ
         </div>
-        <div id="status-text">JARVIS DİNLİYOR...</div>
-        <div id="cmd-preview">"Komut Bekleniyor"</div>
+        <div class="data-panel" style="text-align: right; border-left: none; border-right: 3px solid #00d9ff;">
+            BIOMETRIC: AKTİF<br>
+            HEDEF: <span id="target">YOK</span><br>
+            NETWORK: ENCRYPTED
+        </div>
     </div>
 
-    <div class="hud bottom-right">
-        BATARYA: %98<br>
-        SICAKLIK: 32°C<br>
-        İŞLEMCİ: STABİL
+    <div class="container">
+        <div class="core">
+            <div class="scan-circle"></div>
+            <div class="scan-circle" style="animation-duration: 3s; direction: reverse;"></div>
+            <div style="width: 60px; height: 60px; background: #00d9ff; border-radius: 50%; box-shadow: 0 0 50px #00d9ff;"></div>
+        </div>
+        <div id="status">SİSTEM UYKUDA</div>
+        <div id="log">BAŞLATMAK İÇİN EKRANA DOKUNUN</div>
     </div>
 
     <script>
-        const statusText = document.getElementById('status-text');
-        const cmdPreview = document.getElementById('cmd-preview');
-        const mainUi = document.body;
+        let isStarted = false;
 
-        // --- SES TANIMA MOTORU ---
-        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!Recognition) {
-            alert("Tarayıcınız ses tanımayı desteklemiyor. Lütfen Chrome kullanın.");
-        } else {
-            const jarvis = new Recognition();
-            jarvis.continuous = true;
-            jarvis.lang = 'tr-TR';
-            jarvis.interimResults = false;
-
-            jarvis.onstart = () => { statusText.innerText = "JARVIS ÇEVRİMİÇİ"; };
-
-            jarvis.onresult = (event) => {
-                const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
-                cmdPreview.innerText = `Son Komut: "${command}"`;
-                executeCommand(command);
-            };
-
-            jarvis.onerror = () => { jarvis.start(); }; // Hata olursa yeniden başlat
-            jarvis.onend = () => { jarvis.start(); };   // Kapanırsa geri aç
+        function startSystem() {
+            if (isStarted) return;
+            isStarted = true;
+            document.getElementById('status').innerText = "BAŞLATILIYOR...";
             
-            // Başlat
-            jarvis.start();
-        }
-
-        function executeCommand(cmd) {
-            // 1. GECE GÖRÜŞÜ
-            if (cmd.includes("gece görüşü")) {
-                mainUi.classList.add('night-vision');
-                speak("Gece görüşü protokolü aktif, komutanım.");
-            }
-            // 2. NORMAL MOD
-            if (cmd.includes("normal mod") || cmd.includes("standard")) {
-                mainUi.classList.remove('night-vision');
-                speak("Sistem standart değerlere döndürülüyor.");
-            }
-            // 3. SİSTEM ANALİZİ
-            if (cmd.includes("analiz") || cmd.includes("tara")) {
-                speak("Çevresel biyometrik tarama başlatıldı. Tehdit algılanmadı.");
-            }
-            // 4. KİMLİK DOĞRULAMA
-            if (cmd.includes("kim") || cmd.includes("tanı")) {
-                speak("Biyometrik veriler eşleşti. Hoş geldiniz enişte bey.");
-            }
+            // 1. SESİ AYARLA (ERKEK TONU İÇİN)
+            speak("Sistem çekirdeği yükleniyor. Tüm yetkiler onaylandı. Hoş geldiniz komutanım.");
+            
+            // 2. SES TANIMAYI BAŞLAT
+            initVoiceRecognition();
+            
+            // 3. HUD GÜNCELLEME
+            setInterval(() => {
+                document.getElementById('cpu-val').innerText = Math.floor(Math.random() * 25 + 5);
+            }, 2000);
         }
 
         function speak(text) {
             const synth = window.speechSynthesis;
             const utter = new SpeechSynthesisUtterance(text);
+            
+            // Erkek sesi bulma algoritması
+            const voices = synth.getVoices();
+            // Türkçe erkek sesi genellikle "Google Türkçe" veya cihazda yüklü seslerden seçilir
+            const maleVoice = voices.find(v => v.lang.includes('tr') && (v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('google')));
+            
+            if (maleVoice) utter.voice = maleVoice;
             utter.lang = 'tr-TR';
-            utter.pitch = 0.9;
-            utter.rate = 1;
+            utter.pitch = 0.8; // Sesi kalınlaştırır
+            utter.rate = 0.9;  // Daha otoriter ve yavaş konuşur
+            
             synth.speak(utter);
+            document.getElementById('status').innerText = "JARVIS DİNLİYOR";
+            document.getElementById('log').innerText = "KOMUT BEKLENİYOR...";
         }
+
+        function initVoiceRecognition() {
+            const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!Recognition) return;
+
+            const jarvis = new Recognition();
+            jarvis.continuous = true;
+            jarvis.lang = 'tr-TR';
+
+            jarvis.onresult = (event) => {
+                const cmd = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                document.getElementById('log').innerText = `ALINAN EMİR: ${cmd}`;
+                processCommand(cmd);
+            };
+
+            jarvis.start();
+        }
+
+        function processCommand(cmd) {
+            if (cmd.includes("analiz")) {
+                speak("Çevresel analiz tamamlandı. Enişte beyin heyecan seviyesi normalin üzerinde. Sistemler stabil.");
+                document.getElementById('target').innerText = "ENİŞTE_DETECTION";
+            }
+            if (cmd.includes("gece görüşü")) {
+                document.body.style.filter = "sepia(1) hue-rotate(90deg) saturate(5)";
+                speak("Gece görüşü protokolü devreye alındı.");
+            }
+            if (cmd.includes("normal")) {
+                document.body.style.filter = "none";
+                speak("Sistem standart moda dönüyor.");
+            }
+            if (cmd.includes("kimsin")) {
+                speak("Ben, Titan çekirdeği üzerine kurulu, sizin için özelleştirilmiş Jarvis işletim sistemiyim.");
+            }
+        }
+
+        // Seslerin yüklenmesi için bekle
+        window.speechSynthesis.onvoiceschanged = () => { console.log("Sesler hazır."); };
     </script>
 </body>
 </html>
+
