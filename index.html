@@ -1,111 +1,184 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SHINOBI-STARK OS: GOD MODE</title>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic/holistic.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TITAN-X SYSTEM</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Share Tech Mono', monospace; }
-        canvas { display: block; width: 100vw; height: 100vh; transform: scaleX(-1); }
-        .hud-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; border: 2px solid rgba(0, 255, 0, 0.2);
-            box-shadow: inset 0 0 100px rgba(0, 255, 0, 0.1); z-index: 5;
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
+        canvas { position: absolute; width: 100vw; height: 100vh; transform: scaleX(-1); }
+        
+        /* GİRİŞ EKRANI */
+        #boot-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 100; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: #0f0;
         }
-        #top-info { position: absolute; top: 20px; width: 100%; text-align: center; color: #0f0; letter-spacing: 5px; font-size: 20px; text-shadow: 0 0 10px #0f0; }
+        #boot-text { font-size: 20px; animation: blink 0.5s infinite; }
+        #start-btn {
+            margin-top: 20px; padding: 15px 40px; border: 2px solid #0f0; background: transparent;
+            color: #0f0; font-size: 18px; font-weight: bold; cursor: pointer;
+            box-shadow: 0 0 15px #0f0;
+        }
+
+        /* HUD KATMANLARI */
+        .hud-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
+        
+        .corner-box {
+            position: absolute; border: 2px solid rgba(0, 255, 255, 0.5); padding: 10px;
+            color: cyan; font-size: 12px; background: rgba(0, 20, 20, 0.6);
+        }
+        .top-left { top: 20px; left: 20px; width: 150px; }
+        .top-right { top: 20px; right: 20px; text-align: right; }
+        .bottom-left { bottom: 20px; left: 20px; }
+        
+        /* AKAN YAZILAR */
+        .scrolling-code {
+            position: absolute; right: 10px; top: 100px; width: 100px; height: 300px;
+            color: rgba(0, 255, 0, 0.6); font-size: 10px; overflow: hidden; text-align: right;
+        }
+
+        /* HEDEF KUTUSU (Yüz Etrafında) */
+        #target-box {
+            position: absolute; border: 2px solid red; box-shadow: 0 0 10px red;
+            width: 0; height: 0; display: none; z-index: 5;
+            transition: all 0.1s ease;
+        }
+        #target-label {
+            position: absolute; top: -20px; left: 0; background: red; color: white;
+            font-size: 10px; padding: 2px 5px; white-space: nowrap;
+        }
+
+        @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
-    <div class="hud-overlay"></div>
-    <div id="top-info">NVG_MODE: ACTIVE // PROTOCOL: SHINOBI</div>
-    <canvas id="output"></canvas>
+
+    <div id="boot-screen">
+        <div id="boot-text">SYSTEM INITIALIZING...</div>
+        <button id="start-btn" onclick="startSystem()">BAŞLAT / START</button>
+    </div>
+
+    <canvas id="canvas"></canvas>
     <video id="video" style="display:none" playsinline></video>
+
+    <div id="target-box"><div id="target-label">HEDEF: TANIMLANAMIYOR</div></div>
+
+    <div class="hud-overlay">
+        <div class="corner-box top-left">
+            CPU: <span id="cpu">0</span>%<br>
+            RAM: <span id="ram">0</span>MB<br>
+            FPS: <span id="fps">0</span>
+        </div>
+        <div class="corner-box top-right">
+            TITAN-X PROTOCOL<br>
+            V.9.0.1 [BETA]<br>
+            SECURE LINK: ACTIVE
+        </div>
+        <div class="corner-box bottom-left">
+            SCAN MODE: OMNI<br>
+            THREAT: LOW
+        </div>
+        <div class="scrolling-code" id="matrix"></div>
+    </div>
 
     <script>
         const video = document.getElementById('video');
-        const canvas = document.getElementById('output');
+        const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        let frame = 0;
+        const targetBox = document.getElementById('target-box');
+        
+        let startTime = Date.now();
+        let frameCount = 0;
 
-        function onResults(res) {
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            ctx.save();
+        // MATRİX KODLARI OLUŞTUR
+        setInterval(() => {
+            const matrix = document.getElementById('matrix');
+            matrix.innerHTML += Math.random().toString(36).substring(7) + "<br>";
+            if(matrix.innerHTML.length > 500) matrix.innerHTML = "";
             
-            // 1. ÜST SEVİYE GECE GÖRÜŞÜ (NASA GREEN FILTER)
-            ctx.filter = "brightness(1.2) contrast(1.5) sepia(1) hue-rotate(80deg) saturate(2)";
-            ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
-            ctx.filter = "none";
+            // SAHTE VERİ GÜNCELLEME
+            document.getElementById('cpu').innerText = Math.floor(Math.random() * 30 + 10);
+            document.getElementById('ram').innerText = Math.floor(Math.random() * 500 + 1024);
+        }, 100);
 
-            // 2. TAKTİKSEL IZGARA
-            ctx.strokeStyle = "rgba(0, 255, 0, 0.2)";
-            for(let i=0; i<canvas.width; i+=100) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,canvas.height); ctx.stroke(); }
+        // HOLISTIC MODEL (YÜZ + VÜCUT + EL)
+        const holistic = new Holistic({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`});
+        holistic.setOptions({
+            modelComplexity: 0, // HIZ İÇİN 0
+            smoothLandmarks: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
 
-            // 3. ANİME & ASKERİ EFEKTLER
-            if (res.rightHandLandmarks || res.leftHandLandmarks) {
-                const hand = res.rightHandLandmarks || res.leftHandLandmarks;
-                const cx = hand[9].x * canvas.width;
-                const cy = hand[9].y * canvas.height;
-                const code = getCode(hand);
-
-                ctx.shadowBlur = 30;
-
-                if (code === "00000") { // ✊ CHIDORI / ENERGY BALL
-                    ctx.shadowColor = "#0ff";
-                    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
-                    ctx.beginPath(); ctx.arc(cx, cy, 40, 0, 7); ctx.fill();
-                    for(let i=0; i<8; i++) {
-                        ctx.strokeStyle = "#0ff"; ctx.lineWidth = 2;
-                        ctx.beginPath(); ctx.moveTo(cx, cy);
-                        ctx.lineTo(cx+(Math.random()-0.5)*200, cy+(Math.random()-0.5)*200); ctx.stroke();
-                    }
-                } 
-                else if (code === "11111") { // 🖐️ REPULSOR / SHINRA TENSEI
-                    ctx.shadowColor = "#f00";
-                    ctx.strokeStyle = "#fff"; ctx.lineWidth = 5;
-                    ctx.beginPath(); ctx.arc(cx, cy, 60 + (frame%20), 0, 7); ctx.stroke();
-                    ctx.beginPath(); ctx.arc(cx, cy, 30, 0, 7); ctx.fillStyle="white"; ctx.fill();
-                }
-                else if (code === "01100") { // ✌️ INFINITY AURA (GOJO STYLE)
-                    ctx.shadowColor = "#m0f";
-                    let t = Date.now() * 0.01;
-                    for(let i=0; i<6; i++) {
-                        ctx.strokeStyle = `hsl(${280+i*10}, 100%, 50%)`;
-                        ctx.beginPath(); ctx.arc(cx, cy, i*20, t+i, t+i+3); ctx.stroke();
-                    }
-                }
-                else if (code === "01000") { // ☝️ AMATERASU / LASER
-                    ctx.strokeStyle = "red"; ctx.lineWidth = 10; ctx.shadowColor="red";
-                    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx, 0); ctx.stroke();
-                }
+        holistic.onResults((results) => {
+            // FPS HESAPLA
+            frameCount++;
+            if (Date.now() - startTime > 1000) {
+                document.getElementById('fps').innerText = frameCount;
+                frameCount = 0;
+                startTime = Date.now();
             }
 
-            // 4. JUTSU MÜHÜRÜ (İKİ EL YAN YANA GELİNCE)
-            if (res.leftHandLandmarks && res.rightHandLandmarks) {
-                const lx = res.leftHandLandmarks[9].x * canvas.width;
-                const rx = res.rightHandLandmarks[9].y * canvas.height;
-                if (Math.abs(lx - rx) < 200) {
-                    ctx.strokeStyle = "yellow"; ctx.shadowColor = "yellow";
-                    ctx.font = "40px Courier";
-                    ctx.strokeText("JUTSU: SEAL RELEASED", canvas.width/2 - 200, canvas.height/2);
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            ctx.save();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+
+            // ÇİZİM FONKSİYONLARI
+            ctx.lineWidth = 2;
+            
+            // VÜCUT (CYAN)
+            if (results.poseLandmarks) {
+                drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#00FFFF', lineWidth: 2});
+                drawLandmarks(ctx, results.poseLandmarks, {color: '#00FFFF', lineWidth: 1, radius: 2});
+            }
+
+            // ELLER (MAGENTA & SARI)
+            if (results.leftHandLandmarks) {
+                drawConnectors(ctx, results.leftHandLandmarks, HAND_CONNECTIONS, {color: '#FF00FF', lineWidth: 2});
+                drawLandmarks(ctx, results.leftHandLandmarks, {color: '#FFFF00', radius: 3});
+            }
+            if (results.rightHandLandmarks) {
+                drawConnectors(ctx, results.rightHandLandmarks, HAND_CONNECTIONS, {color: '#FF00FF', lineWidth: 2});
+                drawLandmarks(ctx, results.rightHandLandmarks, {color: '#FFFF00', radius: 3});
+            }
+
+            // YÜZ (YEŞİL MATRIX)
+            if (results.faceLandmarks) {
+                drawConnectors(ctx, results.faceLandmarks, FACEMESH_TESSELATION, {color: '#00FF0011', lineWidth: 0.5});
+                
+                // HEDEF KUTUSUNU YÜZE SABİTLE (CSS İLE)
+                // Burun ucunu referans alıyoruz (Index 1)
+                const nose = results.faceLandmarks[1];
+                if(nose) {
+                    const x = (1 - nose.x) * window.innerWidth; // Mirror effect
+                    const y = nose.y * window.innerHeight;
+                    
+                    targetBox.style.display = "block";
+                    targetBox.style.left = (x - 75) + "px"; // Ortala
+                    targetBox.style.top = (y - 100) + "px"; // Ortala
+                    targetBox.style.width = "150px";
+                    targetBox.style.height = "200px";
                 }
+            } else {
+                targetBox.style.display = "none";
             }
 
             ctx.restore();
-            frame++;
-        }
+        });
 
-        function getCode(h) {
-            let f = [h[4].x < h[3].x ? 1 : 0];
-            [8,12,16,20].forEach(i => f.push(h[i].y < h[i-2].y ? 1 : 0));
-            return f.join('');
+        function startSystem() {
+            document.getElementById('boot-screen').style.display = 'none';
+            const camera = new Camera(video, {
+                onFrame: async () => { await holistic.send({image: video}); },
+                width: 640, height: 480
+            });
+            camera.start();
         }
-
-        const h = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
-        h.setOptions({ modelComplexity: 1, minDetectionConfidence: 0.5 });
-        h.onResults(onResults);
-        new Camera(video, {onFrame: async () => await h.send({image: video}), width: 1280, height: 720}).start();
     </script>
 </body>
 </html>
