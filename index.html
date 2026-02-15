@@ -3,49 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TITAN OVERDRIVE</title>
+    <title>JARVIS ZERO-LAG</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Share Tech Mono', monospace; color: #0f0; }
-        canvas { position: absolute; width: 100vw; height: 100vh; transform: scaleX(-1); filter: contrast(1.2) brightness(1.1); }
-        
-        /* ÜST MOD SEÇİMİ */
-        #top-nav {
-            position: fixed; top: 0; width: 100%; display: flex; justify-content: space-around;
-            background: rgba(0, 20, 0, 0.8); z-index: 20; border-bottom: 1px solid #0f0;
-        }
-        .mod-btn { padding: 10px; font-size: 10px; cursor: pointer; border: none; background: none; color: #0f0; opacity: 0.5; }
-        .mod-btn.active { opacity: 1; border-bottom: 2px solid #0f0; }
-
-        /* HUD VERİLERİ */
-        .hud { position: fixed; z-index: 10; pointer-events: none; text-shadow: 0 0 5px #0f0; }
-        .left-data { top: 50px; left: 10px; border-left: 2px solid #0f0; padding-left: 5px; font-size: 12px; }
-        .right-data { top: 50px; right: 10px; text-align: right; border-right: 2px solid #0f0; padding-right: 5px; font-size: 12px; }
-
-        /* GECE GÖRÜŞÜ FİLTRESİ */
-        .nv-mode { filter: sepia(1) hue-rotate(90deg) saturate(4) brightness(0.8) !important; }
+        body { margin: 0; background: #000; overflow: hidden; font-family: monospace; color: #0f0; }
+        canvas { position: absolute; width: 100vw; height: 100vh; transform: scaleX(-1); }
+        .hud { position: fixed; z-index: 10; font-size: 10px; background: rgba(0,0,0,0.5); padding: 5px; border: 1px solid #0f0; }
+        #top-ui { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; gap: 5px; }
+        button { background: black; color: #0f0; border: 1px solid #0f0; padding: 5px; font-size: 10px; }
+        #age-tag { position: fixed; color: white; background: red; padding: 2px 5px; font-size: 10px; display: none; z-index: 15; }
     </style>
 </head>
 <body>
 
-    <div id="top-nav">
-        <button class="mod-btn active" onclick="changeMode('combat', this)">COMBAT</button>
-        <button class="mod-btn" onclick="changeMode('stealth', this)">STEALTH (NV)</button>
-        <button class="mod-btn" onclick="changeMode('scan', this)">BIO-SCAN</button>
+    <div id="top-ui">
+        <button onclick="setNV(false)">NORMAL</button>
+        <button onclick="setNV(true)">GECE GÖRÜŞÜ</button>
     </div>
 
-    <div class="hud left-data">
-        TARGET: <span id="target-id">ANALYZING...</span><br>
-        EST. AGE: <span id="age">--</span><br>
-        BALANCE: <span id="balance">0%</span>
+    <div class="hud" style="top:50px; left:10px;">
+        FPS: <span id="fps">0</span><br>
+        DURUM: STABİL<br>
+        DENGE: <span id="bal">--</span>
     </div>
 
-    <div class="hud right-data">
-        SİSTEM: AKTİF<br>
-        BAĞLANTI: ŞİFRELİ<br>
-        FPS: <span id="fps">0</span>
-    </div>
+    <div id="age-tag">HEDEF: TANIMLANDI</div>
 
     <canvas id="canvas"></canvas>
     <video id="video" style="display:none" playsinline></video>
@@ -54,58 +37,74 @@
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        let mode = 'combat';
+        const ageTag = document.getElementById('age-tag');
+        let nv = false;
 
-        function changeMode(m, btn) {
-            mode = m;
-            document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            canvas.className = (m === 'stealth') ? 'nv-mode' : '';
-        }
+        function setNV(val) { nv = val; }
 
         const holistic = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
-        holistic.setOptions({ modelComplexity: 0, smoothLandmarks: true, minDetectionConfidence: 0.5 });
+        holistic.setOptions({ modelComplexity: 0, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
 
-        let lastTime = 0;
+        let last = 0;
         holistic.onResults((res) => {
-            // FPS Hesabı
+            // FPS Sayacı
             const now = Date.now();
-            document.getElementById('fps').innerText = Math.round(1000 / (now - lastTime));
-            lastTime = now;
+            document.getElementById('fps').innerText = Math.round(1000 / (now - last));
+            last = now;
 
             canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             ctx.save();
             ctx.clearRect(0,0, canvas.width, canvas.height);
+
+            // GECE GÖRÜŞÜ EFEKTİ (Filtre kullanmıyoruz, manuel çiziyoruz - DAHA HIZLI)
+            if(nv) {
+                ctx.fillStyle = "rgba(0, 50, 0, 1)";
+                ctx.fillRect(0,0, canvas.width, canvas.height);
+                ctx.globalAlpha = 0.5;
+            }
+            
             ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 1.0;
 
-            // 1. İSKELET TARAMA (POSE)
+            // 1. İSKELET (SADECE ANA HATLAR)
             if (res.poseLandmarks) {
-                drawConnectors(ctx, res.poseLandmarks, POSE_CONNECTIONS, {color: '#0f0', lineWidth: 2});
-                // Denge Analizi (Omuz ve kalça hizasından salla)
-                const balance = Math.abs(res.poseLandmarks[11].y - res.poseLandmarks[12].y);
-                document.getElementById('balance').innerText = (100 - (balance * 1000)).toFixed(1) + "%";
+                ctx.strokeStyle = nv ? "#0f0" : "cyan";
+                ctx.lineWidth = 3;
+                // Sadece omuz-kol hattını çiz (Hız için)
+                [[11,12], [11,13], [13,15], [12,14], [14,16]].forEach(p => {
+                    const a = res.poseLandmarks[p[0]]; const b = res.poseLandmarks[p[1]];
+                    ctx.beginPath();
+                    ctx.moveTo(a.x * canvas.width, a.y * canvas.height);
+                    ctx.lineTo(b.x * canvas.width, b.y * canvas.height);
+                    ctx.stroke();
+                });
+                document.getElementById('bal').innerText = "OK";
             }
 
-            // 2. 20 EL HAREKETİ (HANDS)
-            if (res.leftHandLandmarks) drawConnectors(ctx, res.leftHandLandmarks, HAND_CONNECTIONS, {color: '#fff', lineWidth: 1.5});
-            if (res.rightHandLandmarks) drawConnectors(ctx, res.rightHandLandmarks, HAND_CONNECTIONS, {color: '#fff', lineWidth: 1.5});
+            // 2. EL TAKİBİ (SADECE TEK EL VE NOKTALAR - HIZLI!)
+            if (res.rightHandLandmarks) {
+                ctx.fillStyle = "red";
+                res.rightHandLandmarks.forEach(p => {
+                    ctx.fillRect(p.x * canvas.width, p.y * canvas.height, 4, 4);
+                });
+            }
 
-            // 3. YAŞ TAHMİNİ (FACE - SİMÜLE)
+            // 3. YAŞ TAHMİNİ (SADECE ETİKET)
             if (res.faceLandmarks) {
-                document.getElementById('target-id').innerText = "HUMAN_MALE_01";
-                // Yaş tahmini (Yüz genişliğine göre rastgele ama mantıklı bir sayı üretir)
-                if(document.getElementById('age').innerText === "--") {
-                    document.getElementById('age').innerText = Math.floor(Math.random() * 5 + 24); // Enişteye göre ayarla
-                }
-                drawConnectors(ctx, res.faceLandmarks, FACEMESH_TESSELATION, {color: '#0f03', lineWidth: 0.5});
-            }
+                const f = res.faceLandmarks[1];
+                ageTag.style.display = "block";
+                ageTag.style.left = (canvas.width - f.x * canvas.width) + "px";
+                ageTag.style.top = (f.y * canvas.height - 30) + "px";
+                ageTag.innerText = "HEDEF: 27 YAŞ / ANALİZ TAMAM";
+            } else { ageTag.style.display = "none"; }
 
             ctx.restore();
         });
 
+        // ÇÖZÜNÜRLÜĞÜ YERİN DİBİNE SOKTUK (160x120) - BU SAYEDE ASLA KASMAZ
         const cam = new Camera(video, {
             onFrame: async () => { await holistic.send({image: video}); },
-            width: 480, height: 360 // TURBO HIZ İÇİN DÜŞÜK ÇÖZÜNÜRLÜK
+            width: 160, height: 120 
         });
         cam.start();
     </script>
