@@ -3,110 +3,145 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JARVIS ZERO-LAG</title>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+    <title>JARVIS COMMANDER V3</title>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: monospace; color: #0f0; }
-        canvas { position: absolute; width: 100vw; height: 100vh; transform: scaleX(-1); }
-        .hud { position: fixed; z-index: 10; font-size: 10px; background: rgba(0,0,0,0.5); padding: 5px; border: 1px solid #0f0; }
-        #top-ui { position: fixed; top: 10px; left: 50%; transform: translateX(-50%); z-index: 20; display: flex; gap: 5px; }
-        button { background: black; color: #0f0; border: 1px solid #0f0; padding: 5px; font-size: 10px; }
-        #age-tag { position: fixed; color: white; background: red; padding: 2px 5px; font-size: 10px; display: none; z-index: 15; }
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+        
+        body { 
+            margin: 0; background: #000; overflow: hidden; 
+            font-family: 'Share Tech Mono', monospace; color: #00f2ff;
+        }
+
+        /* JARVIS ANA MERKEZ */
+        #core-container {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 100vh;
+        }
+
+        .arc-reactor {
+            width: 200px; height: 200px; border-radius: 50%;
+            border: 2px solid rgba(0, 242, 255, 0.2);
+            position: relative; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 50px rgba(0, 242, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .ring {
+            position: absolute; border-radius: 50%;
+            border: 2px dashed #00f2ff;
+            animation: rotate 10s linear infinite;
+        }
+        .r1 { width: 180px; height: 180px; opacity: 0.8; }
+        .r2 { width: 150px; height: 150px; border-style: dotted; animation-direction: reverse; }
+        
+        #inner-core {
+            width: 80px; height: 80px; background: radial-gradient(#fff, #00f2ff);
+            border-radius: 50%; box-shadow: 0 0 30px #00f2ff;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* SES DALGASI */
+        #status-text { margin-top: 30px; font-size: 18px; text-transform: uppercase; letter-spacing: 2px; }
+        #cmd-preview { margin-top: 10px; color: rgba(0, 242, 255, 0.6); font-size: 14px; }
+
+        /* HUD VERİLERİ */
+        .hud { position: fixed; padding: 15px; background: rgba(0, 20, 20, 0.5); border: 1px solid #00f2ff; font-size: 12px; }
+        .top-left { top: 20px; left: 20px; }
+        .bottom-right { bottom: 20px; right: 20px; text-align: right; }
+
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.1); opacity: 1; } }
+
+        /* GECE GÖRÜŞÜ MODU */
+        .night-vision { color: #00ff00 !important; }
+        .night-vision .arc-reactor { border-color: #00ff00; }
+        .night-vision .ring { border-color: #00ff00; }
+        .night-vision #inner-core { background: radial-gradient(#fff, #00ff00); box-shadow: 0 0 30px #00ff00; }
     </style>
 </head>
 <body>
 
-    <div id="top-ui">
-        <button onclick="setNV(false)">NORMAL</button>
-        <button onclick="setNV(true)">GECE GÖRÜŞÜ</button>
+    <div class="hud top-left">
+        SİSTEM: AKTİF<br>
+        BAĞLANTI: SECURE_OS<br>
+        YETKİ: YÖNETİCİ
     </div>
 
-    <div class="hud" style="top:50px; left:10px;">
-        FPS: <span id="fps">0</span><br>
-        DURUM: STABİL<br>
-        DENGE: <span id="bal">--</span>
+    <div id="core-container">
+        <div class="arc-reactor" id="main-ui">
+            <div class="ring r1"></div>
+            <div class="ring r2"></div>
+            <div id="inner-core"></div>
+        </div>
+        <div id="status-text">JARVIS DİNLİYOR...</div>
+        <div id="cmd-preview">"Komut Bekleniyor"</div>
     </div>
 
-    <div id="age-tag">HEDEF: TANIMLANDI</div>
-
-    <canvas id="canvas"></canvas>
-    <video id="video" style="display:none" playsinline></video>
+    <div class="hud bottom-right">
+        BATARYA: %98<br>
+        SICAKLIK: 32°C<br>
+        İŞLEMCİ: STABİL
+    </div>
 
     <script>
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const ageTag = document.getElementById('age-tag');
-        let nv = false;
+        const statusText = document.getElementById('status-text');
+        const cmdPreview = document.getElementById('cmd-preview');
+        const mainUi = document.body;
 
-        function setNV(val) { nv = val; }
+        // --- SES TANIMA MOTORU ---
+        const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Recognition) {
+            alert("Tarayıcınız ses tanımayı desteklemiyor. Lütfen Chrome kullanın.");
+        } else {
+            const jarvis = new Recognition();
+            jarvis.continuous = true;
+            jarvis.lang = 'tr-TR';
+            jarvis.interimResults = false;
 
-        const holistic = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
-        holistic.setOptions({ modelComplexity: 0, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+            jarvis.onstart = () => { statusText.innerText = "JARVIS ÇEVRİMİÇİ"; };
 
-        let last = 0;
-        holistic.onResults((res) => {
-            // FPS Sayacı
-            const now = Date.now();
-            document.getElementById('fps').innerText = Math.round(1000 / (now - last));
-            last = now;
+            jarvis.onresult = (event) => {
+                const command = event.results[event.results.length - 1][0].transcript.toLowerCase();
+                cmdPreview.innerText = `Son Komut: "${command}"`;
+                executeCommand(command);
+            };
 
-            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-            ctx.save();
-            ctx.clearRect(0,0, canvas.width, canvas.height);
-
-            // GECE GÖRÜŞÜ EFEKTİ (Filtre kullanmıyoruz, manuel çiziyoruz - DAHA HIZLI)
-            if(nv) {
-                ctx.fillStyle = "rgba(0, 50, 0, 1)";
-                ctx.fillRect(0,0, canvas.width, canvas.height);
-                ctx.globalAlpha = 0.5;
-            }
+            jarvis.onerror = () => { jarvis.start(); }; // Hata olursa yeniden başlat
+            jarvis.onend = () => { jarvis.start(); };   // Kapanırsa geri aç
             
-            ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
-            ctx.globalAlpha = 1.0;
+            // Başlat
+            jarvis.start();
+        }
 
-            // 1. İSKELET (SADECE ANA HATLAR)
-            if (res.poseLandmarks) {
-                ctx.strokeStyle = nv ? "#0f0" : "cyan";
-                ctx.lineWidth = 3;
-                // Sadece omuz-kol hattını çiz (Hız için)
-                [[11,12], [11,13], [13,15], [12,14], [14,16]].forEach(p => {
-                    const a = res.poseLandmarks[p[0]]; const b = res.poseLandmarks[p[1]];
-                    ctx.beginPath();
-                    ctx.moveTo(a.x * canvas.width, a.y * canvas.height);
-                    ctx.lineTo(b.x * canvas.width, b.y * canvas.height);
-                    ctx.stroke();
-                });
-                document.getElementById('bal').innerText = "OK";
+        function executeCommand(cmd) {
+            // 1. GECE GÖRÜŞÜ
+            if (cmd.includes("gece görüşü")) {
+                mainUi.classList.add('night-vision');
+                speak("Gece görüşü protokolü aktif, komutanım.");
             }
-
-            // 2. EL TAKİBİ (SADECE TEK EL VE NOKTALAR - HIZLI!)
-            if (res.rightHandLandmarks) {
-                ctx.fillStyle = "red";
-                res.rightHandLandmarks.forEach(p => {
-                    ctx.fillRect(p.x * canvas.width, p.y * canvas.height, 4, 4);
-                });
+            // 2. NORMAL MOD
+            if (cmd.includes("normal mod") || cmd.includes("standard")) {
+                mainUi.classList.remove('night-vision');
+                speak("Sistem standart değerlere döndürülüyor.");
             }
+            // 3. SİSTEM ANALİZİ
+            if (cmd.includes("analiz") || cmd.includes("tara")) {
+                speak("Çevresel biyometrik tarama başlatıldı. Tehdit algılanmadı.");
+            }
+            // 4. KİMLİK DOĞRULAMA
+            if (cmd.includes("kim") || cmd.includes("tanı")) {
+                speak("Biyometrik veriler eşleşti. Hoş geldiniz enişte bey.");
+            }
+        }
 
-            // 3. YAŞ TAHMİNİ (SADECE ETİKET)
-            if (res.faceLandmarks) {
-                const f = res.faceLandmarks[1];
-                ageTag.style.display = "block";
-                ageTag.style.left = (canvas.width - f.x * canvas.width) + "px";
-                ageTag.style.top = (f.y * canvas.height - 30) + "px";
-                ageTag.innerText = "HEDEF: 27 YAŞ / ANALİZ TAMAM";
-            } else { ageTag.style.display = "none"; }
-
-            ctx.restore();
-        });
-
-        // ÇÖZÜNÜRLÜĞÜ YERİN DİBİNE SOKTUK (160x120) - BU SAYEDE ASLA KASMAZ
-        const cam = new Camera(video, {
-            onFrame: async () => { await holistic.send({image: video}); },
-            width: 160, height: 120 
-        });
-        cam.start();
+        function speak(text) {
+            const synth = window.speechSynthesis;
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = 'tr-TR';
+            utter.pitch = 0.9;
+            utter.rate = 1;
+            synth.speak(utter);
+        }
     </script>
 </body>
 </html>
