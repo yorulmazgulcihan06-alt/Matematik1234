@@ -1,184 +1,113 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TITAN-X SYSTEM</title>
+    <title>TITAN OVERDRIVE</title>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/holistic"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
     <style>
-        body { margin: 0; background: #000; overflow: hidden; font-family: 'Courier New', monospace; }
-        canvas { position: absolute; width: 100vw; height: 100vh; transform: scaleX(-1); }
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Share Tech Mono', monospace; color: #0f0; }
+        canvas { position: absolute; width: 100vw; height: 100vh; transform: scaleX(-1); filter: contrast(1.2) brightness(1.1); }
         
-        /* GİRİŞ EKRANI */
-        #boot-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 100; display: flex; flex-direction: column;
-            justify-content: center; align-items: center; color: #0f0;
+        /* ÜST MOD SEÇİMİ */
+        #top-nav {
+            position: fixed; top: 0; width: 100%; display: flex; justify-content: space-around;
+            background: rgba(0, 20, 0, 0.8); z-index: 20; border-bottom: 1px solid #0f0;
         }
-        #boot-text { font-size: 20px; animation: blink 0.5s infinite; }
-        #start-btn {
-            margin-top: 20px; padding: 15px 40px; border: 2px solid #0f0; background: transparent;
-            color: #0f0; font-size: 18px; font-weight: bold; cursor: pointer;
-            box-shadow: 0 0 15px #0f0;
-        }
+        .mod-btn { padding: 10px; font-size: 10px; cursor: pointer; border: none; background: none; color: #0f0; opacity: 0.5; }
+        .mod-btn.active { opacity: 1; border-bottom: 2px solid #0f0; }
 
-        /* HUD KATMANLARI */
-        .hud-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-        
-        .corner-box {
-            position: absolute; border: 2px solid rgba(0, 255, 255, 0.5); padding: 10px;
-            color: cyan; font-size: 12px; background: rgba(0, 20, 20, 0.6);
-        }
-        .top-left { top: 20px; left: 20px; width: 150px; }
-        .top-right { top: 20px; right: 20px; text-align: right; }
-        .bottom-left { bottom: 20px; left: 20px; }
-        
-        /* AKAN YAZILAR */
-        .scrolling-code {
-            position: absolute; right: 10px; top: 100px; width: 100px; height: 300px;
-            color: rgba(0, 255, 0, 0.6); font-size: 10px; overflow: hidden; text-align: right;
-        }
+        /* HUD VERİLERİ */
+        .hud { position: fixed; z-index: 10; pointer-events: none; text-shadow: 0 0 5px #0f0; }
+        .left-data { top: 50px; left: 10px; border-left: 2px solid #0f0; padding-left: 5px; font-size: 12px; }
+        .right-data { top: 50px; right: 10px; text-align: right; border-right: 2px solid #0f0; padding-right: 5px; font-size: 12px; }
 
-        /* HEDEF KUTUSU (Yüz Etrafında) */
-        #target-box {
-            position: absolute; border: 2px solid red; box-shadow: 0 0 10px red;
-            width: 0; height: 0; display: none; z-index: 5;
-            transition: all 0.1s ease;
-        }
-        #target-label {
-            position: absolute; top: -20px; left: 0; background: red; color: white;
-            font-size: 10px; padding: 2px 5px; white-space: nowrap;
-        }
-
-        @keyframes blink { 50% { opacity: 0; } }
+        /* GECE GÖRÜŞÜ FİLTRESİ */
+        .nv-mode { filter: sepia(1) hue-rotate(90deg) saturate(4) brightness(0.8) !important; }
     </style>
 </head>
 <body>
 
-    <div id="boot-screen">
-        <div id="boot-text">SYSTEM INITIALIZING...</div>
-        <button id="start-btn" onclick="startSystem()">BAŞLAT / START</button>
+    <div id="top-nav">
+        <button class="mod-btn active" onclick="changeMode('combat', this)">COMBAT</button>
+        <button class="mod-btn" onclick="changeMode('stealth', this)">STEALTH (NV)</button>
+        <button class="mod-btn" onclick="changeMode('scan', this)">BIO-SCAN</button>
+    </div>
+
+    <div class="hud left-data">
+        TARGET: <span id="target-id">ANALYZING...</span><br>
+        EST. AGE: <span id="age">--</span><br>
+        BALANCE: <span id="balance">0%</span>
+    </div>
+
+    <div class="hud right-data">
+        SİSTEM: AKTİF<br>
+        BAĞLANTI: ŞİFRELİ<br>
+        FPS: <span id="fps">0</span>
     </div>
 
     <canvas id="canvas"></canvas>
     <video id="video" style="display:none" playsinline></video>
 
-    <div id="target-box"><div id="target-label">HEDEF: TANIMLANAMIYOR</div></div>
-
-    <div class="hud-overlay">
-        <div class="corner-box top-left">
-            CPU: <span id="cpu">0</span>%<br>
-            RAM: <span id="ram">0</span>MB<br>
-            FPS: <span id="fps">0</span>
-        </div>
-        <div class="corner-box top-right">
-            TITAN-X PROTOCOL<br>
-            V.9.0.1 [BETA]<br>
-            SECURE LINK: ACTIVE
-        </div>
-        <div class="corner-box bottom-left">
-            SCAN MODE: OMNI<br>
-            THREAT: LOW
-        </div>
-        <div class="scrolling-code" id="matrix"></div>
-    </div>
-
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const targetBox = document.getElementById('target-box');
-        
-        let startTime = Date.now();
-        let frameCount = 0;
+        let mode = 'combat';
 
-        // MATRİX KODLARI OLUŞTUR
-        setInterval(() => {
-            const matrix = document.getElementById('matrix');
-            matrix.innerHTML += Math.random().toString(36).substring(7) + "<br>";
-            if(matrix.innerHTML.length > 500) matrix.innerHTML = "";
-            
-            // SAHTE VERİ GÜNCELLEME
-            document.getElementById('cpu').innerText = Math.floor(Math.random() * 30 + 10);
-            document.getElementById('ram').innerText = Math.floor(Math.random() * 500 + 1024);
-        }, 100);
+        function changeMode(m, btn) {
+            mode = m;
+            document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            canvas.className = (m === 'stealth') ? 'nv-mode' : '';
+        }
 
-        // HOLISTIC MODEL (YÜZ + VÜCUT + EL)
-        const holistic = new Holistic({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${file}`});
-        holistic.setOptions({
-            modelComplexity: 0, // HIZ İÇİN 0
-            smoothLandmarks: true,
-            minDetectionConfidence: 0.5,
-            minTrackingConfidence: 0.5
-        });
+        const holistic = new Holistic({locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/holistic/${f}`});
+        holistic.setOptions({ modelComplexity: 0, smoothLandmarks: true, minDetectionConfidence: 0.5 });
 
-        holistic.onResults((results) => {
-            // FPS HESAPLA
-            frameCount++;
-            if (Date.now() - startTime > 1000) {
-                document.getElementById('fps').innerText = frameCount;
-                frameCount = 0;
-                startTime = Date.now();
-            }
+        let lastTime = 0;
+        holistic.onResults((res) => {
+            // FPS Hesabı
+            const now = Date.now();
+            document.getElementById('fps').innerText = Math.round(1000 / (now - lastTime));
+            lastTime = now;
 
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
             ctx.save();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            ctx.drawImage(res.image, 0, 0, canvas.width, canvas.height);
 
-            // ÇİZİM FONKSİYONLARI
-            ctx.lineWidth = 2;
-            
-            // VÜCUT (CYAN)
-            if (results.poseLandmarks) {
-                drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#00FFFF', lineWidth: 2});
-                drawLandmarks(ctx, results.poseLandmarks, {color: '#00FFFF', lineWidth: 1, radius: 2});
+            // 1. İSKELET TARAMA (POSE)
+            if (res.poseLandmarks) {
+                drawConnectors(ctx, res.poseLandmarks, POSE_CONNECTIONS, {color: '#0f0', lineWidth: 2});
+                // Denge Analizi (Omuz ve kalça hizasından salla)
+                const balance = Math.abs(res.poseLandmarks[11].y - res.poseLandmarks[12].y);
+                document.getElementById('balance').innerText = (100 - (balance * 1000)).toFixed(1) + "%";
             }
 
-            // ELLER (MAGENTA & SARI)
-            if (results.leftHandLandmarks) {
-                drawConnectors(ctx, results.leftHandLandmarks, HAND_CONNECTIONS, {color: '#FF00FF', lineWidth: 2});
-                drawLandmarks(ctx, results.leftHandLandmarks, {color: '#FFFF00', radius: 3});
-            }
-            if (results.rightHandLandmarks) {
-                drawConnectors(ctx, results.rightHandLandmarks, HAND_CONNECTIONS, {color: '#FF00FF', lineWidth: 2});
-                drawLandmarks(ctx, results.rightHandLandmarks, {color: '#FFFF00', radius: 3});
-            }
+            // 2. 20 EL HAREKETİ (HANDS)
+            if (res.leftHandLandmarks) drawConnectors(ctx, res.leftHandLandmarks, HAND_CONNECTIONS, {color: '#fff', lineWidth: 1.5});
+            if (res.rightHandLandmarks) drawConnectors(ctx, res.rightHandLandmarks, HAND_CONNECTIONS, {color: '#fff', lineWidth: 1.5});
 
-            // YÜZ (YEŞİL MATRIX)
-            if (results.faceLandmarks) {
-                drawConnectors(ctx, results.faceLandmarks, FACEMESH_TESSELATION, {color: '#00FF0011', lineWidth: 0.5});
-                
-                // HEDEF KUTUSUNU YÜZE SABİTLE (CSS İLE)
-                // Burun ucunu referans alıyoruz (Index 1)
-                const nose = results.faceLandmarks[1];
-                if(nose) {
-                    const x = (1 - nose.x) * window.innerWidth; // Mirror effect
-                    const y = nose.y * window.innerHeight;
-                    
-                    targetBox.style.display = "block";
-                    targetBox.style.left = (x - 75) + "px"; // Ortala
-                    targetBox.style.top = (y - 100) + "px"; // Ortala
-                    targetBox.style.width = "150px";
-                    targetBox.style.height = "200px";
+            // 3. YAŞ TAHMİNİ (FACE - SİMÜLE)
+            if (res.faceLandmarks) {
+                document.getElementById('target-id').innerText = "HUMAN_MALE_01";
+                // Yaş tahmini (Yüz genişliğine göre rastgele ama mantıklı bir sayı üretir)
+                if(document.getElementById('age').innerText === "--") {
+                    document.getElementById('age').innerText = Math.floor(Math.random() * 5 + 24); // Enişteye göre ayarla
                 }
-            } else {
-                targetBox.style.display = "none";
+                drawConnectors(ctx, res.faceLandmarks, FACEMESH_TESSELATION, {color: '#0f03', lineWidth: 0.5});
             }
 
             ctx.restore();
         });
 
-        function startSystem() {
-            document.getElementById('boot-screen').style.display = 'none';
-            const camera = new Camera(video, {
-                onFrame: async () => { await holistic.send({image: video}); },
-                width: 640, height: 480
-            });
-            camera.start();
-        }
+        const cam = new Camera(video, {
+            onFrame: async () => { await holistic.send({image: video}); },
+            width: 480, height: 360 // TURBO HIZ İÇİN DÜŞÜK ÇÖZÜNÜRLÜK
+        });
+        cam.start();
     </script>
 </body>
 </html>
