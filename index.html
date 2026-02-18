@@ -2,753 +2,269 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UTKAN-OS | NEURO-LINKED BIOMETRIC KERNEL v99.0</title>
+    <title>UTKAN OMNI-KERNEL | 2023-2026 LEGACY EDITION</title>
     <style>
-        /* =========================================
-           CORE STYLESHEET - SYSTEM LEVEL
-           ========================================= */
+        /* 2026 ULTRA-MODERN NEUMORPHIC CYBERPUNK THEME */
         :root {
-            --primary: #00ff41;
-            --secondary: #008F11;
-            --alert: #ff0033;
-            --warn: #ffcc00;
-            --bg-dark: #020202;
-            --panel-bg: rgba(10, 10, 10, 0.95);
-            --grid-line: rgba(0, 255, 65, 0.1);
-            --font-stack: 'Courier New', 'Consolas', monospace;
+            --neon: #00ff41; --bg: #020202; --panel: rgba(15, 15, 15, 0.9);
+            --warn: #ff003c; --accent: #00e5ff;
         }
 
-        * { box-sizing: border-box; user-select: none; }
-        
         body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-dark);
-            color: var(--primary);
-            font-family: var(--font-stack);
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin: 0; background: var(--bg); color: var(--neon);
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            overflow: hidden; height: 100vh;
         }
 
-        /* CRT EFFECT & SCANLINES */
-        body::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 999;
-            background-size: 100% 2px, 3px 100%;
-            pointer-events: none;
+        /* 2024 GPU GRID ACCELERATION */
+        .grid-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(var(--s) 1px, transparent 1px), linear-gradient(90deg, var(--s) 1px, transparent 1px);
+            background-size: 40px 40px; background-color: #000;
+            opacity: 0.1; z-index: -1;
         }
 
-        /* LAYOUT GRID */
-        #main-interface {
-            display: none; /* Hidden until boot */
-            grid-template-columns: 300px 1fr 350px;
-            grid-template-rows: 60px 1fr 200px;
-            height: 100%;
-            width: 100%;
-            padding: 10px;
-            gap: 5px;
+        #os-container {
+            display: grid;
+            grid-template-columns: 350px 1fr 350px;
+            grid-template-rows: 70px 1fr 220px;
+            gap: 10px; padding: 10px; height: 100vh;
         }
 
-        /* HEADER */
-        header {
-            grid-column: 1 / -1;
-            border: 1px solid var(--secondary);
-            background: var(--panel-bg);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            box-shadow: 0 0 15px var(--grid-line);
+        .module {
+            background: var(--panel); border: 1px solid #222;
+            position: relative; backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
-        .sys-badge { font-weight: bold; letter-spacing: 2px; border: 1px solid var(--primary); padding: 5px 10px; font-size: 0.8rem; }
-        .sys-time { font-size: 0.9rem; color: #aaa; }
+        /* 2025 AI CONSOLE STYLING */
+        header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-bottom: 2px solid var(--neon); }
+        .glitch-text { animation: glitch 3s infinite; font-weight: bold; letter-spacing: 3px; }
 
-        /* PANELS */
-        .panel {
-            border: 1px solid #222;
-            background: var(--panel-bg);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+        @keyframes glitch {
+            0% { text-shadow: 2px 0 var(--accent); }
+            50% { text-shadow: -2px 0 var(--warn); }
+            100% { text-shadow: 2px 0 var(--accent); }
         }
+
+        /* LIVE CAMERA VIEWPORT */
+        #viewport-container { position: relative; overflow: hidden; border: 1px solid var(--accent); }
+        #webcam { width: 100%; height: 100%; object-fit: cover; filter: sepia(100%) hue-rotate(90deg) brightness(0.8); }
+        #scanner-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+        /* ANALYTICS PANELS */
+        .stat-card { padding: 20px; border-bottom: 1px solid #1a1a1a; }
+        .val { font-size: 2.5rem; color: #fff; text-shadow: 0 0 10px var(--neon); }
         
-        .panel-header {
-            background: #111;
-            padding: 5px 10px;
-            font-size: 0.7rem;
-            border-bottom: 1px solid #333;
-            color: #666;
-            text-transform: uppercase;
-            display: flex;
-            justify-content: space-between;
+        #log-stream { font-size: 0.7rem; height: 100%; overflow-y: auto; padding: 10px; color: var(--accent); }
+        .pulse-btn { 
+            width: 100%; padding: 15px; background: none; border: 2px solid var(--neon); 
+            color: var(--neon); cursor: pointer; font-size: 1rem; transition: 0.3s;
         }
+        .pulse-btn:hover { background: var(--neon); color: #000; box-shadow: 0 0 30px var(--neon); }
 
-        /* METRIC CARDS */
-        .metric-row {
-            padding: 15px;
-            border-bottom: 1px solid #1a1a1a;
-            transition: 0.2s;
-        }
-
-        .metric-row:hover { background: rgba(0, 255, 65, 0.05); }
-
-        .label { display: block; font-size: 0.7rem; color: #555; text-transform: uppercase; }
-        .value { display: block; font-size: 1.8rem; margin-top: 5px; font-weight: bold; color: #ddd; }
-        .unit { font-size: 0.8rem; margin-left: 5px; color: #444; }
-
-        /* PULSE LED */
-        .led-panel {
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-top: 1px solid #222;
-        }
-
-        #pulse-led {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #222;
-            box-shadow: 0 0 5px #000;
-            transition: 0.05s;
-        }
-
-        .led-active {
-            background: var(--alert) !important;
-            box-shadow: 0 0 20px var(--alert), 0 0 40px var(--alert) !important;
-        }
-
-        /* MAIN VISUALIZATION AREA (CANVAS) */
-        #core-viz {
-            background: #000;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid #222;
-            cursor: crosshair;
-        }
-
-        canvas { display: block; }
-
-        /* TERMINAL (CONSOLE) */
-        #sys-log {
-            grid-column: 1 / -1;
-            background: #000;
-            border: 1px solid #222;
-            padding: 10px;
-            font-family: 'Consolas', monospace;
-            font-size: 0.75rem;
-            color: var(--secondary);
-            overflow-y: scroll;
-            height: 100%;
-        }
-
-        .log-entry { margin-bottom: 3px; border-left: 2px solid #111; padding-left: 5px; }
-        .log-warn { color: var(--warn); }
-        .log-error { color: var(--alert); }
-
-        /* BOOT SCREEN */
-        #boot-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #000;
-            color: var(--primary);
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: monospace;
-        }
-
-        #boot-text { text-align: left; width: 600px; line-height: 1.5; font-size: 0.9rem; }
-        .boot-bar { width: 600px; height: 5px; background: #222; margin-top: 20px; }
-        .boot-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s; }
-
-        /* BUTTONS */
-        .btn-panel { display: flex; gap: 5px; padding: 10px; margin-top: auto; }
-        .btn {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 8px 15px;
-            font-family: inherit;
-            cursor: pointer;
-            flex: 1;
-            font-size: 0.7rem;
-            transition: 0.2s;
-        }
-        .btn:hover { background: var(--primary); color: #000; }
-
-        /* SPECTRUM ANALYZER */
-        .spectrum-bar { height: 100px; display: flex; align-items: flex-end; gap: 1px; padding: 5px; background: #050505; }
-        .spec-col { flex: 1; background: var(--secondary); min-height: 2px; transition: height 0.1s; }
-
-        /* MODALS */
-        .modal {
-            position: fixed;
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95);
-            border: 2px solid var(--primary);
-            padding: 30px;
-            z-index: 2000;
-            width: 500px;
-            display: none;
-            box-shadow: 0 0 50px rgba(0, 255, 65, 0.2);
-        }
-        .modal h2 { margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .modal p { font-size: 0.8rem; color: #aaa; line-height: 1.6; }
-
+        .progress-mini { height: 4px; background: #111; margin-top: 10px; }
+        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.2s; }
     </style>
 </head>
 <body>
 
-<div id="boot-screen">
-    <div id="boot-text">INITIALIZING BIOS KERNEL...</div>
-    <div class="boot-bar"><div class="boot-fill" id="boot-prog"></div></div>
-</div>
+<div class="grid-bg"></div>
 
-<div id="main-interface">
-    <header>
-        <div class="sys-badge">UTKAN-OS v99.0</div>
-        <div class="sys-info">
-            CPU: <span id="cpu-load">0%</span> | MEM: <span id="mem-load">0MB</span>
-        </div>
-        <div class="sys-time" id="clock-display">00:00:00</div>
+<div id="os-container">
+    <header class="module">
+        <div class="glitch-text">UTKAN_OMNI_KERNEL_v2026.4</div>
+        <div id="sys-status">KERNEL_STABLE // HIBRİT_SENSÖR_AKTIF</div>
+        <div id="timer">TIMESTAMP: 2026-02-19</div>
     </header>
 
-    <aside class="panel">
-        <div class="panel-header"><span>Real-Time Biometrics</span><span>[SENS-01]</span></div>
-        
-        <div class="metric-row">
-            <span class="label">Sampling Rate (Avg)</span>
-            <span class="value" id="val-hz">0.00</span><span class="unit">Hz</span>
+    <aside class="module">
+        <div class="stat-card">
+            <label>BIOMETRIC_HZ (2023_STD)</label>
+            <div id="hz-val" class="val">0.00</div>
+            <div class="progress-mini"><div id="hz-bar" class="progress-fill"></div></div>
         </div>
-        
-        <div class="metric-row">
-            <span class="label">Jitter Variance (σ)</span>
-            <span class="value" id="val-jitter">0.00</span><span class="unit">ms</span>
+        <div class="stat-card">
+            <label>NEURAL_JITTER (2024_OPT)</label>
+            <div id="jitter-val" class="val">0.00</div>
+            <div class="progress-mini"><div id="jt-bar" class="progress-fill"></div></div>
         </div>
-        
-        <div class="metric-row">
-            <span class="label">Neuro-Stability</span>
-            <span class="value" id="val-stab">0.0</span><span class="unit">%</span>
+        <div class="stat-card">
+            <label>INTEGRITY (2025_AI)</label>
+            <div id="int-val" class="val">100%</div>
         </div>
-
-        <div class="led-panel">
-            <div id="pulse-led"></div>
-        </div>
-
-        <div class="btn-panel">
-            <button class="btn" onclick="Kernel.reset()">RESET_CORE</button>
-            <button class="btn" onclick="Kernel.export()">DUMP_LOGS</button>
+        <div style="padding: 20px;">
+            <button class="pulse-btn" id="trigger">MANUAL_SIGNAL_INJECTION</button>
         </div>
     </aside>
 
-    <section class="panel" id="core-viz">
-        <div class="panel-header"><span>Oscilloscope Display</span><span>[GPU-ACCEL]</span></div>
-        <canvas id="mainCanvas"></canvas>
-    </section>
-
-    <aside class="panel">
-        <div class="panel-header"><span>Cognitive AI Engine</span><span>[BETA]</span></div>
-        
-        <div style="padding: 15px; flex: 1; overflow-y: auto;">
-            <div style="font-size: 0.7rem; color: #888; margin-bottom: 5px;">AI DIAGNOSIS:</div>
-            <div id="ai-output" style="font-size: 0.85rem; line-height: 1.4; color: #fff;">
-                Waiting for sufficient biometric data (N > 10)...
-            </div>
+    <main class="module" id="viewport-container">
+        <video id="webcam" autoplay playsinline></video>
+        <canvas id="scanner-layer"></canvas>
+        <div style="position:absolute; bottom:10px; left:10px; font-size:0.6rem; background:rgba(0,0,0,0.7); padding:5px;">
+            RAW_PIXEL_DATA_STREAM: ENABLED // NOISE_REDUCTION: v4.2
         </div>
+    </main>
 
-        <div class="panel-header"><span>Frequency Spectrum</span></div>
-        <div class="spectrum-bar" id="spec-viz">
-            </div>
-
-        <div style="padding: 10px; font-size: 0.65rem; color: #555; text-align: center;">
-            PRESS [SPACE] OR CLICK TO INJECT PULSE SIGNAL
+    <aside class="module">
+        <div style="padding:15px; border-bottom:1px solid #333; font-weight:bold;">AI_INFERENCE_ENGINE_2025</div>
+        <div id="ai-thought-process" style="padding:15px; font-size:0.8rem; color:#888; line-height:1.6;">
+            Awaiting biometric pulse... Analysing environmental noise... 
         </div>
+        <canvas id="brain-wave-canvas" style="width:100%; height:150px; border-top:1px solid #1a1a1a;"></canvas>
     </aside>
 
-    <footer class="panel" style="grid-column: 1 / -1;">
-        <div class="panel-header"><span>System Kernel Logs</span><span>[TERMINAL]</span></div>
-        <div id="sys-log"></div>
+    <footer class="module" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr;">
+        <div id="log-stream"></div>
+        <div id="spectrogram" style="border-left:1px solid #222; position:relative;">
+            <canvas id="spec-canvas"></canvas>
+        </div>
     </footer>
-</div>
-
-<div id="report-modal" class="modal">
-    <h2>SESSION REPORT GENERATED</h2>
-    <p>Biometric session data has been compiled into a localized JSON object.</p>
-    <div style="background: #111; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 0.7rem;" id="modal-content"></div>
-    <button class="btn" onclick="document.getElementById('report-modal').style.display='none'">CLOSE_WINDOW</button>
 </div>
 
 <script>
 /**
- * UTKAN-OS NEURO-LINKED KERNEL
- * ARCHITECTURE: MONOLITHIC CLASS-BASED SYSTEM
- * AUTHOR: GEMINI AI | FOR USER: UTKAN
- * BUILD: 2026.02.19_v99
+ * OMNI-KERNEL v2026 ENGINE
+ * Merging technologies from 2023, 2024, 2025, and 2026.
  */
 
-/* =========================================
-   MODULE 1: UTILITIES & MATH LIBRARY
-   ========================================= */
-const MathLib = {
-    avg: (arr) => arr.reduce((a, b) => a + b, 0) / arr.length,
+const OmniCore = {
+    timestamps: [],
+    intervals: [],
+    config: { buffer: 120, sensitivity: 0.85 },
     
-    stdDev: (arr) => {
-        if (arr.length < 2) return 0;
-        const mean = MathLib.avg(arr);
-        const variance = arr.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / arr.length;
-        return Math.sqrt(variance);
+    async init() {
+        this.log("CORE: Booting 2023-2026 Legacy Hybrid System...");
+        this.setupCanvases();
+        this.initCamera(); // 2026 Sensor Tech
+        this.attachEvents();
+        this.engineLoop(); // 2024 GPU Loop
     },
 
-    map: (val, inMin, inMax, outMin, outMax) => {
-        return (val - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+    log(m, err = false) {
+        const s = document.getElementById('log-stream');
+        const l = document.createElement('div');
+        l.style.color = err ? 'var(--warn)' : 'var(--accent)';
+        l.innerHTML = `> [${new Date().toLocaleTimeString()}] ${m}`;
+        s.prepend(l);
     },
 
-    formatTime: () => {
-        const d = new Date();
-        return d.toLocaleTimeString('tr-TR', { hour12: false });
-    },
-
-    generateId: () => {
-        return Math.random().toString(36).substr(2, 9);
-    }
-};
-
-/* =========================================
-   MODULE 2: AUDIO SYNTHESIZER (WEB AUDIO API)
-   ========================================= */
-class AudioEngine {
-    constructor() {
-        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        this.masterGain = this.ctx.createGain();
-        this.masterGain.gain.value = 0.1; // Low volume safety
-        this.masterGain.connect(this.ctx.destination);
-    }
-
-    playTone(freq, type = 'sine', duration = 0.1) {
-        if (this.ctx.state === 'suspended') this.ctx.resume();
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
+    setupCanvases() {
+        this.view = document.getElementById('viewport-container');
+        this.scan = document.getElementById('scanner-layer');
+        this.brain = document.getElementById('brain-wave-canvas');
+        this.spec = document.getElementById('spec-canvas');
         
-        osc.type = type;
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        
-        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
-        
-        osc.connect(gain);
-        gain.connect(this.masterGain);
-        
-        osc.start();
-        osc.stop(this.ctx.currentTime + duration);
-    }
-
-    playAlert() {
-        this.playTone(880, 'square', 0.2);
-        setTimeout(() => this.playTone(440, 'square', 0.4), 200);
-    }
-}
-
-/* =========================================
-   MODULE 3: VISUALIZATION ENGINE (CANVAS)
-   ========================================= */
-class RenderEngine {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.width = this.canvas.offsetWidth;
-        this.height = this.canvas.offsetHeight;
-        this.particles = [];
-        this.waveData = [];
-        
-        window.addEventListener('resize', () => this.resize());
         this.resize();
-        this.animate();
-    }
+        window.onresize = () => this.resize();
+    },
 
     resize() {
-        this.width = this.canvas.parentElement.offsetWidth;
-        this.height = this.canvas.parentElement.offsetHeight;
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
-    }
+        this.scan.width = this.view.offsetWidth;
+        this.scan.height = this.view.offsetHeight;
+        this.spec.width = this.spec.parentElement.offsetWidth;
+        this.spec.height = 200;
+    },
 
-    addPulse(x, intensity) {
-        for(let i=0; i<10; i++) {
-            this.particles.push({
-                x: x,
-                y: this.height / 2,
-                vx: (Math.random() - 0.5) * 5,
-                vy: (Math.random() - 0.5) * 5,
-                life: 1.0,
-                color: intensity > 100 ? '#ff0033' : '#00ff41'
-            });
+    async initCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            document.getElementById('webcam').srcObject = stream;
+            this.log("2026_SENSOR: Webcam feed established. Pixel-tracking active.");
+        } catch (e) {
+            this.log("2026_SENSOR: Webcam failed. Reverting to 2023 Manual Mode.", true);
         }
-    }
+    },
 
-    updateWave(data) {
-        this.waveData = data;
-    }
-
-    animate() {
-        const { ctx, width, height } = this;
-        
-        // Clear with trails
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-        ctx.fillRect(0, 0, width, height);
-
-        // Grid Background
-        ctx.strokeStyle = '#111';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        for(let i=0; i<width; i+=50) { ctx.moveTo(i,0); ctx.lineTo(i,height); }
-        for(let i=0; i<height; i+=50) { ctx.moveTo(0,i); ctx.lineTo(width,i); }
-        ctx.stroke();
-
-        // Draw Waveform
-        if (this.waveData.length > 1) {
-            ctx.beginPath();
-            ctx.strokeStyle = '#00ff41';
-            ctx.lineWidth = 2;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#00ff41';
-            
-            const step = width / 100; // Show last 100 points
-            const startIdx = Math.max(0, this.waveData.length - 100);
-            
-            for (let i = startIdx; i < this.waveData.length; i++) {
-                const x = (i - startIdx) * step;
-                // Normalize value for display (assuming range 0-1000ms)
-                const y = height - MathLib.map(this.waveData[i], 0, 1000, 10, height - 10);
-                if (i === startIdx) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
+    attachEvents() {
+        const btn = document.getElementById('trigger');
+        const inject = () => {
+            const now = performance.now();
+            if(this.timestamps.length > 0) {
+                const diff = now - this.timestamps[this.timestamps.length - 1];
+                if(diff > 100) this.process(diff);
             }
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-        }
-
-        // Update Particles
-        for (let i = this.particles.length - 1; i >= 0; i--) {
-            let p = this.particles[i];
-            p.x += p.vx;
-            p.y += p.vy;
-            p.life -= 0.02;
-            
-            ctx.fillStyle = p.color;
-            ctx.globalAlpha = p.life;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
-            ctx.fill();
-            
-            if (p.life <= 0) this.particles.splice(i, 1);
-        }
-        ctx.globalAlpha = 1;
-
-        // Center Line
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.beginPath();
-        ctx.moveTo(0, height/2);
-        ctx.lineTo(width, height/2);
-        ctx.stroke();
-
-        requestAnimationFrame(() => this.animate());
-    }
-}
-
-/* =========================================
-   MODULE 4: SYSTEM KERNEL (MAIN LOGIC)
-   ========================================= */
-class SystemKernel {
-    constructor() {
-        this.state = {
-            timestamps: [],
-            intervals: [],
-            isReady: false,
-            metrics: {
-                hz: 0,
-                jitter: 0,
-                stability: 0
-            }
-        };
-        
-        this.config = {
-            bufferSize: 100,
-            debounce: 80, // ms
-            noiseThreshold: 2000 // ms
+            this.timestamps.push(now);
         };
 
-        this.audio = new AudioEngine();
-        this.logger = document.getElementById('sys-log');
-        this.viz = null; // Initialized after boot
-        this.ui = {}; // Cached DOM elements
-    }
+        btn.onclick = inject;
+        window.onkeydown = (e) => { if(e.code === 'Space') inject(); };
+    },
 
-    // BOOT SEQUENCE SIMULATION
-    boot() {
-        const bootText = document.getElementById('boot-text');
-        const bootProg = document.getElementById('boot-prog');
-        const bootScreen = document.getElementById('boot-screen');
-        const mainInterface = document.getElementById('main-interface');
+    process(diff) {
+        this.intervals.push(diff);
+        if(this.intervals.length > this.config.buffer) this.intervals.shift();
+
+        // 2023 MATH
+        const avg = this.intervals.reduce((a,b)=>a+b) / this.intervals.length;
+        const hz = (1000 / avg).toFixed(2);
         
-        let progress = 0;
-        const logs = [
-            "Mounting file system...",
-            "Loading biometric drivers...",
-            "Initializing DSP engine...",
-            "Connecting to neural interface...",
-            "Calibrating sensors...",
-            "System check: OK",
-            "Starting UTKAN-OS kernel..."
-        ];
-
-        const interval = setInterval(() => {
-            progress += Math.random() * 10;
-            if (progress > 100) progress = 100;
-            bootProg.style.width = `${progress}%`;
-            
-            if (Math.random() > 0.7) {
-                const log = logs.shift();
-                if (log) bootText.innerHTML += `<br>> ${log}`;
-            }
-
-            if (progress === 100) {
-                clearInterval(interval);
-                setTimeout(() => {
-                    bootScreen.style.display = 'none';
-                    mainInterface.style.display = 'grid'; // Grid layout activated
-                    this.init();
-                }, 500);
-            }
-        }, 100);
-    }
-
-    // INITIALIZATION
-    init() {
-        this.log("KERNEL_LOADED successfully.");
-        this.viz = new RenderEngine('mainCanvas');
-        this.cacheDOM();
-        this.bindEvents();
-        this.startClock();
-        this.generateSpectrumBars();
-        this.log("Listening for input signals...");
-    }
-
-    cacheDOM() {
-        this.ui = {
-            hz: document.getElementById('val-hz'),
-            jitter: document.getElementById('val-jitter'),
-            stab: document.getElementById('val-stab'),
-            ai: document.getElementById('ai-output'),
-            led: document.getElementById('pulse-led'),
-            cpu: document.getElementById('cpu-load'),
-            mem: document.getElementById('mem-load')
-        };
-    }
-
-    bindEvents() {
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.key === 'j') {
-                this.handleInput();
-            }
-        });
+        // 2024 STATS
+        const sigma = Math.sqrt(this.intervals.reduce((s,x)=> s + Math.pow(x-avg,2), 0) / this.intervals.length).toFixed(2);
         
-        document.getElementById('core-viz').addEventListener('mousedown', () => {
-            this.handleInput();
-        });
-    }
+        // Update UI
+        document.getElementById('hz-val').innerText = hz;
+        document.getElementById('jitter-val').innerText = sigma;
+        document.getElementById('hz-bar').style.width = Math.min(100, hz * 20) + "%";
+        document.getElementById('jt-bar').style.width = Math.min(100, sigma / 2) + "%";
 
-    // CORE LOGIC: INPUT HANDLING
-    handleInput() {
-        const now = performance.now();
-        this.flashLed();
-        this.audio.playTone(600, 'sine', 0.05);
+        this.aiInference(hz, sigma); // 2025 AI
+    },
 
-        // Particle effect at center
-        if (this.viz) this.viz.addPulse(this.viz.width / 2, 50);
-
-        if (this.state.timestamps.length > 0) {
-            const lastTime = this.state.timestamps[this.state.timestamps.length - 1];
-            const diff = now - lastTime;
-
-            // Filters
-            if (diff < this.config.debounce) return; // Debounce
-            if (diff > this.config.noiseThreshold) {
-                this.log(`Signal reset: Time gap too large (${diff.toFixed(0)}ms)`, 'warn');
-                this.state.timestamps = [now]; // Reset chain
-                return;
-            }
-
-            this.processSignal(diff);
-        }
+    aiInference(hz, sigma) {
+        const ai = document.getElementById('ai-thought-process');
+        const integrity = document.getElementById('int-val');
         
-        this.state.timestamps.push(now);
-        if (this.state.timestamps.length > this.config.bufferSize) this.state.timestamps.shift();
-    }
-
-    processSignal(diff) {
-        this.state.intervals.push(diff);
-        if (this.state.intervals.length > this.config.bufferSize) this.state.intervals.shift();
-
-        // Pass data to visualizer
-        this.viz.updateWave(this.state.intervals);
-
-        // CALCULATE METRICS
-        const avg = MathLib.avg(this.state.intervals);
-        const sigma = MathLib.stdDev(this.state.intervals);
-        
-        // Hz Calculation (1000ms / avg ms)
-        const hz = (1000 / avg);
-        
-        // Stability Calculation (Lower sigma is better)
-        // Heuristic: If sigma is 10% of avg, stability is 0. If sigma is 0, stability is 100.
-        const cv = sigma / avg; // Coefficient of Variation
-        let stability = 100 - (cv * 1000); 
-        stability = Math.max(0, Math.min(100, stability));
-
-        // UPDATE STATE
-        this.state.metrics = { hz, jitter: sigma, stability };
-        
-        // UPDATE UI
-        this.updateUI();
-        this.updateAI(sigma, stability);
-        this.animateSpectrum(diff);
-
-        // LOG
-        this.log(`IMPULSE: ${diff.toFixed(1)}ms | σ: ${sigma.toFixed(2)}`, sigma > 50 ? 'warn' : 'info');
-    }
-
-    updateUI() {
-        const { hz, jitter, stability } = this.state.metrics;
-        
-        this.ui.hz.innerText = hz.toFixed(2);
-        this.ui.jitter.innerText = jitter.toFixed(2);
-        this.ui.stab.innerText = stability.toFixed(1);
-        
-        // Dynamic Color Changes
-        this.ui.stab.style.color = stability > 80 ? 'var(--primary)' : (stability > 50 ? 'var(--warn)' : 'var(--alert)');
-    }
-
-    updateAI(sigma, stability) {
-        if (this.state.intervals.length < 10) return;
-
-        let diagnosis = "";
-        let color = "#fff";
-
-        if (stability > 90) {
-            diagnosis = "OPTIMAL SYNCHRONIZATION DETECTED. Subject is in 'Flow State'. Motor cortex activity is highly rhythmic.";
-            color = "var(--primary)";
-        } else if (stability > 70) {
-            diagnosis = "NORMAL OPERATION. Minor variances detected within acceptable cognitive load limits.";
-            color = "#ccc";
-        } else if (stability > 40) {
-            diagnosis = "IRREGULAR PATTERN DETECTED. Possible cognitive fatigue or distraction. Variance exceeds safety thresholds.";
-            color = "var(--warn)";
+        if(sigma < 20) {
+            ai.innerHTML = "SYSTEM_REPORT: 2026 Neural Focus detected. Signal is exceptionally clean. Subject is in high-performance state.";
+            integrity.innerText = "99.8%"; integrity.style.color = "var(--neon)";
+        } else if(sigma < 70) {
+            ai.innerHTML = "SYSTEM_REPORT: Standard variance. Cognitive load is balanced. System processing nominal pulses.";
+            integrity.innerText = "94.2%"; integrity.style.color = "var(--accent)";
         } else {
-            diagnosis = "CRITICAL INSTABILITY. Neuro-motor feedback loop is compromised. Immediate recalibration required.";
-            color = "var(--alert)";
-            if (Math.random() > 0.9) this.audio.playAlert();
+            ai.innerHTML = "SYSTEM_REPORT: High Entropy detected! 2024 Jitter thresholds breached. Check sensor contact or subject fatigue.";
+            integrity.innerText = "62.1%"; integrity.style.color = "var(--warn)";
         }
+    },
 
-        this.ui.ai.innerHTML = diagnosis;
-        this.ui.ai.style.color = color;
-    }
+    engineLoop() {
+        const ctx = this.scan.getContext('2d');
+        const btx = this.brain.getContext('2d');
+        const stx = this.spec.getContext('2d');
 
-    // VISUAL: FLASH LED
-    flashLed() {
-        this.ui.led.classList.add('led-active');
-        setTimeout(() => this.ui.led.classList.remove('led-active'), 50);
-    }
-
-    // VISUAL: SPECTRUM BARS
-    generateSpectrumBars() {
-        const container = document.getElementById('spec-viz');
-        for (let i = 0; i < 20; i++) {
-            const bar = document.createElement('div');
-            bar.className = 'spec-col';
-            bar.id = `spec-${i}`;
-            container.appendChild(bar);
-        }
-    }
-
-    animateSpectrum(val) {
-        // Simulate frequency spectrum based on input value
-        for(let i=0; i<20; i++) {
-            const bar = document.getElementById(`spec-${i}`);
-            const h = Math.random() * 100;
-            bar.style.height = `${h}%`;
-            bar.style.backgroundColor = h > 80 ? 'var(--primary)' : 'var(--secondary)';
-        }
-    }
-
-    // SYSTEM UTILS
-    log(msg, type = 'info') {
-        const entry = document.createElement('div');
-        entry.className = `log-entry ${type === 'warn' ? 'log-warn' : ''} ${type === 'error' ? 'log-error' : ''}`;
-        entry.innerText = `[${MathLib.formatTime()}] ${msg}`;
-        this.logger.prepend(entry);
-        if (this.logger.children.length > 50) this.logger.lastChild.remove();
-    }
-
-    startClock() {
-        setInterval(() => {
-            document.getElementById('clock-display').innerText = MathLib.formatTime();
-            // Simulate CPU/Mem load
-            this.ui.cpu.innerText = (Math.random() * 15).toFixed(1) + "%";
-            this.ui.mem.innerText = Math.floor(200 + Math.random() * 50) + "MB";
-        }, 1000);
-    }
-
-    reset() {
-        this.state.intervals = [];
-        this.state.timestamps = [];
-        this.state.metrics = { hz: 0, jitter: 0, stability: 0 };
-        this.ui.hz.innerText = "0.00";
-        this.ui.jitter.innerText = "0.00";
-        this.ui.stab.innerText = "0.0";
-        this.ui.ai.innerText = "System Reset. Awaiting input...";
-        this.log("System manually reset via Kernel Override.", "warn");
-    }
-
-    export() {
-        const modal = document.getElementById('report-modal');
-        const content = document.getElementById('modal-content');
+        // Draw 2026 Scanner
+        ctx.clearRect(0,0, this.scan.width, this.scan.height);
+        ctx.strokeStyle = "var(--accent)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(this.scan.width/4, this.scan.height/4, this.scan.width/2, this.scan.height/2);
         
-        const report = {
-            sessionId: MathLib.generateId(),
-            timestamp: new Date().toISOString(),
-            totalPulses: this.state.intervals.length,
-            metrics: this.state.metrics,
-            rawData: this.state.intervals.slice(-10) // Last 10 samples
-        };
+        // Draw 2025 Brain Waves (Simulated)
+        btx.fillStyle = "rgba(0,0,0,0.1)";
+        btx.fillRect(0,0, this.brain.width, this.brain.height);
+        btx.beginPath(); btx.strokeStyle = "var(--neon)";
+        for(let i=0; i<this.brain.width; i+=5) {
+            const y = (this.brain.height/2) + Math.sin(i*0.05 + Date.now()*0.01) * 20;
+            if(i===0) btx.moveTo(i,y); else btx.lineTo(i,y);
+        }
+        btx.stroke();
 
-        content.innerText = JSON.stringify(report, null, 2);
-        modal.style.display = 'block';
-        this.log("Data dumped to modal window.");
+        // Draw 2024 Spectrogram
+        stx.fillStyle = "#000"; stx.fillRect(0,0,this.spec.width, this.spec.height);
+        const step = this.spec.width / this.config.buffer;
+        stx.beginPath(); stx.strokeStyle = "var(--accent)";
+        this.intervals.forEach((v, i) => {
+            const x = i * step;
+            const y = this.spec.height - (v/5);
+            if(i===0) stx.moveTo(x,y); else stx.lineTo(x,y);
+        });
+        stx.stroke();
+
+        requestAnimationFrame(() => this.engineLoop());
     }
-}
-
-// =========================================
-// SYSTEM ENTRY POINT
-// =========================================
-const Kernel = new SystemKernel();
-
-window.onload = () => {
-    // Start the boot sequence
-    Kernel.boot();
 };
 
+window.onload = () => OmniCore.init();
 </script>
 </body>
 </html>
+
