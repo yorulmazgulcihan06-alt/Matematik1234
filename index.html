@@ -2,268 +2,249 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>UTKAN OMNI-KERNEL | 2023-2026 LEGACY EDITION</title>
+    <title>UTKAN OMNI-KERNEL | 2023-2026 PRESTIGE EDITION</title>
     <style>
-        /* 2026 ULTRA-MODERN NEUMORPHIC CYBERPUNK THEME */
+        /* 2026 ULTRA-NEON DESIGN LANGUAGE */
         :root {
-            --neon: #00ff41; --bg: #020202; --panel: rgba(15, 15, 15, 0.9);
-            --warn: #ff003c; --accent: #00e5ff;
+            --p: #00ff41; --s: #003b00; --bg: #000; --warn: #ff003c; --accent: #00e5ff;
+            --f: 'JetBrains Mono', 'Fira Code', monospace;
         }
 
         body {
-            margin: 0; background: var(--bg); color: var(--neon);
-            font-family: 'JetBrains Mono', 'Fira Code', monospace;
-            overflow: hidden; height: 100vh;
+            margin: 0; background: var(--bg); color: var(--p);
+            font-family: var(--f); overflow: hidden; height: 100vh;
         }
 
-        /* 2024 GPU GRID ACCELERATION */
-        .grid-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(var(--s) 1px, transparent 1px), linear-gradient(90deg, var(--s) 1px, transparent 1px);
-            background-size: 40px 40px; background-color: #000;
-            opacity: 0.1; z-index: -1;
-        }
-
-        #os-container {
+        /* 2024 GPU INTERFACE ACCELERATION */
+        #main-os {
             display: grid;
-            grid-template-columns: 350px 1fr 350px;
-            grid-template-rows: 70px 1fr 220px;
-            gap: 10px; padding: 10px; height: 100vh;
+            grid-template-columns: 320px 1fr 320px;
+            grid-template-rows: 60px 1fr 200px;
+            height: 100vh; gap: 5px; padding: 5px;
         }
 
         .module {
-            background: var(--panel); border: 1px solid #222;
-            position: relative; backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid var(--s); position: relative;
+            backdrop-filter: blur(15px);
         }
 
-        /* 2025 AI CONSOLE STYLING */
-        header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-bottom: 2px solid var(--neon); }
-        .glitch-text { animation: glitch 3s infinite; font-weight: bold; letter-spacing: 3px; }
-
-        @keyframes glitch {
-            0% { text-shadow: 2px 0 var(--accent); }
-            50% { text-shadow: -2px 0 var(--warn); }
-            100% { text-shadow: 2px 0 var(--accent); }
+        /* HEADER - 2025 AI INTEGRITY */
+        header { 
+            grid-column: 1 / -1; display: flex; align-items: center; 
+            justify-content: space-between; padding: 0 20px;
+            border-bottom: 2px solid var(--p);
         }
 
-        /* LIVE CAMERA VIEWPORT */
-        #viewport-container { position: relative; overflow: hidden; border: 1px solid var(--accent); }
-        #webcam { width: 100%; height: 100%; object-fit: cover; filter: sepia(100%) hue-rotate(90deg) brightness(0.8); }
-        #scanner-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-
-        /* ANALYTICS PANELS */
-        .stat-card { padding: 20px; border-bottom: 1px solid #1a1a1a; }
-        .val { font-size: 2.5rem; color: #fff; text-shadow: 0 0 10px var(--neon); }
+        /* 2026 SENSOR VIEWPORT - FOTOĞRAFTAKİ LAZER ETKİSİ */
+        #viewport { position: relative; border: 1px solid var(--accent); overflow: hidden; }
+        #cam-feed { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.5) contrast(1.2); }
         
-        #log-stream { font-size: 0.7rem; height: 100%; overflow-y: auto; padding: 10px; color: var(--accent); }
-        .pulse-btn { 
-            width: 100%; padding: 15px; background: none; border: 2px solid var(--neon); 
-            color: var(--neon); cursor: pointer; font-size: 1rem; transition: 0.3s;
+        /* LAZER TARAYICI ÇİZGİSİ */
+        .laser-line {
+            position: absolute; width: 100%; height: 2px;
+            background: var(--p); box-shadow: 0 0 15px var(--p);
+            top: 50%; z-index: 10; animation: scan 3s ease-in-out infinite;
         }
-        .pulse-btn:hover { background: var(--neon); color: #000; box-shadow: 0 0 30px var(--neon); }
 
-        .progress-mini { height: 4px; background: #111; margin-top: 10px; }
-        .progress-fill { height: 100%; background: var(--accent); width: 0%; transition: 0.2s; }
+        @keyframes scan { 
+            0%, 100% { top: 20%; opacity: 0.2; } 
+            50% { top: 80%; opacity: 1; } 
+        }
+
+        /* BIOMETRIC CARDS - 2023 CORE STATS */
+        .card { padding: 15px; border-bottom: 1px solid #1a1a1a; }
+        .label { font-size: 0.65rem; color: #555; text-transform: uppercase; }
+        .value { font-size: 2.2rem; display: block; font-weight: 200; }
+
+        /* 2025 AI CONSOLE */
+        #ai-log { font-size: 0.75rem; line-height: 1.4; color: #888; padding: 15px; }
+        .ai-active { color: var(--p); text-shadow: 0 0 5px var(--p); }
+
+        /* 2024 DATA STREAM FOOTER */
+        footer { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        #terminal { background: #000; overflow-y: auto; padding: 10px; font-size: 0.7rem; }
+        canvas { width: 100%; height: 100%; }
+
+        .btn-pulse {
+            width: 100%; padding: 12px; border: 1px solid var(--p);
+            background: none; color: var(--p); cursor: pointer;
+            font-family: var(--f); transition: 0.3s;
+        }
+        .btn-pulse:hover { background: var(--p); color: #000; }
     </style>
 </head>
 <body>
 
-<div class="grid-bg"></div>
-
-<div id="os-container">
+<div id="main-os">
     <header class="module">
-        <div class="glitch-text">UTKAN_OMNI_KERNEL_v2026.4</div>
-        <div id="sys-status">KERNEL_STABLE // HIBRİT_SENSÖR_AKTIF</div>
-        <div id="timer">TIMESTAMP: 2026-02-19</div>
+        <div style="letter-spacing: 5px;">NEURO_CORE_v2026_ULTIMATE</div>
+        <div id="status">SYS_STATUS: HYBRID_SENSOR_ACTIVE</div>
+        <div id="clock">00:00:00</div>
     </header>
 
     <aside class="module">
-        <div class="stat-card">
-            <label>BIOMETRIC_HZ (2023_STD)</label>
-            <div id="hz-val" class="val">0.00</div>
-            <div class="progress-mini"><div id="hz-bar" class="progress-fill"></div></div>
+        <div class="card">
+            <span class="label">Sampling Rate (2023)</span>
+            <span class="value" id="val-hz">0.00</span>
         </div>
-        <div class="stat-card">
-            <label>NEURAL_JITTER (2024_OPT)</label>
-            <div id="jitter-val" class="val">0.00</div>
-            <div class="progress-mini"><div id="jt-bar" class="progress-fill"></div></div>
+        <div class="card">
+            <span class="label">Jitter Variance (2024)</span>
+            <span class="value" id="val-jitter">0.00</span>
         </div>
-        <div class="stat-card">
-            <label>INTEGRITY (2025_AI)</label>
-            <div id="int-val" class="val">100%</div>
+        <div class="card">
+            <span class="label">Neural Stability</span>
+            <span class="value" id="val-stab" style="color: var(--accent);">0%</span>
         </div>
-        <div style="padding: 20px;">
-            <button class="pulse-btn" id="trigger">MANUAL_SIGNAL_INJECTION</button>
+        <div style="padding: 15px;">
+            <button class="btn-pulse" onclick="Kernel.inject()">MANUAL_PULSE_INJECTION</button>
         </div>
     </aside>
 
-    <main class="module" id="viewport-container">
-        <video id="webcam" autoplay playsinline></video>
-        <canvas id="scanner-layer"></canvas>
-        <div style="position:absolute; bottom:10px; left:10px; font-size:0.6rem; background:rgba(0,0,0,0.7); padding:5px;">
-            RAW_PIXEL_DATA_STREAM: ENABLED // NOISE_REDUCTION: v4.2
+    <main class="module" id="viewport">
+        <video id="cam-feed" autoplay playsinline></video>
+        <div class="laser-line"></div>
+        <canvas id="overlay-canvas" style="position:absolute; top:0; left:0; z-index:5;"></canvas>
+        <div style="position:absolute; top:10px; right:10px; font-size:0.6rem; color:var(--p);">
+            [REC] BIO_TRACKING_ON
         </div>
-    </main>
+    </aside>
 
     <aside class="module">
-        <div style="padding:15px; border-bottom:1px solid #333; font-weight:bold;">AI_INFERENCE_ENGINE_2025</div>
-        <div id="ai-thought-process" style="padding:15px; font-size:0.8rem; color:#888; line-height:1.6;">
-            Awaiting biometric pulse... Analysing environmental noise... 
+        <div id="ai-log">
+            <div style="color: var(--p); margin-bottom: 10px;">> AI_INFERENCE_ENGINE_V2025</div>
+            <div id="ai-thought">Awaiting biometric signal stream... Analyzing environmental noise...</div>
         </div>
-        <canvas id="brain-wave-canvas" style="width:100%; height:150px; border-top:1px solid #1a1a1a;"></canvas>
+        <canvas id="wave-canvas" style="border-top: 1px solid #1a1a1a;"></canvas>
     </aside>
 
-    <footer class="module" style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr;">
-        <div id="log-stream"></div>
-        <div id="spectrogram" style="border-left:1px solid #222; position:relative;">
-            <canvas id="spec-canvas"></canvas>
+    <footer class="module">
+        <div id="terminal"></div>
+        <div id="data-graph" style="border-left: 1px solid var(--s);">
+            <canvas id="graph-canvas"></canvas>
         </div>
     </footer>
 </div>
 
 <script>
 /**
- * OMNI-KERNEL v2026 ENGINE
- * Merging technologies from 2023, 2024, 2025, and 2026.
+ * UTKAN OMNI-KERNEL v2026.4.5
+ * Legacy Integration: 2023, 2024, 2025, 2026
  */
 
-const OmniCore = {
-    timestamps: [],
+const Kernel = {
     intervals: [],
-    config: { buffer: 120, sensitivity: 0.85 },
+    timestamps: [],
     
     async init() {
-        this.log("CORE: Booting 2023-2026 Legacy Hybrid System...");
+        this.log("CORE: Initializing Legacy Hybrid Engine...");
+        this.setupMedia();
         this.setupCanvases();
-        this.initCamera(); // 2026 Sensor Tech
-        this.attachEvents();
-        this.engineLoop(); // 2024 GPU Loop
+        this.startClock();
+        this.loop();
+        this.log("SYSTEM: All modules (2023-2026) loaded. Status: Stable.");
     },
 
-    log(m, err = false) {
-        const s = document.getElementById('log-stream');
+    log(m) {
+        const t = document.getElementById('terminal');
         const l = document.createElement('div');
-        l.style.color = err ? 'var(--warn)' : 'var(--accent)';
         l.innerHTML = `> [${new Date().toLocaleTimeString()}] ${m}`;
-        s.prepend(l);
+        t.prepend(l);
+    },
+
+    async setupMedia() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            document.getElementById('cam-feed').srcObject = stream;
+            this.log("2026_SENSOR: Lazer tarayıcı aktif. Kamera senkronize.");
+        } catch (e) {
+            this.log("2026_SENSOR: Kamera erişimi engellendi. 2023 Manuel mod devrede.", true);
+        }
     },
 
     setupCanvases() {
-        this.view = document.getElementById('viewport-container');
-        this.scan = document.getElementById('scanner-layer');
-        this.brain = document.getElementById('brain-wave-canvas');
-        this.spec = document.getElementById('spec-canvas');
-        
+        this.ov = document.getElementById('overlay-canvas');
+        this.wv = document.getElementById('wave-canvas');
+        this.gv = document.getElementById('graph-canvas');
         this.resize();
         window.onresize = () => this.resize();
     },
 
     resize() {
-        this.scan.width = this.view.offsetWidth;
-        this.scan.height = this.view.offsetHeight;
-        this.spec.width = this.spec.parentElement.offsetWidth;
-        this.spec.height = 200;
+        const v = document.getElementById('viewport');
+        this.ov.width = v.offsetWidth; this.ov.height = v.offsetHeight;
+        this.wv.width = 320; this.wv.height = 150;
+        this.gv.width = 800; this.gv.height = 200;
     },
 
-    async initCamera() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            document.getElementById('webcam').srcObject = stream;
-            this.log("2026_SENSOR: Webcam feed established. Pixel-tracking active.");
-        } catch (e) {
-            this.log("2026_SENSOR: Webcam failed. Reverting to 2023 Manual Mode.", true);
+    inject() {
+        const now = performance.now();
+        if(this.timestamps.length > 0) {
+            const diff = now - this.timestamps[this.timestamps.length - 1];
+            if(diff > 80) this.process(diff);
         }
-    },
-
-    attachEvents() {
-        const btn = document.getElementById('trigger');
-        const inject = () => {
-            const now = performance.now();
-            if(this.timestamps.length > 0) {
-                const diff = now - this.timestamps[this.timestamps.length - 1];
-                if(diff > 100) this.process(diff);
-            }
-            this.timestamps.push(now);
-        };
-
-        btn.onclick = inject;
-        window.onkeydown = (e) => { if(e.code === 'Space') inject(); };
+        this.timestamps.push(now);
     },
 
     process(diff) {
         this.intervals.push(diff);
-        if(this.intervals.length > this.config.buffer) this.intervals.shift();
+        if(this.intervals.length > 100) this.intervals.shift();
 
         // 2023 MATH
-        const avg = this.intervals.reduce((a,b)=>a+b) / this.intervals.length;
-        const hz = (1000 / avg).toFixed(2);
+        const avg = this.intervals.reduce((a,b)=>a+b)/this.intervals.length;
+        const hz = (1000/avg).toFixed(2);
         
         // 2024 STATS
-        const sigma = Math.sqrt(this.intervals.reduce((s,x)=> s + Math.pow(x-avg,2), 0) / this.intervals.length).toFixed(2);
-        
-        // Update UI
-        document.getElementById('hz-val').innerText = hz;
-        document.getElementById('jitter-val').innerText = sigma;
-        document.getElementById('hz-bar').style.width = Math.min(100, hz * 20) + "%";
-        document.getElementById('jt-bar').style.width = Math.min(100, sigma / 2) + "%";
+        const sigma = Math.sqrt(this.intervals.reduce((s,x)=> s + Math.pow(x-avg,2),0)/this.intervals.length);
+        const stab = Math.max(0, 100 - (sigma/avg * 1000)).toFixed(1);
 
-        this.aiInference(hz, sigma); // 2025 AI
+        document.getElementById('val-hz').innerText = hz;
+        document.getElementById('val-jitter').innerText = sigma.toFixed(2);
+        document.getElementById('val-stab').innerText = stab + "%";
+
+        this.aiInference(stab); // 2025 AI
     },
 
-    aiInference(hz, sigma) {
-        const ai = document.getElementById('ai-thought-process');
-        const integrity = document.getElementById('int-val');
-        
-        if(sigma < 20) {
-            ai.innerHTML = "SYSTEM_REPORT: 2026 Neural Focus detected. Signal is exceptionally clean. Subject is in high-performance state.";
-            integrity.innerText = "99.8%"; integrity.style.color = "var(--neon)";
-        } else if(sigma < 70) {
-            ai.innerHTML = "SYSTEM_REPORT: Standard variance. Cognitive load is balanced. System processing nominal pulses.";
-            integrity.innerText = "94.2%"; integrity.style.color = "var(--accent)";
-        } else {
-            ai.innerHTML = "SYSTEM_REPORT: High Entropy detected! 2024 Jitter thresholds breached. Check sensor contact or subject fatigue.";
-            integrity.innerText = "62.1%"; integrity.style.color = "var(--warn)";
-        }
+    aiInference(s) {
+        const thought = document.getElementById('ai-thought');
+        if(s > 85) thought.innerHTML = "<span class='ai-active'>SYSTEM_OPTIMAL:</span> Kullanıcı flow durumunda. Senkronizasyon %100.";
+        else if(s > 60) thought.innerHTML = "SYSTEM_NOMINAL: Standart bilişsel yük. Analiz devam ediyor...";
+        else thought.innerHTML = "<span style='color:var(--warn)'>WARNING:</span> Jitter eşiği aşıldı. Sensör kalibrasyonu öneriliyor.";
     },
 
-    engineLoop() {
-        const ctx = this.scan.getContext('2d');
-        const btx = this.brain.getContext('2d');
-        const stx = this.spec.getContext('2d');
-
-        // Draw 2026 Scanner
-        ctx.clearRect(0,0, this.scan.width, this.scan.height);
-        ctx.strokeStyle = "var(--accent)";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(this.scan.width/4, this.scan.height/4, this.scan.width/2, this.scan.height/2);
+    loop() {
+        // 2024 GPU Rendering
+        const ctx = this.ov.getContext('2d');
+        ctx.clearRect(0,0,this.ov.width, this.ov.height);
         
-        // Draw 2025 Brain Waves (Simulated)
-        btx.fillStyle = "rgba(0,0,0,0.1)";
-        btx.fillRect(0,0, this.brain.width, this.brain.height);
-        btx.beginPath(); btx.strokeStyle = "var(--neon)";
-        for(let i=0; i<this.brain.width; i+=5) {
-            const y = (this.brain.height/2) + Math.sin(i*0.05 + Date.now()*0.01) * 20;
-            if(i===0) btx.moveTo(i,y); else btx.lineTo(i,y);
+        // Fotoğraftaki gibi bilek tarama odağı
+        ctx.strokeStyle = "rgba(0, 255, 65, 0.5)";
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(this.ov.width/4, this.ov.height/4, this.ov.width/2, this.ov.height/2);
+        ctx.setLineDash([]);
+
+        // 2025 Waveform
+        const wtx = this.wv.getContext('2d');
+        wtx.fillStyle = "rgba(0,0,0,0.1)"; wtx.fillRect(0,0,320,150);
+        wtx.beginPath(); wtx.strokeStyle = "var(--p)";
+        for(let i=0; i<320; i+=10) {
+            const y = 75 + Math.sin(i*0.05 + Date.now()*0.01) * 20;
+            if(i===0) wtx.moveTo(i,y); else wtx.lineTo(i,y);
         }
-        btx.stroke();
+        wtx.stroke();
 
-        // Draw 2024 Spectrogram
-        stx.fillStyle = "#000"; stx.fillRect(0,0,this.spec.width, this.spec.height);
-        const step = this.spec.width / this.config.buffer;
-        stx.beginPath(); stx.strokeStyle = "var(--accent)";
-        this.intervals.forEach((v, i) => {
-            const x = i * step;
-            const y = this.spec.height - (v/5);
-            if(i===0) stx.moveTo(x,y); else stx.lineTo(x,y);
-        });
-        stx.stroke();
+        requestAnimationFrame(() => this.loop());
+    },
 
-        requestAnimationFrame(() => this.engineLoop());
+    startClock() {
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
     }
 };
 
-window.onload = () => OmniCore.init();
+window.onload = () => Kernel.init();
+window.onkeydown = (e) => { if(e.code === 'Space') Kernel.inject(); };
 </script>
 </body>
 </html>
