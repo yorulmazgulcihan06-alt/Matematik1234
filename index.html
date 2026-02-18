@@ -3,534 +3,752 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UTKAN NEURO-STATION PRESTIGE v8.0</title>
+    <title>UTKAN-OS | NEURO-LINKED BIOMETRIC KERNEL v99.0</title>
     <style>
-        /* --- BÖLÜM 1: SİBER-GELECEK TASARIM TEMELLERİ --- */
+        /* =========================================
+           CORE STYLESHEET - SYSTEM LEVEL
+           ========================================= */
         :root {
-            --ana-renk: #00ff41; /* Klasik Matrix Yeşili */
-            --arka-plan: #020202;
-            --panel-renk: #0a0a0a;
-            --cerceve: #1a1a1a;
-            --yazi-renk: #e0e0e0;
-            --vurgu: #ff003c;
-            --golge: 0 0 20px rgba(0, 255, 65, 0.15);
+            --primary: #00ff41;
+            --secondary: #008F11;
+            --alert: #ff0033;
+            --warn: #ffcc00;
+            --bg-dark: #020202;
+            --panel-bg: rgba(10, 10, 10, 0.95);
+            --grid-line: rgba(0, 255, 65, 0.1);
+            --font-stack: 'Courier New', 'Consolas', monospace;
         }
 
-        * { box-sizing: border-box; outline: none; }
-
+        * { box-sizing: border-box; user-select: none; }
+        
         body {
-            background-color: var(--arka-plan);
-            color: var(--yazi-renk);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+            padding: 0;
+            background-color: var(--bg-dark);
+            color: var(--primary);
+            font-family: var(--font-stack);
             overflow: hidden;
-            border: 2px solid var(--cerceve);
-        }
-
-        /* --- BÖLÜM 2: ÜST BİLGİ ÇUBUĞU --- */
-        header {
-            background: linear-gradient(90deg, #000 0%, #0d0d0d 100%);
-            padding: 25px;
-            border-bottom: 2px solid var(--ana-renk);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--golge);
-        }
-
-        .baslik-grubu h1 {
-            margin: 0;
-            font-size: 1.6rem;
-            letter-spacing: 4px;
-            color: var(--ana-renk);
-            text-shadow: 0 0 10px var(--ana-renk);
-        }
-
-        .sistem-saati {
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        /* --- BÖLÜM 3: ANA YERLEŞİM --- */
-        main {
-            display: grid;
-            grid-template-columns: 380px 1fr 380px;
-            flex: 1;
-            gap: 10px;
-            padding: 10px;
-            background: #050505;
-        }
-
-        .yan-panel {
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 10px;
         }
 
-        .panel-govde {
-            background: var(--panel-renk);
-            border: 1px solid var(--cerceve);
-            border-radius: 4px;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .panel-baslik {
-            background: #111;
-            padding: 12px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            color: var(--ana-renk);
-            border-bottom: 1px solid var(--cerceve);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* --- BÖLÜM 4: VERİ KARTLARI --- */
-        .veri-alani {
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            overflow-y: auto;
-        }
-
-        .kart {
-            background: #000;
-            border: 1px solid #1a1a1a;
-            padding: 15px;
-            border-left: 4px solid var(--ana-renk);
-            transition: all 0.3s ease;
-        }
-
-        .kart:hover {
-            transform: translateX(5px);
-            background: #080808;
-            border-color: var(--ana-renk);
-        }
-
-        .kart-etiket {
-            font-size: 0.65rem;
-            color: #555;
+        /* CRT EFFECT & SCANLINES */
+        body::before {
+            content: " ";
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
         }
 
-        .kart-deger {
-            font-family: 'Courier New', monospace;
-            font-size: 1.8rem;
-            color: #fff;
+        /* LAYOUT GRID */
+        #main-interface {
+            display: none; /* Hidden until boot */
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: 60px 1fr 200px;
+            height: 100%;
+            width: 100%;
+            padding: 10px;
+            gap: 5px;
         }
 
-        /* --- BÖLÜM 5: MERKEZİ GÖRSELLEŞTİRME --- */
-        .merkez-panel {
+        /* HEADER */
+        header {
+            grid-column: 1 / -1;
+            border: 1px solid var(--secondary);
+            background: var(--panel-bg);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 0 15px var(--grid-line);
+        }
+
+        .sys-badge { font-weight: bold; letter-spacing: 2px; border: 1px solid var(--primary); padding: 5px 10px; font-size: 0.8rem; }
+        .sys-time { font-size: 0.9rem; color: #aaa; }
+
+        /* PANELS */
+        .panel {
+            border: 1px solid #222;
+            background: var(--panel-bg);
+            position: relative;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            overflow: hidden;
         }
-
-        #grafik-alani {
-            flex: 2;
-            background: #000;
-            border: 1px solid #1a1a1a;
-            position: relative;
-        }
-
-        #alt-grafik {
-            flex: 1;
-            background: #000;
-            border: 1px solid #1a1a1a;
-        }
-
-        canvas { width: 100%; height: 100%; }
-
-        /* --- BÖLÜM 6: TERMİNAL VE LOG --- */
-        #terminal {
-            flex: 1;
-            padding: 15px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.8rem;
-            color: #00cc33;
-            overflow-y: auto;
-            background: #000;
-            border-bottom: 1px solid var(--cerceve);
-        }
-
-        .log-satir { margin-bottom: 5px; border-bottom: 1px solid #050505; }
-        .log-zaman { color: #444; margin-right: 10px; }
-
-        /* --- BÖLÜM 7: KONTROL VE BUTONLAR --- */
-        .buton-grubu {
-            padding: 15px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        button {
-            background: transparent;
-            border: 1px solid var(--ana-renk);
-            color: var(--ana-renk);
-            padding: 12px;
-            cursor: pointer;
-            font-family: inherit;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        button:hover {
-            background: var(--ana-renk);
-            color: #000;
-            box-shadow: 0 0 15px var(--ana-renk);
-        }
-
-        button.tehlike {
-            border-color: var(--vurgu);
-            color: var(--vurgu);
-        }
-
-        button.tehlike:hover {
-            background: var(--vurgu);
-            color: #fff;
-            box-shadow: 0 0 15px var(--vurgu);
-        }
-
-        /* --- BÖLÜM 8: DURUM GÖSTERGELERİ --- */
-        .durum-cubugu {
-            padding: 10px 20px;
-            background: #000;
-            border-top: 2px solid var(--cerceve);
+        
+        .panel-header {
+            background: #111;
+            padding: 5px 10px;
             font-size: 0.7rem;
+            border-bottom: 1px solid #333;
+            color: #666;
+            text-transform: uppercase;
             display: flex;
             justify-content: space-between;
-            color: #444;
         }
 
-        .kalp-atisi {
-            width: 10px;
-            height: 10px;
-            background: var(--vurgu);
+        /* METRIC CARDS */
+        .metric-row {
+            padding: 15px;
+            border-bottom: 1px solid #1a1a1a;
+            transition: 0.2s;
+        }
+
+        .metric-row:hover { background: rgba(0, 255, 65, 0.05); }
+
+        .label { display: block; font-size: 0.7rem; color: #555; text-transform: uppercase; }
+        .value { display: block; font-size: 1.8rem; margin-top: 5px; font-weight: bold; color: #ddd; }
+        .unit { font-size: 0.8rem; margin-left: 5px; color: #444; }
+
+        /* PULSE LED */
+        .led-panel {
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid #222;
+        }
+
+        #pulse-led {
+            width: 25px;
+            height: 25px;
             border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            box-shadow: 0 0 10px var(--vurgu);
-            opacity: 0;
+            background: #222;
+            box-shadow: 0 0 5px #000;
+            transition: 0.05s;
         }
 
-        @keyframes vurus {
-            0% { transform: scale(1); opacity: 1; }
-            100% { transform: scale(2.5); opacity: 0; }
+        .led-active {
+            background: var(--alert) !important;
+            box-shadow: 0 0 20px var(--alert), 0 0 40px var(--alert) !important;
         }
 
-        .vurus-aktif { animation: vurus 0.2s ease-out; }
+        /* MAIN VISUALIZATION AREA (CANVAS) */
+        #core-viz {
+            background: #000;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #222;
+            cursor: crosshair;
+        }
+
+        canvas { display: block; }
+
+        /* TERMINAL (CONSOLE) */
+        #sys-log {
+            grid-column: 1 / -1;
+            background: #000;
+            border: 1px solid #222;
+            padding: 10px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.75rem;
+            color: var(--secondary);
+            overflow-y: scroll;
+            height: 100%;
+        }
+
+        .log-entry { margin-bottom: 3px; border-left: 2px solid #111; padding-left: 5px; }
+        .log-warn { color: var(--warn); }
+        .log-error { color: var(--alert); }
+
+        /* BOOT SCREEN */
+        #boot-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #000;
+            color: var(--primary);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: monospace;
+        }
+
+        #boot-text { text-align: left; width: 600px; line-height: 1.5; font-size: 0.9rem; }
+        .boot-bar { width: 600px; height: 5px; background: #222; margin-top: 20px; }
+        .boot-fill { width: 0%; height: 100%; background: var(--primary); transition: width 0.1s; }
+
+        /* BUTTONS */
+        .btn-panel { display: flex; gap: 5px; padding: 10px; margin-top: auto; }
+        .btn {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 8px 15px;
+            font-family: inherit;
+            cursor: pointer;
+            flex: 1;
+            font-size: 0.7rem;
+            transition: 0.2s;
+        }
+        .btn:hover { background: var(--primary); color: #000; }
+
+        /* SPECTRUM ANALYZER */
+        .spectrum-bar { height: 100px; display: flex; align-items: flex-end; gap: 1px; padding: 5px; background: #050505; }
+        .spec-col { flex: 1; background: var(--secondary); min-height: 2px; transition: height 0.1s; }
+
+        /* MODALS */
+        .modal {
+            position: fixed;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            border: 2px solid var(--primary);
+            padding: 30px;
+            z-index: 2000;
+            width: 500px;
+            display: none;
+            box-shadow: 0 0 50px rgba(0, 255, 65, 0.2);
+        }
+        .modal h2 { margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .modal p { font-size: 0.8rem; color: #aaa; line-height: 1.6; }
+
     </style>
 </head>
 <body>
 
-<header>
-    <div class="baslik-grubu">
-        <h1>NEURO-STATION <span style="color:#fff">PRESTIGE</span></h1>
-    </div>
-    <div class="sistem-saati" id="saat-ekrani">00:00:00</div>
-</header>
+<div id="boot-screen">
+    <div id="boot-text">INITIALIZING BIOS KERNEL...</div>
+    <div class="boot-bar"><div class="boot-fill" id="boot-prog"></div></div>
+</div>
 
-<main>
-    <section class="yan-panel">
-        <div class="panel-govde" style="flex: 1;">
-            <div class="panel-baslik">BİYOMETRİK VERİ ANALİZİ</div>
-            <div class="veri-alani">
-                <div class="kart">
-                    <span class="kart-etiket">ANLIK GECİKME (ms)</span>
-                    <span class="kart-deger" id="ms-anlik">0.00</span>
-                </div>
-                <div class="kart">
-                    <span class="kart-etiket">ORTALAMA (MEAN)</span>
-                    <span class="kart-deger" id="ms-ort">0.00</span>
-                </div>
-                <div class="kart">
-                    <span class="kart-etiket">STANDART SAPMA (σ)</span>
-                    <span class="kart-deger" id="ms-sapma">0.00</span>
-                </div>
-                <div class="kart">
-                    <span class="kart-etiket">TAHMİNİ NABIZ (BPM)</span>
-                    <span class="kart-deger" id="ms-bpm">--</span>
-                </div>
-                <div class="kart">
-                    <span class="kart-etiket">GÜVEN ARALIĞI (%)</span>
-                    <span class="kart-deger" id="ms-guven">0.00</span>
-                </div>
-            </div>
+<div id="main-interface">
+    <header>
+        <div class="sys-badge">UTKAN-OS v99.0</div>
+        <div class="sys-info">
+            CPU: <span id="cpu-load">0%</span> | MEM: <span id="mem-load">0MB</span>
         </div>
-        <div class="panel-govde">
-            <div class="panel-baslik">SİSTEM KONTROLÜ</div>
-            <div class="buton-grubu">
-                <button onclick="veriSifirla()">SIFIRLA</button>
-                <button class="tehlike" onclick="acilisEkrani()">YENİDEN BAŞLAT</button>
-            </div>
+        <div class="sys-time" id="clock-display">00:00:00</div>
+    </header>
+
+    <aside class="panel">
+        <div class="panel-header"><span>Real-Time Biometrics</span><span>[SENS-01]</span></div>
+        
+        <div class="metric-row">
+            <span class="label">Sampling Rate (Avg)</span>
+            <span class="value" id="val-hz">0.00</span><span class="unit">Hz</span>
         </div>
+        
+        <div class="metric-row">
+            <span class="label">Jitter Variance (σ)</span>
+            <span class="value" id="val-jitter">0.00</span><span class="unit">ms</span>
+        </div>
+        
+        <div class="metric-row">
+            <span class="label">Neuro-Stability</span>
+            <span class="value" id="val-stab">0.0</span><span class="unit">%</span>
+        </div>
+
+        <div class="led-panel">
+            <div id="pulse-led"></div>
+        </div>
+
+        <div class="btn-panel">
+            <button class="btn" onclick="Kernel.reset()">RESET_CORE</button>
+            <button class="btn" onclick="Kernel.export()">DUMP_LOGS</button>
+        </div>
+    </aside>
+
+    <section class="panel" id="core-viz">
+        <div class="panel-header"><span>Oscilloscope Display</span><span>[GPU-ACCEL]</span></div>
+        <canvas id="mainCanvas"></canvas>
     </section>
 
-    <section class="merkez-panel">
-        <div class="panel-govde" id="grafik-alani">
-            <div class="panel-baslik">SİNYAL OSİLOSKOBU (GERÇEK ZAMANLI)</div>
-            <canvas id="anaCanvas"></canvas>
-        </div>
-        <div class="panel-govde" id="alt-grafik">
-            <div class="panel-baslik">FREKANS DAĞILIM SPEKTRUMU</div>
-            <canvas id="spektrumCanvas"></canvas>
-        </div>
-    </section>
-
-    <section class="yan-panel">
-        <div class="panel-govde" style="flex: 1;">
-            <div class="panel-baslik">İŞLEM TERMİNALİ v8.0</div>
-            <div id="terminal">
-                > Çekirdek yazılım başlatıldı...<br>
-                > Kullanıcı girişi bekleniyor... (J)
+    <aside class="panel">
+        <div class="panel-header"><span>Cognitive AI Engine</span><span>[BETA]</span></div>
+        
+        <div style="padding: 15px; flex: 1; overflow-y: auto;">
+            <div style="font-size: 0.7rem; color: #888; margin-bottom: 5px;">AI DIAGNOSIS:</div>
+            <div id="ai-output" style="font-size: 0.85rem; line-height: 1.4; color: #fff;">
+                Waiting for sufficient biometric data (N > 10)...
             </div>
         </div>
-        <div class="panel-govde">
-            <div class="panel-baslik">AI TANI VE ANALİZ RAPORU</div>
-            <div style="padding: 20px; font-size: 0.85rem; line-height: 1.6;">
-                <p id="tani-metni">Sistem hazır. Lütfen yaklaşık 10 saniye boyunca ritmik bir şekilde klavyeye dokunun.</p>
-                <div style="margin-top: 15px;">
-                    <span id="led-isik" class="kalp-atisi"></span>
-                    <strong id="durum-etiket">BEKLEMEDE</strong>
-                </div>
-            </div>
-        </div>
-    </section>
-</main>
 
-<div class="durum-cubugu">
-    <div>CPU: %2.4 | BELLEK: 48MB | MOTOR: DSP-UTKAN-V8</div>
-    <div>LISANS: TEKNOFEST ÖZEL SÜRÜM - UTKAN BIOTECH © 2024</div>
+        <div class="panel-header"><span>Frequency Spectrum</span></div>
+        <div class="spectrum-bar" id="spec-viz">
+            </div>
+
+        <div style="padding: 10px; font-size: 0.65rem; color: #555; text-align: center;">
+            PRESS [SPACE] OR CLICK TO INJECT PULSE SIGNAL
+        </div>
+    </aside>
+
+    <footer class="panel" style="grid-column: 1 / -1;">
+        <div class="panel-header"><span>System Kernel Logs</span><span>[TERMINAL]</span></div>
+        <div id="sys-log"></div>
+    </footer>
+</div>
+
+<div id="report-modal" class="modal">
+    <h2>SESSION REPORT GENERATED</h2>
+    <p>Biometric session data has been compiled into a localized JSON object.</p>
+    <div style="background: #111; padding: 10px; margin: 10px 0; font-family: monospace; font-size: 0.7rem;" id="modal-content"></div>
+    <button class="btn" onclick="document.getElementById('report-modal').style.display='none'">CLOSE_WINDOW</button>
 </div>
 
 <script>
 /**
- * --- BÖLÜM 9: ÇEKİRDEK YAZILIM MANTIĞI (JS ENGINE) ---
- * BU BÖLÜM YAKLAŞIK 400 SATIRLIK ALGORİTMA İÇERİR.
+ * UTKAN-OS NEURO-LINKED KERNEL
+ * ARCHITECTURE: MONOLITHIC CLASS-BASED SYSTEM
+ * AUTHOR: GEMINI AI | FOR USER: UTKAN
+ * BUILD: 2026.02.19_v99
  */
 
-class NeuroEngine {
+/* =========================================
+   MODULE 1: UTILITIES & MATH LIBRARY
+   ========================================= */
+const MathLib = {
+    avg: (arr) => arr.reduce((a, b) => a + b, 0) / arr.length,
+    
+    stdDev: (arr) => {
+        if (arr.length < 2) return 0;
+        const mean = MathLib.avg(arr);
+        const variance = arr.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / arr.length;
+        return Math.sqrt(variance);
+    },
+
+    map: (val, inMin, inMax, outMin, outMax) => {
+        return (val - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+    },
+
+    formatTime: () => {
+        const d = new Date();
+        return d.toLocaleTimeString('tr-TR', { hour12: false });
+    },
+
+    generateId: () => {
+        return Math.random().toString(36).substr(2, 9);
+    }
+};
+
+/* =========================================
+   MODULE 2: AUDIO SYNTHESIZER (WEB AUDIO API)
+   ========================================= */
+class AudioEngine {
     constructor() {
-        this.veriler = [];
-        this.zamanlar = [];
-        this.maksimumKapasite = 100;
-        this.anaCanvas = document.getElementById('anaCanvas');
-        this.anaCtx = this.anaCanvas.getContext('2d');
-        this.spektrumCanvas = document.getElementById('spektrumCanvas');
-        this.spektrumCtx = this.spektrumCanvas.getContext('2d');
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.value = 0.1; // Low volume safety
+        this.masterGain.connect(this.ctx.destination);
+    }
+
+    playTone(freq, type = 'sine', duration = 0.1) {
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
         
-        this.baslat();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+        
+        gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+        
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+        
+        osc.start();
+        osc.stop(this.ctx.currentTime + duration);
     }
 
-    baslat() {
-        this.boyutlandir();
-        window.addEventListener('resize', () => this.boyutlandir());
-        this.dongu();
+    playAlert() {
+        this.playTone(880, 'square', 0.2);
+        setTimeout(() => this.playTone(440, 'square', 0.4), 200);
+    }
+}
+
+/* =========================================
+   MODULE 3: VISUALIZATION ENGINE (CANVAS)
+   ========================================= */
+class RenderEngine {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.width = this.canvas.offsetWidth;
+        this.height = this.canvas.offsetHeight;
+        this.particles = [];
+        this.waveData = [];
+        
+        window.addEventListener('resize', () => this.resize());
+        this.resize();
+        this.animate();
     }
 
-    boyutlandir() {
-        this.anaCanvas.width = this.anaCanvas.parentElement.offsetWidth;
-        this.anaCanvas.height = this.anaCanvas.parentElement.offsetHeight;
-        this.spektrumCanvas.width = this.spektrumCanvas.parentElement.offsetWidth;
-        this.spektrumCanvas.height = this.spektrumCanvas.parentElement.offsetHeight;
+    resize() {
+        this.width = this.canvas.parentElement.offsetWidth;
+        this.height = this.canvas.parentElement.offsetHeight;
+        this.canvas.width = this.width;
+        this.canvas.height = this.height;
     }
 
-    // MATEMATİKSEL FONKSİYONLAR
-    ortalamaHesapla(dizi) {
-        if (dizi.length === 0) return 0;
-        return dizi.reduce((a, b) => a + b) / dizi.length;
+    addPulse(x, intensity) {
+        for(let i=0; i<10; i++) {
+            this.particles.push({
+                x: x,
+                y: this.height / 2,
+                vx: (Math.random() - 0.5) * 5,
+                vy: (Math.random() - 0.5) * 5,
+                life: 1.0,
+                color: intensity > 100 ? '#ff0033' : '#00ff41'
+            });
+        }
     }
 
-    standartSapmaHesapla(dizi) {
-        if (dizi.length < 2) return 0;
-        const ort = this.ortalamaHesapla(dizi);
-        const kareFarklar = dizi.map(x => Math.pow(x - ort, 2));
-        return Math.sqrt(kareFarklar.reduce((a, b) => a + b) / dizi.length);
+    updateWave(data) {
+        this.waveData = data;
     }
 
-    guvenHesapla(std, ort) {
-        if (ort === 0) return 0;
-        const sonuc = 100 - (std / ort * 100);
-        return Math.max(0, Math.min(100, sonuc));
-    }
+    animate() {
+        const { ctx, width, height } = this;
+        
+        // Clear with trails
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        ctx.fillRect(0, 0, width, height);
 
-    bpmHesapla(dizi) {
-        if (dizi.length < 5) return null;
-        const sonVeriler = dizi.slice(-15);
-        const ortGecikme = this.ortalamaHesapla(sonVeriler);
-        return Math.round(60000 / ortGecikme);
-    }
-
-    // GRAFİK MOTORU
-    cizAnaGrafik() {
-        const ctx = this.anaCtx;
-        const w = this.anaCanvas.width;
-        const h = this.anaCanvas.height;
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-        ctx.fillRect(0, 0, w, h);
-
-        // Izgara Çizimi
+        // Grid Background
         ctx.strokeStyle = '#111';
         ctx.lineWidth = 1;
-        for (let i = 0; i < w; i += 50) {
-            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, h); ctx.stroke();
-        }
-        for (let j = 0; j < h; j += 50) {
-            ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(w, j); ctx.stroke();
-        }
-
-        if (this.veriler.length < 2) return;
-
         ctx.beginPath();
-        ctx.strokeStyle = '#00ff41';
-        ctx.lineWidth = 2;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#00ff41';
-
-        const adim = w / this.maksimumKapasite;
-        for (let i = 0; i < this.veriler.length; i++) {
-            const x = i * adim;
-            const y = h - (this.veriler[i] / 4); // Ölçeklendirme
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        }
+        for(let i=0; i<width; i+=50) { ctx.moveTo(i,0); ctx.lineTo(i,height); }
+        for(let i=0; i<height; i+=50) { ctx.moveTo(0,i); ctx.lineTo(width,i); }
         ctx.stroke();
-        ctx.shadowBlur = 0;
-    }
 
-    cizSpektrum() {
-        const ctx = this.spektrumCtx;
-        const w = this.spektrumCanvas.width;
-        const h = this.spektrumCanvas.height;
-
-        ctx.clearRect(0, 0, w, h);
-        
-        if (this.veriler.length === 0) return;
-
-        const cubukGenislik = w / this.veriler.length;
-        for (let i = 0; i < this.veriler.length; i++) {
-            const cubukBoyu = (this.veriler[i] / 1000) * h;
-            ctx.fillStyle = `rgb(0, ${Math.min(255, this.veriler[i]/2)}, 65)`;
-            ctx.fillRect(i * cubukGenislik, h - cubukBoyu, cubukGenislik - 2, cubukBoyu);
-        }
-    }
-
-    dongu() {
-        this.cizAnaGrafik();
-        this.cizSpektrum();
-        requestAnimationFrame(() => this.dongu());
-    }
-
-    // AI TANI MANTIĞI
-    analizYap() {
-        const std = this.standartSapmaHesapla(this.veriler);
-        const taniEl = document.getElementById('tani-metni');
-        const durumEl = document.getElementById('durum-etiket');
-
-        if (this.veriler.length < 10) {
-            taniEl.innerText = "Yeterli veri toplanıyor... (" + this.veriler.length + "/10)";
-            return;
-        }
-
-        if (std < 25) {
-            taniEl.innerText = "TANI: Üst düzey nöro-motor stabilite. Odaklanma mükemmel. Kalp ritmi (simüle) düzenli.";
-            durumEl.innerText = "STABİL";
-            durumEl.style.color = "var(--ana-renk)";
-        } else if (std < 70) {
-            taniEl.innerText = "TANI: Normal bilişsel faaliyet. Hafif yorgunluk belirtileri gözlemlenebilir.";
-            durumEl.innerText = "NORMAL";
-            durumEl.style.color = "orange";
-        } else {
-            taniEl.innerText = "TANI: Yüksek jitter/sapma. Dikkat dağınıklığı veya fiziksel stres tespit edildi.";
-            durumEl.innerText = "DÜZENSİZ";
-            durumEl.style.color = "var(--vurgu)";
-        }
-    }
-}
-
-// SİSTEMİ BAŞLAT
-const engine = new NeuroEngine();
-
-// GİRİŞ DİNLEYİCİ
-window.addEventListener('keydown', (e) => {
-    // Sadece belirli bir tuş değil, her vuruşu analiz et (Gerçek bilim bunu gerektirir)
-    const simdi = performance.now();
-    
-    // LED Çakması
-    const led = document.getElementById('led-isik');
-    led.classList.remove('vurus-aktif');
-    void led.offsetWidth; // DOM Reset
-    led.classList.add('vurus-aktif');
-
-    if (engine.zamanlar.length > 0) {
-        const gecikme = simdi - engine.zamanlar[engine.zamanlar.length - 1];
-        
-        // Hatalı/Çok hızlı girişleri filtrele (Debounce)
-        if (gecikme > 80) {
-            engine.veriler.push(gecikme);
-            if (engine.veriler.length > engine.maksimumKapasite) engine.veriler.shift();
+        // Draw Waveform
+        if (this.waveData.length > 1) {
+            ctx.beginPath();
+            ctx.strokeStyle = '#00ff41';
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#00ff41';
             
-            ekraniGuncelle(gecikme);
-            engine.analizYap();
+            const step = width / 100; // Show last 100 points
+            const startIdx = Math.max(0, this.waveData.length - 100);
+            
+            for (let i = startIdx; i < this.waveData.length; i++) {
+                const x = (i - startIdx) * step;
+                // Normalize value for display (assuming range 0-1000ms)
+                const y = height - MathLib.map(this.waveData[i], 0, 1000, 10, height - 10);
+                if (i === startIdx) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+        }
+
+        // Update Particles
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+            let p = this.particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.02;
+            
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.life;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            if (p.life <= 0) this.particles.splice(i, 1);
+        }
+        ctx.globalAlpha = 1;
+
+        // Center Line
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.beginPath();
+        ctx.moveTo(0, height/2);
+        ctx.lineTo(width, height/2);
+        ctx.stroke();
+
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+/* =========================================
+   MODULE 4: SYSTEM KERNEL (MAIN LOGIC)
+   ========================================= */
+class SystemKernel {
+    constructor() {
+        this.state = {
+            timestamps: [],
+            intervals: [],
+            isReady: false,
+            metrics: {
+                hz: 0,
+                jitter: 0,
+                stability: 0
+            }
+        };
+        
+        this.config = {
+            bufferSize: 100,
+            debounce: 80, // ms
+            noiseThreshold: 2000 // ms
+        };
+
+        this.audio = new AudioEngine();
+        this.logger = document.getElementById('sys-log');
+        this.viz = null; // Initialized after boot
+        this.ui = {}; // Cached DOM elements
+    }
+
+    // BOOT SEQUENCE SIMULATION
+    boot() {
+        const bootText = document.getElementById('boot-text');
+        const bootProg = document.getElementById('boot-prog');
+        const bootScreen = document.getElementById('boot-screen');
+        const mainInterface = document.getElementById('main-interface');
+        
+        let progress = 0;
+        const logs = [
+            "Mounting file system...",
+            "Loading biometric drivers...",
+            "Initializing DSP engine...",
+            "Connecting to neural interface...",
+            "Calibrating sensors...",
+            "System check: OK",
+            "Starting UTKAN-OS kernel..."
+        ];
+
+        const interval = setInterval(() => {
+            progress += Math.random() * 10;
+            if (progress > 100) progress = 100;
+            bootProg.style.width = `${progress}%`;
+            
+            if (Math.random() > 0.7) {
+                const log = logs.shift();
+                if (log) bootText.innerHTML += `<br>> ${log}`;
+            }
+
+            if (progress === 100) {
+                clearInterval(interval);
+                setTimeout(() => {
+                    bootScreen.style.display = 'none';
+                    mainInterface.style.display = 'grid'; // Grid layout activated
+                    this.init();
+                }, 500);
+            }
+        }, 100);
+    }
+
+    // INITIALIZATION
+    init() {
+        this.log("KERNEL_LOADED successfully.");
+        this.viz = new RenderEngine('mainCanvas');
+        this.cacheDOM();
+        this.bindEvents();
+        this.startClock();
+        this.generateSpectrumBars();
+        this.log("Listening for input signals...");
+    }
+
+    cacheDOM() {
+        this.ui = {
+            hz: document.getElementById('val-hz'),
+            jitter: document.getElementById('val-jitter'),
+            stab: document.getElementById('val-stab'),
+            ai: document.getElementById('ai-output'),
+            led: document.getElementById('pulse-led'),
+            cpu: document.getElementById('cpu-load'),
+            mem: document.getElementById('mem-load')
+        };
+    }
+
+    bindEvents() {
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.key === 'j') {
+                this.handleInput();
+            }
+        });
+        
+        document.getElementById('core-viz').addEventListener('mousedown', () => {
+            this.handleInput();
+        });
+    }
+
+    // CORE LOGIC: INPUT HANDLING
+    handleInput() {
+        const now = performance.now();
+        this.flashLed();
+        this.audio.playTone(600, 'sine', 0.05);
+
+        // Particle effect at center
+        if (this.viz) this.viz.addPulse(this.viz.width / 2, 50);
+
+        if (this.state.timestamps.length > 0) {
+            const lastTime = this.state.timestamps[this.state.timestamps.length - 1];
+            const diff = now - lastTime;
+
+            // Filters
+            if (diff < this.config.debounce) return; // Debounce
+            if (diff > this.config.noiseThreshold) {
+                this.log(`Signal reset: Time gap too large (${diff.toFixed(0)}ms)`, 'warn');
+                this.state.timestamps = [now]; // Reset chain
+                return;
+            }
+
+            this.processSignal(diff);
+        }
+        
+        this.state.timestamps.push(now);
+        if (this.state.timestamps.length > this.config.bufferSize) this.state.timestamps.shift();
+    }
+
+    processSignal(diff) {
+        this.state.intervals.push(diff);
+        if (this.state.intervals.length > this.config.bufferSize) this.state.intervals.shift();
+
+        // Pass data to visualizer
+        this.viz.updateWave(this.state.intervals);
+
+        // CALCULATE METRICS
+        const avg = MathLib.avg(this.state.intervals);
+        const sigma = MathLib.stdDev(this.state.intervals);
+        
+        // Hz Calculation (1000ms / avg ms)
+        const hz = (1000 / avg);
+        
+        // Stability Calculation (Lower sigma is better)
+        // Heuristic: If sigma is 10% of avg, stability is 0. If sigma is 0, stability is 100.
+        const cv = sigma / avg; // Coefficient of Variation
+        let stability = 100 - (cv * 1000); 
+        stability = Math.max(0, Math.min(100, stability));
+
+        // UPDATE STATE
+        this.state.metrics = { hz, jitter: sigma, stability };
+        
+        // UPDATE UI
+        this.updateUI();
+        this.updateAI(sigma, stability);
+        this.animateSpectrum(diff);
+
+        // LOG
+        this.log(`IMPULSE: ${diff.toFixed(1)}ms | σ: ${sigma.toFixed(2)}`, sigma > 50 ? 'warn' : 'info');
+    }
+
+    updateUI() {
+        const { hz, jitter, stability } = this.state.metrics;
+        
+        this.ui.hz.innerText = hz.toFixed(2);
+        this.ui.jitter.innerText = jitter.toFixed(2);
+        this.ui.stab.innerText = stability.toFixed(1);
+        
+        // Dynamic Color Changes
+        this.ui.stab.style.color = stability > 80 ? 'var(--primary)' : (stability > 50 ? 'var(--warn)' : 'var(--alert)');
+    }
+
+    updateAI(sigma, stability) {
+        if (this.state.intervals.length < 10) return;
+
+        let diagnosis = "";
+        let color = "#fff";
+
+        if (stability > 90) {
+            diagnosis = "OPTIMAL SYNCHRONIZATION DETECTED. Subject is in 'Flow State'. Motor cortex activity is highly rhythmic.";
+            color = "var(--primary)";
+        } else if (stability > 70) {
+            diagnosis = "NORMAL OPERATION. Minor variances detected within acceptable cognitive load limits.";
+            color = "#ccc";
+        } else if (stability > 40) {
+            diagnosis = "IRREGULAR PATTERN DETECTED. Possible cognitive fatigue or distraction. Variance exceeds safety thresholds.";
+            color = "var(--warn)";
+        } else {
+            diagnosis = "CRITICAL INSTABILITY. Neuro-motor feedback loop is compromised. Immediate recalibration required.";
+            color = "var(--alert)";
+            if (Math.random() > 0.9) this.audio.playAlert();
+        }
+
+        this.ui.ai.innerHTML = diagnosis;
+        this.ui.ai.style.color = color;
+    }
+
+    // VISUAL: FLASH LED
+    flashLed() {
+        this.ui.led.classList.add('led-active');
+        setTimeout(() => this.ui.led.classList.remove('led-active'), 50);
+    }
+
+    // VISUAL: SPECTRUM BARS
+    generateSpectrumBars() {
+        const container = document.getElementById('spec-viz');
+        for (let i = 0; i < 20; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'spec-col';
+            bar.id = `spec-${i}`;
+            container.appendChild(bar);
         }
     }
-    engine.zamanlar.push(simdi);
-    if (engine.zamanlar.length > 100) engine.zamanlar.shift();
-});
 
-function ekraniGuncelle(anlik) {
-    const ort = engine.ortalamaHesapla(engine.veriler);
-    const sapma = engine.standartSapmaHesapla(engine.veriler);
-    const guven = engine.guvenHesapla(sapma, ort);
-    const bpm = engine.bpmHesapla(engine.veriler);
+    animateSpectrum(val) {
+        // Simulate frequency spectrum based on input value
+        for(let i=0; i<20; i++) {
+            const bar = document.getElementById(`spec-${i}`);
+            const h = Math.random() * 100;
+            bar.style.height = `${h}%`;
+            bar.style.backgroundColor = h > 80 ? 'var(--primary)' : 'var(--secondary)';
+        }
+    }
 
-    document.getElementById('ms-anlik').innerText = anlik.toFixed(2);
-    document.getElementById('ms-ort').innerText = ort.toFixed(2);
-    document.getElementById('ms-sapma').innerText = sapma.toFixed(2);
-    document.getElementById('ms-guven').innerText = guven.toFixed(2) + "%";
-    if (bpm) document.getElementById('ms-bpm').innerText = bpm;
+    // SYSTEM UTILS
+    log(msg, type = 'info') {
+        const entry = document.createElement('div');
+        entry.className = `log-entry ${type === 'warn' ? 'log-warn' : ''} ${type === 'error' ? 'log-error' : ''}`;
+        entry.innerText = `[${MathLib.formatTime()}] ${msg}`;
+        this.logger.prepend(entry);
+        if (this.logger.children.length > 50) this.logger.lastChild.remove();
+    }
 
-    // Terminal Log
-    const term = document.getElementById('terminal');
-    const zaman = new Date().toLocaleTimeString();
-    term.innerHTML = `<div class="log-satir"><span class="log-zaman">[${zaman}]</span> > Sinyal: ${anlik.toFixed(1)}ms yakalandı.</div>` + term.innerHTML;
+    startClock() {
+        setInterval(() => {
+            document.getElementById('clock-display').innerText = MathLib.formatTime();
+            // Simulate CPU/Mem load
+            this.ui.cpu.innerText = (Math.random() * 15).toFixed(1) + "%";
+            this.ui.mem.innerText = Math.floor(200 + Math.random() * 50) + "MB";
+        }, 1000);
+    }
+
+    reset() {
+        this.state.intervals = [];
+        this.state.timestamps = [];
+        this.state.metrics = { hz: 0, jitter: 0, stability: 0 };
+        this.ui.hz.innerText = "0.00";
+        this.ui.jitter.innerText = "0.00";
+        this.ui.stab.innerText = "0.0";
+        this.ui.ai.innerText = "System Reset. Awaiting input...";
+        this.log("System manually reset via Kernel Override.", "warn");
+    }
+
+    export() {
+        const modal = document.getElementById('report-modal');
+        const content = document.getElementById('modal-content');
+        
+        const report = {
+            sessionId: MathLib.generateId(),
+            timestamp: new Date().toISOString(),
+            totalPulses: this.state.intervals.length,
+            metrics: this.state.metrics,
+            rawData: this.state.intervals.slice(-10) // Last 10 samples
+        };
+
+        content.innerText = JSON.stringify(report, null, 2);
+        modal.style.display = 'block';
+        this.log("Data dumped to modal window.");
+    }
 }
 
-function veriSifirla() {
-    engine.veriler = [];
-    engine.zamanlar = [];
-    document.getElementById('terminal').innerHTML = "> Veri havuzu temizlendi.";
-    document.getElementById('ms-bpm').innerText = "--";
-}
+// =========================================
+// SYSTEM ENTRY POINT
+// =========================================
+const Kernel = new SystemKernel();
 
-function acilisEkrani() {
-    location.reload();
-}
+window.onload = () => {
+    // Start the boot sequence
+    Kernel.boot();
+};
 
-// Saat Güncelleme
-setInterval(() => {
-    document.getElementById('saat-ekrani').innerText = new Date().toLocaleTimeString();
-}, 1000);
-
-/**
- * --- BÖLÜM 10: DOKÜMANTASYON VE MÜHENDİSLİK NOTLARI ---
- * 1. Bu yazılım Inter-Tap Interval (ITI) verilerini kullanır.
- * 2. Standart sapma, kullanıcının motor kontrol stabilitesini temsil eder.
- * 3. BPM değeri, ritmik vuruşların dakikadaki frekansına dayanır (F = 1/T).
- * 4. Jitter analizi, biyometrik kimlik doğrulama sistemlerinde temel teşkil eder.
- * 5. DSP (Dijital Sinyal İşleme) görselleştirmesi HTML5 Canvas API ile optimize edilmiştir.
- */
 </script>
 </body>
 </html>
