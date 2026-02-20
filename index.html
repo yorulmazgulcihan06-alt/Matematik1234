@@ -2,250 +2,93 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>UTKAN OMNI-KERNEL | 2023-2026 PRESTIGE EDITION</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>YAMUKA</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
     <style>
-        /* 2026 ULTRA-NEON DESIGN LANGUAGE */
-        :root {
-            --p: #00ff41; --s: #003b00; --bg: #000; --warn: #ff003c; --accent: #00e5ff;
-            --f: 'JetBrains Mono', 'Fira Code', monospace;
-        }
-
-        body {
-            margin: 0; background: var(--bg); color: var(--p);
-            font-family: var(--f); overflow: hidden; height: 100vh;
-        }
-
-        /* 2024 GPU INTERFACE ACCELERATION */
-        #main-os {
-            display: grid;
-            grid-template-columns: 320px 1fr 320px;
-            grid-template-rows: 60px 1fr 200px;
-            height: 100vh; gap: 5px; padding: 5px;
-        }
-
-        .module {
-            background: rgba(10, 10, 10, 0.9);
-            border: 1px solid var(--s); position: relative;
-            backdrop-filter: blur(15px);
-        }
-
-        /* HEADER - 2025 AI INTEGRITY */
-        header { 
-            grid-column: 1 / -1; display: flex; align-items: center; 
-            justify-content: space-between; padding: 0 20px;
-            border-bottom: 2px solid var(--p);
-        }
-
-        /* 2026 SENSOR VIEWPORT - FOTOĞRAFTAKİ LAZER ETKİSİ */
-        #viewport { position: relative; border: 1px solid var(--accent); overflow: hidden; }
-        #cam-feed { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.5) contrast(1.2); }
+        :root { --p: #ff4500; --bg: #050505; --card: #121212; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        /* LAZER TARAYICI ÇİZGİSİ */
-        .laser-line {
-            position: absolute; width: 100%; height: 2px;
-            background: var(--p); box-shadow: 0 0 15px var(--p);
-            top: 50%; z-index: 10; animation: scan 3s ease-in-out infinite;
+        body { 
+            margin: 0; background: var(--bg); color: white; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica; 
+            overflow-x: hidden;
         }
 
-        @keyframes scan { 
-            0%, 100% { top: 20%; opacity: 0.2; } 
-            50% { top: 80%; opacity: 1; } 
+        /* Üst Bar */
+        header {
+            height: 70px; padding: 25px 20px 10px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; background: rgba(5,5,5,0.9);
+            backdrop-filter: blur(10px); z-index: 1000;
         }
+        .logo { font-size: 1.8rem; font-weight: 900; color: var(--p); letter-spacing: -1.5px; }
 
-        /* BIOMETRIC CARDS - 2023 CORE STATS */
-        .card { padding: 15px; border-bottom: 1px solid #1a1a1a; }
-        .label { font-size: 0.65rem; color: #555; text-transform: uppercase; }
-        .value { font-size: 2.2rem; display: block; font-weight: 200; }
-
-        /* 2025 AI CONSOLE */
-        #ai-log { font-size: 0.75rem; line-height: 1.4; color: #888; padding: 15px; }
-        .ai-active { color: var(--p); text-shadow: 0 0 5px var(--p); }
-
-        /* 2024 DATA STREAM FOOTER */
-        footer { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-        #terminal { background: #000; overflow-y: auto; padding: 10px; font-size: 0.7rem; }
-        canvas { width: 100%; height: 100%; }
-
-        .btn-pulse {
-            width: 100%; padding: 12px; border: 1px solid var(--p);
-            background: none; color: var(--p); cursor: pointer;
-            font-family: var(--f); transition: 0.3s;
+        /* Video Akışı */
+        .feed { padding: 10px; padding-bottom: 90px; }
+        .v-card { 
+            background: var(--card); border-radius: 20px; 
+            margin-bottom: 20px; overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #1f1f1f;
         }
-        .btn-pulse:hover { background: var(--p); color: #000; }
+        .v-iframe { width: 100%; aspect-ratio: 16/9; border: none; display: block; }
+        .v-content { padding: 15px; }
+        .v-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 5px; color: #efefef; }
+        .v-meta { font-size: 0.8rem; color: #888; display: flex; gap: 10px; }
+
+        /* Alt Navigasyon */
+        nav {
+            position: fixed; bottom: 0; width: 100%; height: 80px;
+            background: rgba(10,10,10,0.95); backdrop-filter: blur(15px);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid #222; padding-bottom: env(safe-area-inset-bottom);
+        }
+        .n-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #666; font-size: 0.7rem; }
+        .n-item.active { color: var(--p); }
+        .n-icon { font-size: 1.5rem; }
+
+        /* Animasyon */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .v-card { animation: fadeIn 0.5s ease forwards; }
     </style>
 </head>
 <body>
 
-<div id="main-os">
-    <header class="module">
-        <div style="letter-spacing: 5px;">NEURO_CORE_v2026_ULTIMATE</div>
-        <div id="status">SYS_STATUS: HYBRID_SENSOR_ACTIVE</div>
-        <div id="clock">00:00:00</div>
+    <header>
+        <div class="logo">YAMUKA</div>
+        <div style="font-size: 1.2rem;">🔍</div>
     </header>
 
-    <aside class="module">
-        <div class="card">
-            <span class="label">Sampling Rate (2023)</span>
-            <span class="value" id="val-hz">0.00</span>
+    <div class="feed">
+        <div class="v-card">
+            <iframe class="v-iframe" src="https://www.youtube.com/embed/S9uTscDZupg" allowfullscreen></iframe>
+            <div class="v-content">
+                <div class="v-title">Yamuka Özel: 2026 Teknoloji Devrimi</div>
+                <div class="v-meta"><span>Yamuka HQ</span> • <span>1.2 Mn İzlenme</span></div>
+            </div>
         </div>
-        <div class="card">
-            <span class="label">Jitter Variance (2024)</span>
-            <span class="value" id="val-jitter">0.00</span>
+
+        <div class="v-card">
+            <iframe class="v-iframe" src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+            <div class="v-content">
+                <div class="v-title">Geleceğin Platformuna Hoş Geldiniz</div>
+                <div class="v-meta"><span>Utkan</span> • <span>850 B İzlenme</span></div>
+            </div>
         </div>
-        <div class="card">
-            <span class="label">Neural Stability</span>
-            <span class="value" id="val-stab" style="color: var(--accent);">0%</span>
-        </div>
-        <div style="padding: 15px;">
-            <button class="btn-pulse" onclick="Kernel.inject()">MANUAL_PULSE_INJECTION</button>
-        </div>
-    </aside>
+    </div>
 
-    <main class="module" id="viewport">
-        <video id="cam-feed" autoplay playsinline></video>
-        <div class="laser-line"></div>
-        <canvas id="overlay-canvas" style="position:absolute; top:0; left:0; z-index:5;"></canvas>
-        <div style="position:absolute; top:10px; right:10px; font-size:0.6rem; color:var(--p);">
-            [REC] BIO_TRACKING_ON
-        </div>
-    </aside>
+    <nav>
+        <div class="n-item active"><span class="n-icon">🏠</span>Ana Sayfa</div>
+        <div class="n-item"><span class="n-icon">⚡</span>Shorts</div>
+        <div class="n-item"><span class="n-icon" style="font-size: 2rem;">⊕</span></div>
+        <div class="n-item"><span class="n-icon">🔔</span>Bildirim</div>
+        <div class="n-item"><span class="n-icon">👤</span>Profil</div>
+    </nav>
 
-    <aside class="module">
-        <div id="ai-log">
-            <div style="color: var(--p); margin-bottom: 10px;">> AI_INFERENCE_ENGINE_V2025</div>
-            <div id="ai-thought">Awaiting biometric signal stream... Analyzing environmental noise...</div>
-        </div>
-        <canvas id="wave-canvas" style="border-top: 1px solid #1a1a1a;"></canvas>
-    </aside>
-
-    <footer class="module">
-        <div id="terminal"></div>
-        <div id="data-graph" style="border-left: 1px solid var(--s);">
-            <canvas id="graph-canvas"></canvas>
-        </div>
-    </footer>
-</div>
-
-<script>
-/**
- * UTKAN OMNI-KERNEL v2026.4.5
- * Legacy Integration: 2023, 2024, 2025, 2026
- */
-
-const Kernel = {
-    intervals: [],
-    timestamps: [],
-    
-    async init() {
-        this.log("CORE: Initializing Legacy Hybrid Engine...");
-        this.setupMedia();
-        this.setupCanvases();
-        this.startClock();
-        this.loop();
-        this.log("SYSTEM: All modules (2023-2026) loaded. Status: Stable.");
-    },
-
-    log(m) {
-        const t = document.getElementById('terminal');
-        const l = document.createElement('div');
-        l.innerHTML = `> [${new Date().toLocaleTimeString()}] ${m}`;
-        t.prepend(l);
-    },
-
-    async setupMedia() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            document.getElementById('cam-feed').srcObject = stream;
-            this.log("2026_SENSOR: Lazer tarayıcı aktif. Kamera senkronize.");
-        } catch (e) {
-            this.log("2026_SENSOR: Kamera erişimi engellendi. 2023 Manuel mod devrede.", true);
-        }
-    },
-
-    setupCanvases() {
-        this.ov = document.getElementById('overlay-canvas');
-        this.wv = document.getElementById('wave-canvas');
-        this.gv = document.getElementById('graph-canvas');
-        this.resize();
-        window.onresize = () => this.resize();
-    },
-
-    resize() {
-        const v = document.getElementById('viewport');
-        this.ov.width = v.offsetWidth; this.ov.height = v.offsetHeight;
-        this.wv.width = 320; this.wv.height = 150;
-        this.gv.width = 800; this.gv.height = 200;
-    },
-
-    inject() {
-        const now = performance.now();
-        if(this.timestamps.length > 0) {
-            const diff = now - this.timestamps[this.timestamps.length - 1];
-            if(diff > 80) this.process(diff);
-        }
-        this.timestamps.push(now);
-    },
-
-    process(diff) {
-        this.intervals.push(diff);
-        if(this.intervals.length > 100) this.intervals.shift();
-
-        // 2023 MATH
-        const avg = this.intervals.reduce((a,b)=>a+b)/this.intervals.length;
-        const hz = (1000/avg).toFixed(2);
-        
-        // 2024 STATS
-        const sigma = Math.sqrt(this.intervals.reduce((s,x)=> s + Math.pow(x-avg,2),0)/this.intervals.length);
-        const stab = Math.max(0, 100 - (sigma/avg * 1000)).toFixed(1);
-
-        document.getElementById('val-hz').innerText = hz;
-        document.getElementById('val-jitter').innerText = sigma.toFixed(2);
-        document.getElementById('val-stab').innerText = stab + "%";
-
-        this.aiInference(stab); // 2025 AI
-    },
-
-    aiInference(s) {
-        const thought = document.getElementById('ai-thought');
-        if(s > 85) thought.innerHTML = "<span class='ai-active'>SYSTEM_OPTIMAL:</span> Kullanıcı flow durumunda. Senkronizasyon %100.";
-        else if(s > 60) thought.innerHTML = "SYSTEM_NOMINAL: Standart bilişsel yük. Analiz devam ediyor...";
-        else thought.innerHTML = "<span style='color:var(--warn)'>WARNING:</span> Jitter eşiği aşıldı. Sensör kalibrasyonu öneriliyor.";
-    },
-
-    loop() {
-        // 2024 GPU Rendering
-        const ctx = this.ov.getContext('2d');
-        ctx.clearRect(0,0,this.ov.width, this.ov.height);
-        
-        // Fotoğraftaki gibi bilek tarama odağı
-        ctx.strokeStyle = "rgba(0, 255, 65, 0.5)";
-        ctx.setLineDash([5, 5]);
-        ctx.strokeRect(this.ov.width/4, this.ov.height/4, this.ov.width/2, this.ov.height/2);
-        ctx.setLineDash([]);
-
-        // 2025 Waveform
-        const wtx = this.wv.getContext('2d');
-        wtx.fillStyle = "rgba(0,0,0,0.1)"; wtx.fillRect(0,0,320,150);
-        wtx.beginPath(); wtx.strokeStyle = "var(--p)";
-        for(let i=0; i<320; i+=10) {
-            const y = 75 + Math.sin(i*0.05 + Date.now()*0.01) * 20;
-            if(i===0) wtx.moveTo(i,y); else wtx.lineTo(i,y);
-        }
-        wtx.stroke();
-
-        requestAnimationFrame(() => this.loop());
-    },
-
-    startClock() {
-        setInterval(() => {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-        }, 1000);
-    }
-};
-
-window.onload = () => Kernel.init();
-window.onkeydown = (e) => { if(e.code === 'Space') Kernel.inject(); };
-</script>
 </body>
 </html>
 
