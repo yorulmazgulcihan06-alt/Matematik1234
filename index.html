@@ -3,276 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlobalEdu - Dünya Markası Platformu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>GlobalEdu Pro | Sınırları Zorla</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #f8fafc;
-            --card: #ffffff;
-            --primary: #4f46e5;
-            --secondary: #6366f1;
-            --text: #1e293b;
-            --success: #22c55e;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
             --danger: #ef4444;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); margin: 0; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* Navbar */
+        nav { background: white; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--primary); letter-spacing: -1px; }
+
+        /* Ana Ekran */
+        .container { max-width: 1000px; width: 95%; margin: 2rem auto; display: grid; grid-template-columns: 1fr 320px; gap: 2rem; }
+
+        /* Quiz Alanı */
+        .main-content { background: var(--card-bg); border-radius: 24px; padding: 2.5rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+        
+        .progress-container { width: 100%; height: 6px; background: #e5e7eb; border-radius: 10px; margin-bottom: 2rem; }
+        #progress-bar { height: 100%; background: var(--primary); width: 0%; border-radius: 10px; transition: 0.5s ease; }
+
+        .meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .badge { background: #e0e7ff; color: var(--primary); padding: 0.4rem 1rem; border-radius: 100px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+
+        #question-title { font-size: 1.8rem; font-weight: 600; line-height: 1.4; margin-bottom: 2rem; }
+
+        .options-container { display: grid; gap: 1rem; }
+        .option-card {
+            border: 2px solid #f3f4f6; padding: 1.2rem; border-radius: 16px; cursor: pointer;
+            transition: 0.3s; display: flex; align-items: center; font-weight: 500;
         }
+        .option-card:hover { border-color: var(--primary); background: #f9fafb; transform: translateY(-2px); }
+        .option-card.correct { border-color: var(--success); background: #ecfdf5; }
+        .option-card.wrong { border-color: var(--danger); background: #fef2f2; }
+        .option-index { background: #f3f4f6; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: 700; }
 
-        /* Navigasyon Barı */
-        nav {
-            width: 100%;
-            background: var(--primary);
-            padding: 1rem 2rem;
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        /* Sidebar */
+        .sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .ai-box { 
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%); color: white; 
+            padding: 1.5rem; border-radius: 20px; position: relative;
         }
+        .ai-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-weight: 600; }
+        #ai-text { font-size: 0.9rem; opacity: 0.9; line-height: 1.6; min-height: 80px; }
 
-        .logo { font-weight: 700; font-size: 1.5rem; letter-spacing: -1px; }
-
-        /* Ana Konteyner */
-        .app-container {
-            max-width: 900px;
-            width: 95%;
-            margin: 2rem auto;
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 2rem;
+        .btn-ai {
+            width: 100%; padding: 10px; border: none; border-radius: 12px; background: rgba(255,255,255,0.2);
+            color: white; font-weight: 600; cursor: pointer; margin-top: 15px; transition: 0.3s;
         }
+        .btn-ai:hover { background: rgba(255,255,255,0.3); }
 
-        /* Soru Alanı */
-        .quiz-card {
-            background: var(--card);
-            border-radius: 1.5rem;
-            padding: 2.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-            position: relative;
-        }
-
-        .subject-badge {
-            background: #e0e7ff;
-            color: var(--primary);
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        #question-text {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 1.5rem 0;
-            line-height: 1.4;
-        }
-
-        .options-grid {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .option-btn {
-            background: var(--card);
-            border: 2px solid #e2e8f0;
-            padding: 1rem;
-            border-radius: 1rem;
-            text-align: left;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-        }
-
-        .option-btn:hover {
-            border-color: var(--primary);
-            background: #f5f3ff;
-            transform: translateX(5px);
-        }
-
-        /* Sidebar / İstatistikler */
-        .sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .stat-card {
-            background: var(--card);
-            padding: 1.5rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-        }
-
-        .ai-assistant {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 1rem;
-            position: relative;
-        }
-
-        .progress-container {
-            width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            margin-top: 10px;
-        }
-
-        #progress-fill {
-            height: 100%;
-            background: var(--success);
-            width: 0%;
-            border-radius: 4px;
-            transition: width 0.4s ease;
-        }
-
-        /* Aksiyon Butonları */
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 1rem;
-        }
-
-        .exit-btn {
-            background: #fee2e2;
-            color: var(--danger);
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        /* Mobil Uyumluluk */
-        @media (max-width: 768px) {
-            .app-container { grid-template-columns: 1fr; }
+        /* Mobil */
+        @media (max-width: 850px) {
+            .container { grid-template-columns: 1fr; }
+            .sidebar { order: -1; }
         }
     </style>
 </head>
 <body>
 
 <nav>
-    <div class="logo">GLOBALEDU</div>
-    <button class="exit-btn" onclick="terminate()">Çıkış Yap</button>
+    <div class="logo">GLOBALEDU PRO</div>
+    <div style="font-weight: 600;">Puan: <span id="score">0</span></div>
 </nav>
 
-<div class="app-container">
-    <main>
-        <div class="quiz-card">
-            <span id="subject-label" class="subject-badge">MODÜL: YÜKLENİYOR</span>
-            <div id="question-text">Soru veritabanı analiz ediliyor...</div>
-            
-            <div class="options-grid" id="options">
-                </div>
-
-            <div id="feedback" style="margin-top: 20px; font-weight: 600;"></div>
+<div class="container">
+    <main class="main-content">
+        <div class="progress-container">
+            <div id="progress-bar"></div>
         </div>
+        
+        <div class="meta">
+            <span id="subject-badge" class="badge">Ders Seçiliyor...</span>
+            <span id="q-count" style="font-size: 0.8rem; color: var(--text-muted);">Soru: 1</span>
+        </div>
+
+        <div id="question-title">Sorular hazırlanıyor, lütfen bekleyin...</div>
+
+        <div class="options-container" id="options">
+            </div>
+
+        <div id="feedback" style="margin-top: 2rem; font-weight: 700; text-align: center;"></div>
     </main>
 
     <aside class="sidebar">
         <div class="stat-card">
-            <div style="font-size: 0.8rem; color: #64748b;">BAŞARI SKORU</div>
-            <div id="score-display" style="font-size: 2rem; font-weight: 700;">0</div>
-            <div class="progress-container">
-                <div id="progress-fill"></div>
+            <h4 style="margin-top:0">Performans Analizi</h4>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span>Doğru:</span> <span id="correct-count" style="color: var(--success); font-weight: 700;">0</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <span>Yanlış:</span> <span id="wrong-count" style="color: var(--danger); font-weight: 700;">0</span>
             </div>
         </div>
 
-        <div class="ai-assistant">
-            <h3 style="margin-top: 0;">🤖 AI Asistan</h3>
-            <p id="ai-message" style="font-size: 0.9rem; line-height: 1.5;">Merhaba! Bugün seninle dünya markası olma yolunda ilerliyoruz. Hazır olduğunda bir soru seç!</p>
-            <button class="btn-primary" style="background: rgba(255,255,255,0.2);" onclick="askAi()">İpucu İstiyorum</button>
+        <div class="ai-box">
+            <div class="ai-header">🤖 AI Akıllı Asistan</div>
+            <div id="ai-text">Selam kanka! Soruyu inceledim. Yardım istersen butona bas, sana cevabı pat diye söylemek yerine ipucu vereceğim.</div>
+            <button class="btn-ai" onclick="getAIHelp()">Strateji İste</button>
         </div>
     </aside>
 </div>
 
 <script>
-    const questions = [
-        { s: "Bilişim", q: "Dünya çapında 'internet sitelerinin dili' olarak bilinen yapısal dil hangisidir?", o: ["Python", "C#", "HTML", "Swift"], c: 2 },
-        { s: "Matematik", q: "Bir üçgenin iç açılarının toplamı kaç derecedir?", o: ["90°", "180°", "270°", "360°"], c: 1 },
-        { s: "Fen Bilimleri", q: "Işık hızı saniyede yaklaşık kaç kilometredir?", o: ["150.000", "300.000", "500.000", "1.000.000"], c: 1 },
-        { s: "Bilişim", q: "Hangisi veritabanı yönetim sistemidir?", o: ["MySQL", "Photoshop", "Chrome", "Spotify"], c: 0 },
-        { s: "Genel Kültür", q: "Dünya'nın en yüksek dağı hangisidir?", o: ["K2", "Lhotse", "Everest", "Ağrı"], c: 2 }
+    // Geniş Soru Havuzu (Buraya istediğin kadar ekle)
+    const allQuestions = [
+        { d: "Bilişim", q: "Bir web sitesinin görünümünü (renk, font, düzen) belirleyen dil hangisidir?", o: ["HTML", "Python", "CSS", "SQL"], c: 2, h: "Cascading Style Sheets ifadesinin baş harfleridir." },
+        { d: "Matematik", q: "Bir dik üçgende 90 derecenin karşısındaki kenara ne ad verilir?", o: ["Hipotenüs", "Taban", "Yükseklik", "Çap"], c: 0, h: "En uzun kenardır ve 'H' ile başlar." },
+        { d: "Türkçe", q: "Hangisi 'yapım eki' almış bir sözcüktür?", o: ["Evler", "Gözlük", "Masanın", "Sokakta"], c: 1, h: "Kelimenin anlamını tamamen değiştiren bir ek aramalıyız." },
+        { d: "Fen Bilimleri", q: "Güneş sistemindeki en büyük gezegen hangisidir?", o: ["Mars", "Dünya", "Satürn", "Jüpiter"], c: 3, h: "Halkası Satürn kadar belirgin olmasa da kütlesi en büyüktür." },
+        { d: "Bilişim", q: "Bilgisayarda verilerin geçici olarak tutulduğu bellek hangisidir?", o: ["Harddisk", "RAM", "İşlemci", "Flash Bellek"], c: 1, h: "Random Access Memory kelimelerinin kısaltmasıdır." },
+        { d: "Genel Kültür", q: "Türkiye'nin ilk astronotu kimdir?", o: ["Umut Yıldız", "Caner Taslaman", "Alper Gezeravcı", "Selçuk Bayraktar"], c: 2, h: "2024 başında uzay yolculuğunu gerçekleştirdi." },
+        { d: "Matematik", q: "2 üssü 5 kaçtır?", o: ["10", "25", "32", "64"], c: 2, h: "2'yi yan yana 5 kere çarpmalısın: 2x2x2x2x2." },
+        { d: "Bilişim", q: "Yapay zeka modellerinin eğitilmesinde en popüler programlama dili hangisidir?", o: ["Java", "C++", "Python", "PHP"], c: 2, h: "İsmi bir yılan türünden gelir." }
     ];
 
-    let currentIdx = 0;
-    let score = 0;
+    let questionPool = [...allQuestions];
+    let currentQuestion;
+    let stats = { score: 0, correct: 0, wrong: 0, total: 1 };
+    let aiHelpStage = 0;
 
-    function initQuiz() {
-        const q = questions[Math.floor(Math.random() * questions.length)];
-        currentIdx = questions.indexOf(q);
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function init() {
+        if (questionPool.length === 0) {
+            questionPool = [...allQuestions]; // Havuz biterse tekrar doldur (Sonsuz döngü)
+            shuffle(questionPool);
+        }
         
-        document.getElementById('subject-label').innerText = "DERS: " + q.s.toUpperCase();
-        document.getElementById('question-text').innerText = q.q;
+        currentQuestion = questionPool.pop();
+        aiHelpStage = 0;
+        render();
+    }
+
+    function render() {
+        document.getElementById('subject-badge').innerText = currentQuestion.d;
+        document.getElementById('question-title').innerText = currentQuestion.q;
+        document.getElementById('q-count').innerText = "Soru: " + stats.total;
+        document.getElementById('ai-text').innerText = "Soruyu analiz ediyorum... Henüz bir ipucu istenmedi.";
         
-        const optDiv = document.getElementById('options');
-        optDiv.innerHTML = "";
+        const optContainer = document.getElementById('options');
+        optContainer.innerHTML = "";
         
-        q.o.forEach((opt, i) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerHTML = `<b style="margin-right:15px">${String.fromCharCode(65+i)}</b> ${opt}`;
-            btn.onclick = () => check(i);
-            optDiv.appendChild(btn);
+        currentQuestion.o.forEach((opt, i) => {
+            const div = document.createElement('div');
+            div.className = 'option-card';
+            div.innerHTML = `<div class="option-index">${String.fromCharCode(65+i)}</div> <span>${opt}</span>`;
+            div.onclick = () => checkAnswer(i, div);
+            optContainer.appendChild(div);
         });
-        document.getElementById('feedback').innerText = "";
+
+        document.getElementById('progress-bar').style.width = ((stats.correct / allQuestions.length) * 100) + "%";
     }
 
-    function check(idx) {
-        const correct = questions[currentIdx].c;
-        const feedback = document.getElementById('feedback');
-        
-        if(idx === correct) {
-            score += 20;
-            feedback.innerHTML = "✨ MUHTEŞEM! Doğru cevap.";
-            feedback.style.color = "var(--success)";
-            updateProgress();
-            setTimeout(initQuiz, 1500);
+    function checkAnswer(idx, element) {
+        const allOptions = document.querySelectorAll('.option-card');
+        allOptions.forEach(opt => opt.style.pointerEvents = 'none');
+
+        if (idx === currentQuestion.c) {
+            element.classList.add('correct');
+            stats.score += 25;
+            stats.correct++;
+            document.getElementById('feedback').innerText = "⭐ HARİKA! TAM İSABET.";
+            document.getElementById('feedback').style.color = "var(--success)";
         } else {
-            feedback.innerHTML = "⚠️ Hata: Bu seçenek doğru değil kanka.";
-            feedback.style.color = "var(--danger)";
+            element.classList.add('wrong');
+            allOptions[currentQuestion.c].classList.add('correct');
+            stats.wrong++;
+            document.getElementById('feedback').innerText = "❌ SAĞLIK OLSUN, ÖĞRENMEYE DEVAM.";
+            document.getElementById('feedback').style.color = "var(--danger)";
+        }
+
+        updateStats();
+        stats.total++;
+        setTimeout(() => {
+            document.getElementById('feedback').innerText = "";
+            init();
+        }, 1800);
+    }
+
+    function getAIHelp() {
+        aiHelpStage++;
+        const text = document.getElementById('ai-text');
+        if(aiHelpStage === 1) {
+            text.innerText = "🔍 İPUCU: " + currentQuestion.h;
+        } else if(aiHelpStage === 2) {
+            text.innerText = "💡 BİRAZ DAHA YAKLAŞALIM: Doğru cevap " + currentQuestion.o[currentQuestion.c] + " şıkkı değil mi sence?";
+        } else {
+            text.innerText = "🤖 Kanka artık işaretle istersen, cevap belli: " + currentQuestion.o[currentQuestion.c];
         }
     }
 
-    function updateProgress() {
-        document.getElementById('score-display').innerText = score;
-        const fill = document.getElementById('progress-fill');
-        let width = (score / 100) * 100;
-        fill.style.width = (width > 100 ? 100 : width) + "%";
-    }
-
-    function askAi() {
-        const q = questions[currentIdx];
-        document.getElementById('ai-message').innerText = "AI Düşünüyor... Analizime göre doğru cevap " + q.o[q.c] + " gibi görünüyor. Hadi yaparsın!";
-    }
-
-    function terminate() {
-        if(confirm("Marka yolculuğunu durdurmak istediğine emin misin?")) {
-            document.body.innerHTML = `<div style="text-align:center; margin-top:100px;"><h1>Final Skoru: ${score}</h1><p>Yarın daha iyi olmalısın!</p><button onclick="location.reload()">Yeniden Başla</button></div>`;
-        }
+    function updateStats() {
+        document.getElementById('score').innerText = stats.score;
+        document.getElementById('correct-count').innerText = stats.correct;
+        document.getElementById('wrong-count').innerText = stats.wrong;
     }
 
     // Başlat
-    initQuiz();
+    shuffle(questionPool);
+    init();
 </script>
 
 </body>
