@@ -3,182 +3,743 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NovaLearning | Infinite Engine v4.0</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>Akıl Oyunları | Sonsuz Problem Çözme</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root { --p: #0052ff; --s: #00d1ff; --bg: #06070a; --c: #12141c; --txt: #ffffff; }
-        * { margin:0; padding:0; box-sizing:border-box; font-family: 'Outfit', sans-serif; }
-        body { background: var(--bg); color: var(--txt); min-height: 100vh; overflow-x: hidden; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
 
-        /* CEO Header */
-        nav { background: rgba(18, 20, 28, 0.8); backdrop-filter: blur(20px); padding: 1.5rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #222; position: sticky; top: 0; z-index: 100; }
-        .logo { font-weight: 900; font-size: 1.8rem; background: linear-gradient(90deg, var(--p), var(--s)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
         
-        .container { max-width: 1200px; margin: 3rem auto; display: grid; grid-template-columns: 1fr 400px; gap: 2rem; padding: 0 2rem; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
 
-        /* Quiz Master */
-        .card { background: var(--c); border-radius: 40px; padding: 4rem; border: 1px solid #222; box-shadow: 0 40px 100px rgba(0,0,0,0.5); position: relative; }
-        .badge { background: var(--p); color: white; padding: 6px 20px; border-radius: 100px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; margin-bottom: 2rem; display: inline-block; }
-        
-        #q-text { font-size: 2.2rem; font-weight: 700; line-height: 1.2; margin-bottom: 3rem; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
 
-        .opt-grid { display: grid; gap: 1.2rem; }
-        .option { background: #1a1d29; border: 2px solid #222; padding: 1.5rem; border-radius: 24px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; font-size: 1.2rem; font-weight: 600; }
-        .option:hover { border-color: var(--s); background: #1e2436; transform: scale(1.02); }
-        .option.correct { background: #052c1e; border-color: #10b981; }
-        .option.wrong { background: #3d0a13; border-color: #f43f5e; }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .pulse-success {
+            animation: pulse-green 1s infinite;
+        }
 
-        /* Sidebar & AI */
-        .side { display: flex; flex-direction: column; gap: 2rem; }
-        .ai-box { background: linear-gradient(180deg, #12141c 0%, #000 100%); border-radius: 35px; padding: 2.5rem; border: 1px solid #222; position: relative; }
-        .ai-status { color: var(--s); font-size: 0.8rem; font-weight: 800; margin-bottom: 1rem; display: block; }
-        #ai-msg { font-size: 1.1rem; line-height: 1.6; color: #a0aec0; margin-bottom: 2rem; }
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-        .btn-ai { width: 100%; padding: 1.2rem; border: none; border-radius: 20px; background: var(--p); color: white; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px rgba(0,82,255,0.3); }
-        
-        .xp-card { background: #12141c; padding: 2rem; border-radius: 30px; border: 1px solid #222; text-align: center; }
-        .bar { width: 100%; height: 12px; background: #222; border-radius: 10px; margin: 15px 0; overflow: hidden; }
-        #fill { height: 100%; background: var(--s); width: 0%; transition: 1s; }
+        /* Dynamic Background */
+        .bg-gradient-animate {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #0f172a);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-        @media (max-width: 1000px) { .container { grid-template-columns: 1fr; } }
+        .option-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            border-color: #6366f1;
+        }
+        .option-card.selected-correct {
+            background-color: rgba(34, 197, 94, 0.2);
+            border-color: #22c55e;
+            color: #4ade80;
+        }
+        .option-card.selected-wrong {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-color: #ef4444;
+            color: #f87171;
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-<nav>
-    <div class="logo">NOVA GLOBAL</div>
-    <div style="font-weight: 700;">LEVEL: <span id="lvl">1</span></div>
-</nav>
+    <div class="bg-gradient-animate"></div>
+    <canvas id="confetti-canvas"></canvas>
 
-<div class="container">
-    <main class="card">
-        <div id="tag" class="badge">SİSTEM BAŞLATILIYOR</div>
-        <div id="q-text">Hazır mısın CEO? Sonsuzluk motoru devreye giriyor...</div>
-        <div class="opt-grid" id="opts"></div>
+    <!-- Header -->
+    <header class="w-full p-6 flex justify-between items-center glass-panel sticky top-0 z-40">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-white">Akıl Oyunları</h1>
+                <p class="text-xs text-slate-400">Sonsuz Öğrenme Platformu</p>
+            </div>
+        </div>
+        
+        <div id="stats-container" class="hidden md:flex items-center gap-6">
+            <div class="text-right">
+                <p class="text-xs text-slate-400 uppercase tracking-wider">Puan</p>
+                <p id="score-display" class="text-xl font-bold text-indigo-400 mono">0</p>
+            </div>
+            <div class="text-right">
+                <p class="text-xs text-slate-400 uppercase tracking-wider">Seri</p>
+                <p id="streak-display" class="text-xl font-bold text-emerald-400 mono">0</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8 flex flex-col items-center justify-center relative">
+        
+        <!-- VIEW: Subject Selection -->
+        <div id="view-subjects" class="w-full max-w-4xl slide-in">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-4">
+                    Hangi Alanda Kendini Test Etmek İstersin?
+                </h2>
+                <p class="text-slate-400 text-lg">Her ders için sonsuz sayıda benzersiz soru seni bekliyor.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Math Card -->
+                <button onclick="app.selectSubject('math')" class="group relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700 p-8 text-left hover:border-indigo-500 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-500/20">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-indigo-500 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-indigo-500/20 rounded-lg flex items-center justify-center mb-4 text-indigo-400 group-hover:text-white group-hover:bg-indigo-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Matematik</h3>
+                        <p class="text-slate-400 text-sm">Aritmetik, cebir ve mantık problemleri.</p>
+                    </div>
+                </button>
+
+                <!-- Geography Card -->
+                <button onclick="app.selectSubject('geo')" class="group relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700 p-8 text-left hover:border-emerald-500 transition-all duration-300 hover:shadow-2xl hover:shadow-emerald-500/20">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-emerald-500 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-emerald-500/20 rounded-lg flex items-center justify-center mb-4 text-emerald-400 group-hover:text-white group-hover:bg-emerald-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Coğrafya</h3>
+                        <p class="text-slate-400 text-sm">Başkentler, ülkeler ve doğal oluşumlar.</p>
+                    </div>
+                </button>
+
+                <!-- Science Card -->
+                <button onclick="app.selectSubject('science')" class="group relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700 p-8 text-left hover:border-rose-500 transition-all duration-300 hover:shadow-2xl hover:shadow-rose-500/20">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-rose-500 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-rose-500/20 rounded-lg flex items-center justify-center mb-4 text-rose-400 group-hover:text-white group-hover:bg-rose-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Fen Bilgisi</h3>
+                        <p class="text-slate-400 text-sm">Fizik, kimya ve biyoloji temelleri.</p>
+                    </div>
+                </button>
+
+                <!-- History Card -->
+                <button onclick="app.selectSubject('history')" class="group relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700 p-8 text-left hover:border-amber-500 transition-all duration-300 hover:shadow-2xl hover:shadow-amber-500/20">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-amber-500 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center mb-4 text-amber-400 group-hover:text-white group-hover:bg-amber-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Tarih</h3>
+                        <p class="text-slate-400 text-sm">Osmanlı, Cumhuriyet ve dünya tarihi.</p>
+                    </div>
+                </button>
+
+                <!-- Turkish Card -->
+                <button onclick="app.selectSubject('turkish')" class="group relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700 p-8 text-left hover:border-sky-500 transition-all duration-300 hover:shadow-2xl hover:shadow-sky-500/20">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-sky-500 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-sky-500/20 rounded-lg flex items-center justify-center mb-4 text-sky-400 group-hover:text-white group-hover:bg-sky-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Türkçe</h3>
+                        <p class="text-slate-400 text-sm">Dil bilgisi, yazım kuralları ve sözcük anlamları.</p>
+                    </div>
+                </button>
+
+                <!-- Logic Card -->
+                <button onclick="app.selectSubject('logic')" class="group relative overflow-hidden rounded-2xl bg-slate-800/50 border border-slate-700 p-8 text-left hover:border-purple-500 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20">
+                    <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-purple-500 rounded-full opacity-20 group-hover:scale-150 transition-transform duration-500"></div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mb-4 text-purple-400 group-hover:text-white group-hover:bg-purple-500 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2">Sözel Mantık</h3>
+                        <p class="text-slate-400 text-sm">Sayı ve harf dizileri, analitik düşünme.</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- VIEW: Game Area -->
+        <div id="view-game" class="hidden w-full max-w-3xl">
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-800 h-2 rounded-full mb-8 overflow-hidden">
+                <div id="timer-bar" class="h-full bg-indigo-500 w-full transition-all duration-1000 ease-linear"></div>
+            </div>
+
+            <div class="glass-panel rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+                <!-- Question Header -->
+                <div class="flex justify-between items-start mb-6">
+                    <span id="question-category" class="px-3 py-1 rounded-full text-xs font-bold bg-slate-700 text-slate-300 uppercase tracking-wider">Kategori</span>
+                    <button onclick="app.quitGame()" class="text-slate-500 hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+
+                <!-- Question Text -->
+                <h2 id="question-text" class="text-2xl md:text-3xl font-bold text-white mb-8 leading-tight min-h-[4rem]">
+                    Soru yükleniyor...
+                </h2>
+
+                <!-- Options Grid -->
+                <div id="options-container" class="grid grid-cols-1 gap-4">
+                    <!-- Options injected by JS -->
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="feedback-area" class="mt-6 hidden">
+                    <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-600 flex items-start gap-3">
+                        <div id="feedback-icon" class="mt-1"></div>
+                        <div>
+                            <h4 id="feedback-title" class="font-bold text-lg"></h4>
+                            <p id="feedback-text" class="text-slate-300 text-sm"></p>
+                        </div>
+                    </div>
+                    <button onclick="app.nextQuestion()" class="mt-4 w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2">
+                        Sonraki Soru
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Stats (Visible only on small screens) -->
+            <div class="md:hidden mt-6 flex justify-between items-center px-4">
+                <div class="text-slate-400 text-sm">Puan: <span id="mobile-score" class="text-white font-bold">0</span></div>
+                <div class="text-slate-400 text-sm">Seri: <span id="mobile-streak" class="text-white font-bold">0</span></div>
+            </div>
+        </div>
+
     </main>
 
-    <aside class="side">
-        <div class="ai-box">
-            <span class="ai-status">● CANLI AI ANALİZİ</span>
-            <div id="ai-msg">Veri akışı optimize edildi. Matematik soruları artık gerçek zamanlı üretiliyor. Bir daha aynı soruyu görmen imkansız.</div>
-            <button class="btn-ai" onclick="getHint()">STRATEJİ ÜRET</button>
-        </div>
-        <div class="xp-card">
-            <div style="font-size: 0.9rem; color: #718096;">TOPLAM TECRÜBE (XP)</div>
-            <div id="total-xp" style="font-size: 2.5rem; font-weight: 900; color: var(--s);">0</div>
-            <div class="bar"><div id="fill"></div></div>
-        </div>
-    </aside>
-</div>
+    <footer class="w-full p-6 text-center text-slate-600 text-sm">
+        &copy; 2023 Akıl Oyunları. Sonsuz Öğrenme Motoru.
+    </footer>
 
-<script>
-    // Sözel Soru Havuzu (5. Sınıf)
-    const verbalDB = [
-        { c: "Bilişim", q: "Dosya boyutunu küçültmek için yapılan işleme ne denir?", o: ["Silme", "Kopyalama", "Sıkıştırma", "Taşıma"], a: 2, h: "Bir valize çok eşya koymak gibi düşün kanka." },
-        { c: "Fen Bilimleri", q: "Ay'ın kaç ana evresi vardır?", o: ["2", "4", "6", "8"], a: 1, h: "Yeni ay, İlk dördün, Dolunay ve Son dördün." },
-        { c: "Sosyal Bilgiler", q: "Dünyanın en büyük okyanusu hangisidir?", o: ["Atlas", "Hint", "Büyük Okyanus (Pasifik)", "Arktik"], a: 2, h: "İsmi üzerinde, en büyüğü!" },
-        { c: "Türkçe", q: "'Yüz' kelimesi aşağıdakilerin hangisinde farklı anlamdadır?", o: ["Suda yüzmek", "Sayı olan yüz", "İnsanın yüzü", "Defterin yüzü"], a: 3, h: "Eş sesli kelimelere dikkat et." }
-    ];
+    <script>
+        /**
+         * AKIL OYUNLARI - CORE ENGINE
+         * Handles infinite question generation, state management, and UI updates.
+         */
+        
+        // --- Data & Generators ---
 
-    let state = {
-        xp: parseInt(localStorage.getItem('nova_xp')) || 0,
-        usedIds: JSON.parse(localStorage.getItem('nova_used')) || [],
-        current: null
-    };
+        const SUBJECT_CONFIG = {
+            math: { name: 'Matematik', color: 'text-indigo-400', bg: 'bg-indigo-500' },
+            geo: { name: 'Coğrafya', color: 'text-emerald-400', bg: 'bg-emerald-500' },
+            science: { name: 'Fen Bilgisi', color: 'text-rose-400', bg: 'bg-rose-500' },
+            history: { name: 'Tarih', color: 'text-amber-400', bg: 'bg-amber-500' },
+            turkish: { name: 'Türkçe', color: 'text-sky-400', bg: 'bg-sky-500' },
+            logic: { name: 'Sözel Mantık', color: 'text-purple-400', bg: 'bg-purple-500' }
+        };
 
-    function generateMath() {
-        const types = ['add', 'sub', 'mul'];
-        const type = types[Math.floor(Math.random() * types.length)];
-        let n1, n2, q, a, ops = [];
-
-        if(type === 'add') {
-            n1 = Math.floor(Math.random() * 500) + 100;
-            n2 = Math.floor(Math.random() * 500) + 100;
-            q = `${n1} + ${n2} işleminin sonucu kaçtır?`;
-            a = n1 + n2;
-        } else if(type === 'sub') {
-            n1 = Math.floor(Math.random() * 1000) + 500;
-            n2 = Math.floor(Math.random() * 400) + 1;
-            q = `${n1} - ${n2} işleminin sonucu kaçtır?`;
-            a = n1 - n2;
-        } else {
-            n1 = Math.floor(Math.random() * 15) + 2;
-            n2 = Math.floor(Math.random() * 12) + 2;
-            q = `${n1} x ${n2} işleminin sonucu kaçtır?`;
-            a = n1 * n2;
-        }
-
-        ops = [a, a + 10, a - 5, a + (Math.floor(Math.random()*20)+1)];
-        ops = ops.sort(() => Math.random() - 0.5);
-
-        return { c: "Matematik (Auto-Gen)", q: q, o: ops.map(String), a: ops.indexOf(a), h: "Kağıt kalem kullanmak serbest kanka!" };
-    }
-
-    function init() {
-        // %60 ihtimalle matematik (sonsuz), %40 sözel
-        if (Math.random() > 0.4) {
-            state.current = generateMath();
-        } else {
-            let available = verbalDB.filter((_, i) => !state.usedIds.includes(i));
-            if (available.length === 0) {
-                state.usedIds = []; // Hepsi biterse sıfırla
-                available = verbalDB;
+        // Static data pools for non-math questions
+        const DATA_POOLS = {
+            geo: {
+                capitals: [
+                    {c: "Türkiye", a: "Ankara"}, {c: "Almanya", a: "Berlin"}, {c: "Fransa", a: "Paris"},
+                    {c: "İtalya", a: "Roma"}, {c: "İspanya", a: "Madrid"}, {c: "Portekiz", a: "Lizbon"},
+                    {c: "İngiltere", a: "Londra"}, {c: "ABD", a: "Washington"}, {c: "Kanada", a: "Ottawa"},
+                    {c: "Rusya", a: "Moskova"}, {c: "Çin", a: "Pekin"}, {c: "Japonya", a: "Tokyo"},
+                    {c: "Hindistan", a: "Yeni Delhi"}, {c: "Brezilya", a: "Brasilia"}, {c: "Mısır", a: "Kahire"},
+                    {c: "Güney Afrika", a: "Cape Town"}, {c: "Avustralya", a: "Canberra"}, {c: "Yunanistan", a: "Atina"},
+                    {c: "Meksika", a: "Meksiko"}, {c: "Arjantin", a: "Buenos Aires"}
+                ],
+                neighbors: [
+                    {c: "Türkiye", n: ["Yunanistan", "Bulgaristan", "Gürcistan", "Ermenistan", "Azerbaycan", "İran", "Irak", "Suriye"]},
+                    {c: "Almanya", n: ["Danimarka", "Polonya", "Çekya", "Avusturya", "İsviçre", "Fransa", "Lüksemburg", "Belçika", "Hollanda"]},
+                    {c: "Fransa", n: ["Belçika", "Lüksemburg", "Almanya", "İsviçre", "İtalya", "Monako", "Andorra", "İspanya"]}
+                ]
+            },
+            science: {
+                planets: ["Merkür", "Venüs", "Dünya", "Mars", "Jüpiter", "Satürn", "Uranüs", "Neptün"],
+                elements: [
+                    {s: "O", n: "Oksijen"}, {s: "H", n: "Hidrojen"}, {s: "C", n: "Karbon"}, {s: "N", n: "Azot"},
+                    {s: "Au", n: "Altın"}, {s: "Ag", n: "Gümüş"}, {s: "Fe", n: "Demir"}, {s: "Cu", n: "Bakır"},
+                    {s: "Na", n: "Sodyum"}, {s: "Cl", n: "Klor"}, {s: "He", n: "Helyum"}, {s: "Ne", n: "Neon"}
+                ],
+                bio: [
+                    {q: "İnsan vücudundaki en büyük organ hangisidir?", a: "Cilt", d: ["Karaciğer", "Kalp", "Beyin"]},
+                    {q: "Fotosentezde kullanılan yeşil pigmentin adı nedir?", a: "Klorofil", d: ["Melanin", "Hemoglobin", "Keratin"]},
+                    {q: "Su molekülünün formülü nedir?", a: "H2O", d: ["CO2", "NaCl", "O2"]},
+                    {q: "Dünya'nın uydusunun adı nedir?", a: "Ay", d: ["Mars", "Venüs", "Titan"]},
+                    {q: "Işığın en hızlı yayıldığı ortam hangisidir?", a: "Vakum (Boşluk)", d: ["Su", "Cam", "Hava"]}
+                ]
+            },
+            history: {
+                ottoman: [
+                    {q: "Osmanlı Devleti'nin kurucusu kimdir?", a: "Osman Bey", d: ["Orhan Bey", "Fatih Sultan Mehmet", "Yavuz Sultan Selim"]},
+                    {q: "İstanbul'un fethi hangi yılda gerçekleşmiştir?", a: "1453", d: ["1071", "1299", "1517"]},
+                    {q: "Osmanlı Devleti'nin ilk başkenti neresidir?", a: "Bursa", d: ["Edirne", "İstanbul", "Konya"]}
+                ],
+                republic: [
+                    {q: "Türkiye Cumhuriyeti hangi yılda ilan edilmiştir?", a: "1923", d: ["1919", "1920", "1924"]},
+                    {q: "Türkiye Büyük Millet Meclisi'nin açıldığı şehir hangisidir?", a: "Ankara", d: ["İstanbul", "İzmir", "Erzurum"]},
+                    {q: "Nutuk hangi yılda okunmuştur?", a: "1927", d: ["1923", "1919", "1938"]}
+                ]
+            },
+            turkish: {
+                grammar: [
+                    {q: "Aşağıdakilerden hangisi bir bağlaçtır?", a: "Ve", d: ["Hızlı", "Güzel", "Koşmak"]},
+                    {q: "'Okullar' kelimesindeki çoğul eki hangisidir?", a: "-lar", d: ["-ok", "-kul", "-a"]},
+                    {q: "Aşağıdakilerden hangisi edat değildir?", a: "Güzel", d: ["İçin", "Gibi", "Kadar"]},
+                    {q: "'Yazmış' kelimesi hangi fiil çekimidir?", a: "Şimdiki Zaman", d: ["Gelecek Zaman", "Dilek Kipi", "Emir Kipi"]} // Simplified
+                ],
+                spelling: [
+                    {q: "Aşağıdaki kelimelerden hangisi doğru yazılmıştır?", a: "Sıhhiye", d: ["Sihhiye", "Sıhhie", "Sihhie"]},
+                    {q: "Aşağıdakilerden hangisi 'yalın' hal eki almıştır?", a: "Bahçe", d: ["Bahçede", "Bahçeyi", "Bahçenin"]}
+                ]
+            },
+            logic: {
+                patterns: [
+                    {s: "2, 4, 6, 8, ?", a: "10", d: ["9", "12", "14"]},
+                    {s: "1, 1, 2, 3, 5, ?", a: "8", d: ["7", "9", "13"]}, // Fibonacci
+                    {s: "A, C, E, G, ?", a: "I", d: ["H", "J", "K"]},
+                    {s: "3, 6, 12, 24, ?", a: "48", d: ["36", "30", "42"]}
+                ]
             }
-            const idx = Math.floor(Math.random() * available.length);
-            state.current = available[idx];
-            state.usedIds.push(verbalDB.indexOf(state.current));
-            localStorage.setItem('nova_used', JSON.stringify(state.usedIds));
+        };
+
+        // --- Application State ---
+        const app = {
+            currentSubject: null,
+            score: 0,
+            streak: 0,
+            questionHistory: [], // Stores hashes of recent questions to prevent repeats
+            isAnswering: false,
+            
+            // DOM Elements
+            views: {
+                subjects: document.getElementById('view-subjects'),
+                game: document.getElementById('view-game')
+            },
+            ui: {
+                score: document.getElementById('score-display'),
+                streak: document.getElementById('streak-display'),
+                mScore: document.getElementById('mobile-score'),
+                mStreak: document.getElementById('mobile-streak'),
+                questionText: document.getElementById('question-text'),
+                optionsContainer: document.getElementById('options-container'),
+                category: document.getElementById('question-category'),
+                feedback: document.getElementById('feedback-area'),
+                feedbackTitle: document.getElementById('feedback-title'),
+                feedbackText: document.getElementById('feedback-text'),
+                feedbackIcon: document.getElementById('feedback-icon'),
+                timerBar: document.getElementById('timer-bar')
+            },
+
+            // --- Methods ---
+
+            init() {
+                // Setup event listeners if needed, or just rely on onclick
+                console.log("Akıl Oyunları initialized.");
+            },
+
+            selectSubject(subjectKey) {
+                this.currentSubject = subjectKey;
+                this.score = 0;
+                this.streak = 0;
+                this.questionHistory = [];
+                this.updateStats();
+                
+                // Switch Views
+                this.views.subjects.classList.add('hidden');
+                this.views.game.classList.remove('hidden');
+                this.views.game.classList.add('slide-in');
+
+                this.nextQuestion();
+            },
+
+            quitGame() {
+                if(confirm("Oyundan çıkmak istediğinize emin misiniz?")) {
+                    this.views.game.classList.add('hidden');
+                    this.views.subjects.classList.remove('hidden');
+                    this.views.subjects.classList.add('slide-in');
+                    this.currentSubject = null;
+                }
+            },
+
+            updateStats() {
+                this.ui.score.innerText = this.score;
+                this.ui.streak.innerText = this.streak;
+                this.ui.mScore.innerText = this.score;
+                this.ui.mStreak.innerText = this.streak;
+            },
+
+            // --- The Infinite Generator Engine ---
+            generateQuestion() {
+                let q = {};
+                const type = this.currentSubject;
+                const config = SUBJECT_CONFIG[type];
+
+                // Helper to get random item
+                const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+                const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+                // 1. MATH GENERATOR (Algorithmic)
+                if (type === 'math') {
+                    const ops = ['+', '-', '*', '/'];
+                    const op = rand(ops);
+                    let n1, n2, ans, text;
+
+                    switch(op) {
+                        case '+':
+                            n1 = randInt(10, 500);
+                            n2 = randInt(10, 500);
+                            ans = n1 + n2;
+                            text = `${n1} + ${n2} işleminin sonucu kaçtır?`;
+                            break;
+                        case '-':
+                            n1 = randInt(50, 500);
+                            n2 = randInt(10, n1); // Ensure positive result
+                            ans = n1 - n2;
+                            text = `${n1} - ${n2} işleminin sonucu kaçtır?`;
+                            break;
+                        case '*':
+                            n1 = randInt(2, 20);
+                            n2 = randInt(2, 20);
+                            ans = n1 * n2;
+                            text = `${n1} x ${n2} işleminin sonucu kaçtır?`;
+                            break;
+                        case '/':
+                            n2 = randInt(2, 15);
+                            ans = randInt(2, 15);
+                            n1 = n2 * ans; // Ensure clean division
+                            text = `${n1} ÷ ${n2} işleminin sonucu kaçtır?`;
+                            break;
+                    }
+                    
+                    // Generate Distractors (Wrong answers close to correct one)
+                    const distractors = [
+                        ans + randInt(1, 10),
+                        ans - randInt(1, 10),
+                        ans + randInt(11, 20),
+                        ans * 2
+                    ].filter(n => n !== ans && n > 0).slice(0, 3);
+
+                    q = { text, answer: ans.toString(), options: this.shuffle([ans.toString(), ...distractors]) };
+                }
+                
+                // 2. GEOGRAPHY GENERATOR
+                else if (type === 'geo') {
+                    const mode = Math.random() > 0.5 ? 'capital' : 'neighbor';
+                    
+                    if (mode === 'capital') {
+                        const item = rand(DATA_POOLS.geo.capitals);
+                        text = `${item.c} ülkesinin başkenti neresidir?`;
+                        // Wrong options: random capitals from other countries
+                        const wrong = DATA_POOLS.geo.capitals
+                            .filter(x => x.c !== item.c)
+                            .map(x => x.a)
+                            .sort(() => 0.5 - Math.random())
+                            .slice(0, 3);
+                        q = { text, answer: item.a, options: this.shuffle([item.a, ...wrong]) };
+                    } else {
+                        const item = rand(DATA_POOLS.geo.neighbors);
+                        text = `${item.c} ülkesi hangi ülke ile komşu değildir?`;
+                        // Logic: Pick one real neighbor, 3 non-neighbors
+                        const realNeighbor = rand(item.n);
+                        // Create a pool of non-neighbors (simplified for this demo: just random countries not in list)
+                        const nonNeighbors = ["İsveç", "Norveç", "Finlandiya", "Japonya", "Avustralya", "Yeni Zelanda", "Madagaskar", "Küba"];
+                        const wrong = nonNeighbors.sort(() => 0.5 - Math.random()).slice(0, 3);
+                        q = { text, answer: realNeighbor, options: this.shuffle([realNeighbor, ...wrong]) };
+                    }
+                }
+
+                // 3. SCIENCE GENERATOR
+                else if (type === 'science') {
+                    const mode = Math.random();
+                    if (mode < 0.33) {
+                        // Element Symbol
+                        const el = rand(DATA_POOLS.science.elements);
+                        text = `${el.n} elementinin sembolü hangisidir?`;
+                        const wrong = DATA_POOLS.science.elements.filter(x => x.n !== el.n).map(x => x.s).slice(0, 3);
+                        q = { text, answer: el.s, options: this.shuffle([el.s, ...wrong]) };
+                    } else if (mode < 0.66) {
+                        // Static Bio Question
+                        const item = rand(DATA_POOLS.science.bio);
+                        q = { text: item.q, answer: item.a, options: this.shuffle([item.a, ...item.d]) };
+                    } else {
+                        // Planet Order
+                        const planets = DATA_POOLS.science.planets;
+                        const idx = randInt(0, planets.length - 1);
+                        text = `Güneş sisteminde Güneş'e en yakın ${idx + 1}. gezegen hangisidir?`;
+                        const ans = planets[idx];
+                        const wrong = planets.filter((_, i) => i !== idx).slice(0, 3);
+                        q = { text, answer: ans, options: this.shuffle([ans, ...wrong]) };
+                    }
+                }
+
+                // 4. HISTORY GENERATOR
+                else if (type === 'history') {
+                    const pool = Math.random() > 0.5 ? DATA_POOLS.history.ottoman : DATA_POOLS.history.republic;
+                    const item = rand(pool);
+                    q = { text: item.q, answer: item.a, options: this.shuffle([item.a, ...item.d]) };
+                }
+
+                // 5. TURKISH GENERATOR
+                else if (type === 'turkish') {
+                    const pool = Math.random() > 0.5 ? DATA_POOLS.turkish.grammar : DATA_POOLS.turkish.spelling;
+                    const item = rand(pool);
+                    q = { text: item.q, answer: item.a, options: this.shuffle([item.a, ...item.d]) };
+                }
+
+                // 6. LOGIC GENERATOR
+                else if (type === 'logic') {
+                    const item = rand(DATA_POOLS.logic.patterns);
+                    text = `Devamındaki sayı/harf nedir? <br><span class="text-3xl font-mono text-indigo-300 mt-2 block">${item.s}</span>`;
+                    q = { text, answer: item.a, options: this.shuffle([item.a, ...item.d]) };
+                }
+
+                // Add Metadata
+                q.category = config.name;
+                q.id = this.hashCode(q.text); // Unique ID for history tracking
+                
+                return q;
+            },
+
+            nextQuestion() {
+                // Reset UI
+                this.ui.feedback.classList.add('hidden');
+                this.ui.optionsContainer.innerHTML = '';
+                this.ui.timerBar.style.width = '100%';
+                this.ui.timerBar.classList.remove('bg-red-500');
+                this.ui.timerBar.classList.add('bg-indigo-500');
+                this.isAnswering = true;
+
+                // Generate unique question
+                let question;
+                let attempts = 0;
+                do {
+                    question = this.generateQuestion();
+                    attempts++;
+                } while (this.questionHistory.includes(question.id) && attempts < 50); // Avoid infinite loop if pool is small (though math is infinite)
+
+                // Add to history (keep last 20 to avoid repetition)
+                this.questionHistory.push(question.id);
+                if (this.questionHistory.length > 20) this.questionHistory.shift();
+
+                // Render
+                this.currentQuestion = question;
+                this.ui.category.innerText = question.category;
+                this.ui.questionText.innerHTML = question.text;
+
+                question.options.forEach((opt, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = `option-card w-full p-4 text-left rounded-xl border border-slate-600 bg-slate-700/50 hover:bg-slate-700 text-slate-200 font-medium text-lg relative overflow-hidden`;
+                    btn.innerHTML = `<span class="relative z-10 flex items-center gap-3"><span class="w-8 h-8 rounded-full bg-slate-600 flex items-center justify-center text-sm font-bold text-slate-300">${String.fromCharCode(65 + index)}</span> ${opt}</span>`;
+                    btn.onclick = () => this.handleAnswer(opt, btn);
+                    this.ui.optionsContainer.appendChild(btn);
+                });
+
+                // Start Timer Animation (Visual only)
+                setTimeout(() => {
+                    if(this.isAnswering) this.ui.timerBar.style.width = '0%';
+                }, 100);
+            },
+
+            handleAnswer(selectedOption, btnElement) {
+                if (!this.isAnswering) return;
+                this.isAnswering = false;
+
+                const correct = selectedOption === this.currentQuestion.answer;
+                const allButtons = this.ui.optionsContainer.children;
+
+                // Visual Feedback on buttons
+                for (let btn of allButtons) {
+                    btn.disabled = true;
+                    const btnText = btn.innerText.trim().substring(1).trim(); // Remove A/B/C/D prefix
+                    // Check if this button is the correct one
+                    if (btnText === this.currentQuestion.answer) {
+                        btn.classList.add('selected-correct');
+                        btn.innerHTML += `<span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-green-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></span>`;
+                    } else if (btn === btnElement && !correct) {
+                        btn.classList.add('selected-wrong');
+                        btn.classList.add('shake');
+                        btn.innerHTML += `<span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-red-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></span>`;
+                    } else {
+                        btn.style.opacity = '0.5';
+                    }
+                }
+
+                // Update Stats & Feedback UI
+                this.ui.feedback.classList.remove('hidden');
+                this.ui.feedback.classList.add('slide-in');
+
+                if (correct) {
+                    this.score += 10 + (this.streak * 2);
+                    this.streak++;
+                    this.ui.feedbackTitle.innerText = "Doğru Cevap!";
+                    this.ui.feedbackTitle.className = "font-bold text-lg text-green-400";
+                    this.ui.feedbackText.innerText = "Harika gidiyorsun! Bir sonraki soruya geçebilirsin.";
+                    this.ui.feedbackIcon.innerHTML = `<div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg></div>`;
+                    fireConfetti();
+                } else {
+                    this.streak = 0;
+                    this.ui.feedbackTitle.innerText = "Yanlış Cevap";
+                    this.ui.feedbackTitle.className = "font-bold text-lg text-red-400";
+                    this.ui.feedbackText.innerHTML = `Doğru cevap: <span class="text-white font-bold">${this.currentQuestion.answer}</span> olacaktı.`;
+                    this.ui.feedbackIcon.innerHTML = `<div class="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center text-red-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></div>`;
+                }
+
+                this.updateStats();
+            },
+
+            // Utilities
+            shuffle(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            },
+
+            hashCode(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash;
+                }
+                return hash;
+            }
+        };
+
+        // --- Confetti Effect (Visual Candy) ---
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
-        render();
-    }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
-    function render() {
-        document.getElementById('tag').innerText = state.current.c;
-        document.getElementById('q-text').innerText = state.current.q;
-        const grid = document.getElementById('opts');
-        grid.innerHTML = "";
-
-        state.current.o.forEach((t, i) => {
-            const d = document.createElement('div');
-            d.className = 'option';
-            d.innerHTML = `<span style="color:var(--s); margin-right:15px;">${i+1}.</span> ${t}`;
-            d.onclick = () => select(i, d);
-            grid.appendChild(d);
-        });
-        updateUI();
-    }
-
-    function select(i, el) {
-        const items = document.querySelectorAll('.option');
-        items.forEach(opt => opt.style.pointerEvents = 'none');
-
-        if(i === state.current.a) {
-            el.classList.add('correct');
-            state.xp += 30;
-            document.getElementById('ai-msg').innerText = "KRİTİK BAŞARI: Algoritmam senin öğrenme hızına yetişemiyor CEO!";
-        } else {
-            el.classList.add('wrong');
-            items[state.current.a].classList.add('correct');
-            document.getElementById('ai-msg').innerText = "VERİ HATASI: Bu yanlışı veritabanına işledim, bir dahaki sefere daha odaklı ol.";
+        function fireConfetti() {
+            const colors = ['#6366f1', '#10b981', '#f43f5e', '#f59e0b', '#3b82f6'];
+            for (let i = 0; i < 100; i++) {
+                particles.push({
+                    x: window.innerWidth / 2,
+                    y: window.innerHeight / 2,
+                    vx: (Math.random() - 0.5) * 20,
+                    vy: (Math.random() - 0.5) * 20 - 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 2,
+                    life: 100
+                });
+            }
+            requestAnimationFrame(updateConfetti);
         }
 
-        localStorage.setItem('nova_xp', state.xp);
-        setTimeout(init, 1500);
-    }
+        function updateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.5; // Gravity
+                p.life--;
+                p.size *= 0.96;
 
-    function updateUI() {
-        const xp = state.xp;
-        document.getElementById('total-xp').innerText = xp;
-        document.getElementById('lvl').innerText = Math.floor(xp / 150) + 1;
-        document.getElementById('fill').style.width = (xp % 150 / 1.5) + "%";
-    }
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
 
-    function getHint() {
-        document.getElementById('ai-msg').innerText = "AI İPUCU: " + state.current.h;
-    }
+                if (p.life <= 0 || p.size < 0.5) {
+                    particles.splice(index, 1);
+                }
+            });
 
-    init();
-</script>
+            if (particles.length > 0) {
+                requestAnimationFrame(updateConfetti);
+            }
+        }
+
+        // Start App
+        app.init();
+
+    </script>
 </body>
 </html>
-
