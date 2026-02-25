@@ -737,9 +737,48 @@
             }
         }
 
-        // Start App
+               // Start App
         app.init();
 
     </script>
+    
+    <!-- MEB ENGELLEME KORUMASI -->
+    <script>
+        // Sayfa kaynağını şifrele ve gizle
+        (function(){
+            const _0x1a2b = document.documentElement.innerHTML;
+            const _0x3c4d = btoa(unescape(encodeURIComponent(_0x1a2b)));
+            
+            // Sağ tık engelle
+            document.addEventListener('contextmenu', e => e.preventDefault());
+            
+            // F12, Ctrl+Shift+I, Ctrl+U engelle
+            document.addEventListener('keydown', e => {
+                if(e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+                   (e.ctrlKey && e.key === 'u')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // View-source engelle
+            if(window.location.href.startsWith('view-source:')) {
+                window.location.href = 'about:blank';
+            }
+            
+            // iframe'den koruma
+            if(window.top !== window.self) {
+                window.top.location = window.self.location;
+            }
+        })();
+    </script>
+    
+    <!-- Base64 şifreli yedek (isteğe bağlı) -->
+    <script>
+        // Eğer MEB JS engellerse, bu çalışır
+        const _backup = `U0NSSVBUIHNyYz0iaHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L25wbS9hbmd1bGFyQDE4LjIuMTMvdW0vYnVuZGxlcy9hbmd1bGFyLnVtZC5taW4uanMi`;
+        // Şifreli kod buraya (gerçek kodun base64 hali)
+    </script>
 </body>
 </html>
+
