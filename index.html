@@ -2,2116 +2,1187 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>3D Battle Royale - Ultra</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.4.0/simplex-noise.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AkademiAI - Geleceğin Eğitim Platformu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
+            font-family: 'Poppins', sans-serif;
         }
         
-        body {
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .typing-animation::after {
+            content: '|';
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .sidebar-item {
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-item:hover {
+            background: rgba(99, 102, 241, 0.1);
+            color: #6366f1;
+        }
+        
+        .sidebar-item.active {
+            background: #6366f1;
+            color: white;
+        }
+        
+        .chat-message {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 0.8; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+        
+        .video-card {
+            position: relative;
             overflow: hidden;
-            background: #000;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        #gameContainer {
+        .video-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .video-card:hover::before {
+            left: 100%;
+        }
+        
+        .music-visualizer {
+            display: flex;
+            align-items: end;
+            gap: 2px;
+            height: 20px;
+        }
+        
+        .music-bar {
+            width: 3px;
+            background: #6366f1;
+            animation: music-bar 1s ease-in-out infinite;
+        }
+        
+        .music-bar:nth-child(2) { animation-delay: 0.1s; height: 60%; }
+        .music-bar:nth-child(3) { animation-delay: 0.2s; height: 80%; }
+        .music-bar:nth-child(4) { animation-delay: 0.3s; height: 40%; }
+        .music-bar:nth-child(5) { animation-delay: 0.4s; height: 70%; }
+        
+        @keyframes music-bar {
+            0%, 100% { height: 20%; }
+            50% { height: 100%; }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .topic-badge {
+            transition: all 0.3s ease;
+        }
+        
+        .topic-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+        }
+        
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-        }
-        
-        #ui {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 100;
-        }
-        
-        .hud-panel {
-            position: absolute;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid #00d4ff;
-            border-radius: 10px;
-            color: white;
-            pointer-events: auto;
-            backdrop-filter: blur(5px);
-        }
-        
-        #healthBar {
-            top: 20px;
-            left: 20px;
-            width: 280px;
-            padding: 15px;
-        }
-        
-        .bar-container {
-            width: 100%;
-            height: 25px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 12px;
-            overflow: hidden;
-            margin: 8px 0;
-            border: 1px solid #333;
-        }
-        
-        .health-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff2d2d, #ff6b6b);
-            transition: width 0.3s;
-            width: 100%;
-            box-shadow: 0 0 10px rgba(255, 45, 45, 0.5);
-        }
-        
-        .armor-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #2d5aff, #6b8fff);
-            transition: width 0.3s;
-            width: 0%;
-            box-shadow: 0 0 10px rgba(45, 90, 255, 0.5);
-        }
-        
-        #ammoCounter {
-            top: 20px;
-            right: 20px;
-            text-align: center;
-            padding: 15px 25px;
-        }
-        
-        #currentAmmo {
-            font-size: 42px;
-            font-weight: bold;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
-        }
-        
-        #totalAmmo {
-            font-size: 20px;
-            color: #aaa;
-        }
-        
-        #weaponInfo {
-            bottom: 120px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 12px 30px;
-            text-align: center;
-        }
-        
-        #weaponName {
-            font-size: 22px;
-            color: #00d4ff;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        
-        #fireMode {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 5px;
-        }
-        
-        #minimap {
-            top: 20px;
-            right: 20px;
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid #00d4ff;
-            background: rgba(0, 20, 0, 0.8);
-        }
-        
-        #minimapCanvas {
-            width: 100%;
-            height: 100%;
-        }
-        
-        #inventory {
-            bottom: 20px;
-            left: 20px;
-            display: flex;
-            gap: 12px;
-            padding: 10px;
-        }
-        
-        .inv-slot {
-            width: 70px;
-            height: 70px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid #555;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            cursor: pointer;
-            transition: all 0.2s;
-            position: relative;
-        }
-        
-        .inv-slot.active {
-            border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-        }
-        
-        .inv-slot .count {
-            position: absolute;
-            bottom: 2px;
-            right: 5px;
-            font-size: 14px;
-            color: #fff;
-            font-weight: bold;
-        }
-        
-        #killFeed {
-            top: 220px;
-            right: 20px;
-            max-width: 350px;
-            max-height: 250px;
-            overflow: hidden;
-            padding: 10px;
-        }
-        
-        .kill-msg {
-            background: linear-gradient(90deg, rgba(255, 0, 0, 0.4), transparent);
-            padding: 8px 15px;
-            margin: 4px 0;
-            border-radius: 5px;
-            font-size: 14px;
-            border-left: 3px solid #ff4444;
-            animation: slideIn 0.4s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        #crosshair {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 40px;
-            height: 40px;
-            pointer-events: none;
-        }
-        
-        #crosshair::before, #crosshair::after {
-            content: '';
-            position: absolute;
-            background: rgba(0, 212, 255, 0.9);
-            box-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
-        }
-        
-        #crosshair::before {
-            width: 2px;
-            height: 20px;
-            left: 50%;
-            top: 10px;
-            transform: translateX(-50%);
-        }
-        
-        #crosshair::after {
-            width: 20px;
-            height: 2px;
-            top: 50%;
-            left: 10px;
-            transform: translateY(-50%);
-        }
-        
-        #crosshair-dot {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: #ff4444;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 8px #ff4444;
-        }
-        
-        #stormWarning {
-            position: absolute;
-            top: 30%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ff4444;
-            font-size: 48px;
-            font-weight: bold;
-            text-shadow: 0 0 30px rgba(255, 0, 0, 0.9);
-            display: none;
-            animation: pulse 1s infinite;
-            text-align: center;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.6; transform: translate(-50%, -50%) scale(1.15); }
-        }
-        
-        #menu {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background: rgba(0,0,0,0.5);
             z-index: 1000;
-            pointer-events: auto;
-        }
-        
-        .menu-title {
-            font-size: 72px;
-            color: #fff;
-            text-shadow: 0 0 40px rgba(0, 212, 255, 0.8), 0 0 80px rgba(0, 212, 255, 0.4);
-            margin-bottom: 50px;
-            font-weight: 900;
-            letter-spacing: 8px;
-            animation: glow 2s ease-in-out infinite;
-        }
-        
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 0 40px rgba(0, 212, 255, 0.8), 0 0 80px rgba(0, 212, 255, 0.4); }
-            50% { text-shadow: 0 0 60px rgba(0, 212, 255, 1), 0 0 120px rgba(0, 212, 255, 0.6); }
-        }
-        
-        .menu-btn {
-            padding: 20px 60px;
-            margin: 15px;
-            font-size: 24px;
-            background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-        }
-        
-        .menu-btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(0, 212, 255, 0.6);
-        }
-        
-        #planeUI {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 50%, #2d5016 100%);
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            z-index: 500;
-        }
-        
-        .plane-container {
-            width: 80%;
-            max-width: 800px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 40px;
-            border-radius: 20px;
-            border: 3px solid #00d4ff;
-        }
-        
-        .plane-path {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.2);
-            margin: 30px 0;
-            position: relative;
-            border-radius: 3px;
-        }
-        
-        .plane-icon {
-            position: absolute;
-            top: -25px;
-            font-size: 40px;
-            transition: left 0.1s;
-            filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.8));
-        }
-        
-        .jump-btn {
-            padding: 25px 80px;
-            font-size: 28px;
-            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
-            color: white;
-            border: none;
-            border-radius: 15px;
-            cursor: pointer;
-            margin-top: 30px;
-            font-weight: bold;
-            text-transform: uppercase;
-            box-shadow: 0 10px 30px rgba(255, 68, 68, 0.4);
-            transition: all 0.3s;
-        }
-        
-        .jump-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 15px 40px rgba(255, 68, 68, 0.6);
-        }
-        
-        #scopeOverlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, transparent 100px, rgba(0, 0, 0, 0.95) 200px);
-            display: none;
-            pointer-events: none;
-        }
-        
-        #scopeOverlay::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 2px;
-            height: 100%;
-            background: rgba(0, 212, 255, 0.3);
-            transform: translate(-50%, -50%);
-        }
-        
-        #scopeOverlay::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 100%;
-            height: 2px;
-            background: rgba(0, 212, 255, 0.3);
-            transform: translate(-50%, -50%);
-        }
-        
-        .damage-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, transparent 30%, rgba(255, 0, 0, 0.6) 100%);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        
-        #mobileControls {
-            display: none;
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            pointer-events: auto;
-        }
-        
-        .control-btn {
-            width: 100px;
-            height: 100px;
-            background: rgba(0, 212, 255, 0.3);
-            border: 3px solid rgba(0, 212, 255, 0.6);
-            border-radius: 50%;
-            margin: 15px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 36px;
-            touch-action: manipulation;
-            backdrop-filter: blur(5px);
-            transition: all 0.2s;
-        }
-        
-        .control-btn:active {
-            background: rgba(0, 212, 255, 0.6);
-            transform: scale(0.95);
-        }
-        
-        #joystick {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            width: 200px;
-            height: 200px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            display: none;
-            pointer-events: auto;
             backdrop-filter: blur(5px);
         }
         
-        #joystickKnob {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.8), rgba(0, 150, 200, 0.8));
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        #reloadIndicator {
-            position: absolute;
-            top: 60%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 100px;
-            height: 100px;
-            border: 5px solid rgba(255, 255, 255, 0.2);
-            border-top-color: #00d4ff;
-            border-radius: 50%;
-            display: none;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-        
-        .tutorial-box {
-            position: absolute;
-            bottom: 200px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.85);
-            color: #00d4ff;
-            padding: 20px 40px;
-            border-radius: 15px;
-            border: 2px solid #00d4ff;
-            font-size: 18px;
-            max-width: 700px;
-            text-align: center;
-            display: none;
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
-        }
-        
-        #fps {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #00ff00;
-            font-size: 16px;
-            font-family: monospace;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
-        
-        #playersLeft {
-            position: absolute;
-            top: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: #fff;
-            font-size: 18px;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 8px 20px;
-            border-radius: 20px;
-            border: 1px solid #00d4ff;
-        }
-        
-        .stat-bar {
+        .modal.active {
             display: flex;
             align-items: center;
-            margin: 5px 0;
+            justify-content: center;
         }
         
-        .stat-label {
-            width: 60px;
-            font-size: 14px;
-            color: #aaa;
+        .input-focus:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
     </style>
 </head>
-<body>
-    <div id="gameContainer"></div>
-    
-    <div id="ui">
-        <div id="fps">FPS: 60</div>
-        <div id="playersLeft">Kalan: 100</div>
-        
-        <div id="healthBar" class="hud-panel">
-            <div class="stat-bar">
-                <span class="stat-label">CAN</span>
-                <div class="bar-container">
-                    <div class="health-fill" id="healthFill"></div>
+<body class="bg-gray-50 text-gray-800">
+    <!-- Auth Modal -->
+    <div id="authModal" class="modal active">
+        <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-graduation-cap text-white text-2xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">AkademiAI'ye Hoş Geldiniz</h2>
+                <p class="text-gray-600 mt-2">Yapay zeka destekli eğitim platformu</p>
+            </div>
+            
+            <div id="loginForm">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">E-posta</label>
+                        <input type="email" id="loginEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all" placeholder="ornek@email.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Şifre</label>
+                        <input type="password" id="loginPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all" placeholder="••••••••">
+                    </div>
+                    <button onclick="login()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 rounded-lg font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all">
+                        Giriş Yap
+                    </button>
+                </div>
+                <p class="text-center mt-4 text-sm text-gray-600">
+                    Hesabınız yok mu? <button onclick="toggleAuthMode()" class="text-indigo-600 font-medium hover:underline">Kaydol</button>
+                </p>
+            </div>
+            
+            <div id="registerForm" class="hidden">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Ad Soyad</label>
+                        <input type="text" id="regName" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all" placeholder="Adınız Soyadınız">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">E-posta</label>
+                        <input type="email" id="regEmail" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all" placeholder="ornek@email.com">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Şifre</label>
+                        <input type="password" id="regPassword" class="w-full px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all" placeholder="••••••••">
+                    </div>
+                    <button onclick="register()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2 rounded-lg font-medium hover:shadow-lg transform hover:scale-[1.02] transition-all">
+                        Kaydol
+                    </button>
+                </div>
+                <p class="text-center mt-4 text-sm text-gray-600">
+                    Zaten hesabınız var mı? <button onclick="toggleAuthMode()" class="text-indigo-600 font-medium hover:underline">Giriş Yap</button>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="mainApp" class="hidden min-h-screen flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white shadow-xl fixed h-full z-40 overflow-y-auto">
+            <div class="p-6 border-b">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-graduation-cap text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg text-gray-800">AkademiAI</h1>
+                        <p class="text-xs text-gray-500">AI Destekli Eğitim</p>
+                    </div>
                 </div>
             </div>
-            <div class="stat-bar">
-                <span class="stat-label">ZIRH</span>
-                <div class="bar-container">
-                    <div class="armor-fill" id="armorFill"></div>
+            
+            <nav class="p-4 space-y-1">
+                <button onclick="showSection('dashboard')" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left">
+                    <i class="fas fa-home w-5"></i>
+                    <span>Ana Sayfa</span>
+                </button>
+                <button onclick="showSection('math')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left">
+                    <i class="fas fa-calculator w-5"></i>
+                    <span>Matematik</span>
+                </button>
+                <button onclick="showSection('science')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left">
+                    <i class="fas fa-flask w-5"></i>
+                    <span>Fen Bilimleri</span>
+                </button>
+                <button onclick="showSection('geography')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left">
+                    <i class="fas fa-globe-americas w-5"></i>
+                    <span>Coğrafya</span>
+                </button>
+                <button onclick="showSection('history')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left">
+                    <i class="fas fa-landmark w-5"></i>
+                    <span>Tarih</span>
+                </button>
+                <button onclick="showSection('turkish')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left">
+                    <i class="fas fa-book w-5"></i>
+                    <span>Türkçe</span>
+                </button>
+                <button onclick="showSection('ai-tutor')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left">
+                    <i class="fas fa-robot w-5"></i>
+                    <span>AI Özel Ders</span>
+                </button>
+                <button onclick="showSection('music')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left">
+                    <i class="fas fa-music w-5"></i>
+                    <span>Çalma Listem</span>
+                </button>
+            </nav>
+            
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t bg-gray-50">
+                <div class="flex items-center gap-3 mb-3">
+                    <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=6366f1&color=fff" class="w-10 h-10 rounded-full">
+                    <div class="flex-1 min-w-0">
+                        <p id="userName" class="font-medium text-gray-800 truncate">Kullanıcı</p>
+                        <p class="text-xs text-gray-500">Öğrenci</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full flex items-center gap-2 text-red-600 hover:bg-red-50 px-3 py-2 rounded-lg transition-all">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Çıkış Yap</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64">
+            <!-- Header -->
+            <header class="bg-white shadow-sm sticky top-0 z-30 px-8 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <h2 id="pageTitle" class="text-2xl font-bold text-gray-800">Ana Sayfa</h2>
+                        <span id="currentDate" class="text-sm text-gray-500"></span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button onclick="toggleMusicPlayer()" class="relative p-2 text-gray-600 hover:text-indigo-600 transition-all">
+                            <i class="fas fa-music text-xl"></i>
+                            <span id="musicIndicator" class="hidden absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></span>
+                        </button>
+                        <button class="relative p-2 text-gray-600 hover:text-indigo-600 transition-all">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Sections -->
+            <div class="p-8">
+                <!-- Dashboard -->
+                <div id="dashboard-section" class="section-content">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <p class="text-indigo-100 text-sm">Toplam Çalışma</p>
+                                    <h3 class="text-3xl font-bold">124 Saat</h3>
+                                </div>
+                                <div class="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-clock text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-indigo-100">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Bu hafta +12 saat</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl p-6 shadow-lg card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <p class="text-gray-500 text-sm">Tamamlanan Konular</p>
+                                    <h3 class="text-3xl font-bold text-gray-800">48</h3>
+                                </div>
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: 65%"></div>
+                            </div>
+                            <p class="text-sm text-gray-500 mt-2">Hedef: 75 konu</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl p-6 shadow-lg card-hover">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <p class="text-gray-500 text-sm">AI Sohbetleri</p>
+                                    <h3 class="text-3xl font-bold text-gray-800">256</h3>
+                                </div>
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-robot text-blue-600 text-2xl"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <i class="fas fa-comment-dots"></i>
+                                <span>Son: 5 dakika önce</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Devam Eden Konular</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer">
+                                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-calculator text-indigo-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-gray-800">Türev ve Uygulamaları</h4>
+                                        <p class="text-sm text-gray-500">Matematik • 12. Sınıf</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-medium text-indigo-600">%75</p>
+                                        <div class="w-20 bg-gray-200 rounded-full h-1.5 mt-1">
+                                            <div class="bg-indigo-600 h-1.5 rounded-full" style="width: 75%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer">
+                                    <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-flask text-green-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-gray-800">Hücre Biyolojisi</h4>
+                                        <p class="text-sm text-gray-500">Biyoloji • 11. Sınıf</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-medium text-green-600">%45</p>
+                                        <div class="w-20 bg-gray-200 rounded-full h-1.5 mt-1">
+                                            <div class="bg-green-500 h-1.5 rounded-full" style="width: 45%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all cursor-pointer">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                        <i class="fas fa-globe-americas text-blue-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-gray-800">İklim Tipleri</h4>
+                                        <p class="text-sm text-gray-500">Coğrafya • 10. Sınıf</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-medium text-blue-600">%30</p>
+                                        <div class="w-20 bg-gray-200 rounded-full h-1.5 mt-1">
+                                            <div class="bg-blue-500 h-1.5 rounded-full" style="width: 30%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Günlük Görevler</h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-all cursor-pointer">
+                                    <input type="checkbox" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500">
+                                    <span class="flex-1">Matematik çalışması (45 dk)</span>
+                                    <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded">Orta</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-all cursor-pointer">
+                                    <input type="checkbox" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" checked>
+                                    <span class="flex-1 line-through text-gray-400">Fen bilgisi tekrarı</span>
+                                    <span class="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Tamamlandı</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-all cursor-pointer">
+                                    <input type="checkbox" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500">
+                                    <span class="flex-1">AI özel dersten 3 soru sor</span>
+                                    <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded">Yüksek</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-all cursor-pointer">
+                                    <input type="checkbox" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500">
+                                    <span class="flex-1">Coğrafya harita çalışması</span>
+                                    <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">Kolay</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Math Section -->
+                <div id="math-section" class="section-content hidden">
+                    <div class="mb-6">
+                        <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                            <button onclick="filterTopics('all')" class="topic-badge px-4 py-2 bg-indigo-600 text-white rounded-full text-sm font-medium">Tümü</button>
+                            <button onclick="filterTopics('algebra')" class="topic-badge px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium">Cebir</button>
+                            <button onclick="filterTopics('geometry')" class="topic-badge px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium">Geometri</button>
+                            <button onclick="filterTopics('analysis')" class="topic-badge px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium">Analiz</button>
+                            <button onclick="filterTopics('statistics')" class="topic-badge px-4 py-2 bg-gray-200 text-gray-700 rounded-full text-sm font-medium">İstatistik</button>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="mathTopics">
+                        <!-- Math topics will be populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Science Section -->
+                <div id="science-section" class="section-content hidden">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-gradient-to-br from-green-500 to-teal-600 rounded-2xl p-6 text-white card-hover cursor-pointer" onclick="showScienceSubject('physics')">
+                            <i class="fas fa-atom text-4xl mb-4"></i>
+                            <h3 class="text-xl font-bold">Fizik</h3>
+                            <p class="text-green-100 mt-2">Mekanik, Elektrik, Manyetizma</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-2xl p-6 text-white card-hover cursor-pointer" onclick="showScienceSubject('chemistry')">
+                            <i class="fas fa-flask text-4xl mb-4"></i>
+                            <h3 class="text-xl font-bold">Kimya</h3>
+                            <p class="text-blue-100 mt-2">Organik, Anorganik, Fizikokimya</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-6 text-white card-hover cursor-pointer" onclick="showScienceSubject('biology')">
+                            <i class="fas fa-dna text-4xl mb-4"></i>
+                            <h3 class="text-xl font-bold">Biyoloji</h3>
+                            <p class="text-purple-100 mt-2">Hücre, Genetik, Ekoloji</p>
+                        </div>
+                    </div>
+                    
+                    <div id="scienceContent" class="bg-white rounded-2xl shadow-lg p-6">
+                        <p class="text-center text-gray-500 py-12">Konu seçmek için yukarıdaki kartlara tıklayın</p>
+                    </div>
+                </div>
+
+                <!-- Geography Section -->
+                <div id="geography-section" class="section-content hidden">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden mb-6">
+                        <div class="p-6 border-b">
+                            <h3 class="text-lg font-bold text-gray-800">Türkiye Haritası - İklim ve Bitki Örtüsü</h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="relative bg-blue-50 rounded-xl p-8 min-h-[400px] flex items-center justify-center">
+                                <div class="text-center">
+                                    <i class="fas fa-map-marked-alt text-6xl text-blue-300 mb-4"></i>
+                                    <p class="text-gray-600">Etkileşimli harita burada görüntülenecek</p>
+                                    <button class="mt-4 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all">
+                                        Haritayı Aç
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-gray-800 mb-4">İklim Tipleri</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3 p-3 bg-red-50 rounded-lg">
+                                    <div class="w-4 h-4 bg-red-500 rounded-full"></div>
+                                    <span class="flex-1">Akdeniz İklimi</span>
+                                    <button class="text-indigo-600 hover:underline text-sm">Detay</button>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+                                    <div class="w-4 h-4 bg-green-500 rounded-full"></div>
+                                    <span class="flex-1">Karadeniz İklimi</span>
+                                    <button class="text-indigo-600 hover:underline text-sm">Detay</button>
+                                </div>
+                                <div class="flex items-center gap-3 p-3 bg-yellow-50 rounded-lg">
+                                    <div class="w-4 h-4 bg-yellow-500 rounded-full"></div>
+                                    <span class="flex-1">Karasal İklim</span>
+                                    <button class="text-indigo-600 hover:underline text-sm">Detay</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="font-bold text-gray-800 mb-4">Nüfus Dağılımı</h3>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm text-gray-600">İstanbul</span>
+                                        <span class="text-sm font-medium">%15.6</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-indigo-600 h-2 rounded-full" style="width: 15.6%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm text-gray-600">Ankara</span>
+                                        <span class="text-sm font-medium">%5.3</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-indigo-600 h-2 rounded-full" style="width: 5.3%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm text-gray-600">İzmir</span>
+                                        <span class="text-sm font-medium">%4.2</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-indigo-600 h-2 rounded-full" style="width: 4.2%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Section -->
+                <div id="history-section" class="section-content hidden">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">Tarih Zaman Çizelgesi</h3>
+                        <div class="relative">
+                            <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-indigo-200"></div>
+                            <div class="space-y-6">
+                                <div class="flex gap-4">
+                                    <div class="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold z-10">1453</div>
+                                    <div class="flex-1 bg-gray-50 p-4 rounded-lg">
+                                        <h4 class="font-bold text-gray-800">İstanbul'un Fethi</h4>
+                                        <p class="text-gray-600 mt-1">Fatih Sultan Mehmet tarafından Bizans İmparatorluğu'nun sona erdirilmesi.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="w-16 h-16 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold z-10">1923</div>
+                                    <div class="flex-1 bg-gray-50 p-4 rounded-lg">
+                                        <h4 class="font-bold text-gray-800">Cumhuriyetin İlanı</h4>
+                                        <p class="text-gray-600 mt-1">Mustafa Kemal Atatürk önderliğinde Türkiye Cumhuriyeti'nin kuruluşu.</p>
+                                    </div>
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="w-16 h-16 bg-indigo-400 rounded-full flex items-center justify-center text-white font-bold z-10">1982</div>
+                                    <div class="flex-1 bg-gray-50 p-4 rounded-lg">
+                                        <h4 class="font-bold text-gray-800">Anayasa Kabulü</h4>
+                                        <p class="text-gray-600 mt-1">Türkiye Cumhuriyeti Anayasası'nın kabul edilmesi.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Turkish Section -->
+                <div id="turkish-section" class="section-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Dil Bilgisi</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <button class="p-4 bg-gray-50 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all text-left">
+                                    <i class="fas fa-spell-check mb-2 text-xl"></i>
+                                    <p class="font-medium">Yazım Kuralları</p>
+                                </button>
+                                <button class="p-4 bg-gray-50 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all text-left">
+                                    <i class="fas fa-book-open mb-2 text-xl"></i>
+                                    <p class="font-medium">Noktalama İşaretleri</p>
+                                </button>
+                                <button class="p-4 bg-gray-50 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all text-left">
+                                    <i class="fas fa-language mb-2 text-xl"></i>
+                                    <p class="font-medium">Sözcükte Anlam</p>
+                                </button>
+                                <button class="p-4 bg-gray-50 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-all text-left">
+                                    <i class="fas fa-paragraph mb-2 text-xl"></i>
+                                    <p class="font-medium">Cümlede Anlam</p>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl shadow-lg p-6">
+                            <h3 class="text-lg font-bold text-gray-800 mb-4">Paragraf Analizi</h3>
+                            <div class="bg-gray-50 p-4 rounded-xl mb-4">
+                                <p class="text-gray-700 leading-relaxed">
+                                    "Türkçe, dünyanın en zengin dillerinden biridir. Sözcük haznesi geniş, gramer kuralları esnek ve ifade gücü yüksektir..."
+                                </p>
+                            </div>
+                            <div class="space-y-2">
+                                <button class="w-full text-left p-3 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3">
+                                    <span class="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">A</span>
+                                    <span>Ana fikir nedir?</span>
+                                </button>
+                                <button class="w-full text-left p-3 rounded-lg hover:bg-gray-100 transition-all flex items-center gap-3">
+                                    <span class="w-6 h-6 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-bold">B</span>
+                                    <span>Yazarın amacı nedir?</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Tutor Section -->
+                <div id="ai-tutor-section" class="section-content hidden">
+                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden h-[calc(100vh-200px)] flex flex-col">
+                        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 text-white flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="relative">
+                                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-robot"></i>
+                                    </div>
+                                    <div class="pulse-ring"></div>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold">AI Özel Öğretmen</h3>
+                                    <p class="text-xs text-indigo-100">Çevrimiçi • Türkçe</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="clearChat()" class="p-2 hover:bg-white/20 rounded-lg transition-all" title="Sohbeti Temizle">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                            <div class="chat-message flex gap-3">
+                                <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                                    <i class="fas fa-robot text-sm"></i>
+                                </div>
+                                <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[80%]">
+                                    <p class="text-gray-800">Merhaba! Ben senin AI özel öğretmeninim. Matematik, fen bilimleri, coğrafya, tarih veya Türkçe hakkında soruların varsa bana sorabilirsin. 🎓</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-4 bg-white border-t">
+                            <div class="flex gap-2 mb-3 overflow-x-auto">
+                                <button onclick="quickQuestion('Matematikte türev nedir?')" class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 transition-all whitespace-nowrap">
+                                    Türev nedir?
+                                </button>
+                                <button onclick="quickQuestion('Fotosentez nasıl gerçekleşir?')" class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 transition-all whitespace-nowrap">
+                                    Fotosentez?
+                                </button>
+                                <button onclick="quickQuestion('Türkiye'nin en yüksek dağı hangisidir?')" class="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600 hover:bg-indigo-100 hover:text-indigo-600 transition-all whitespace-nowrap">
+                                    En yüksek dağ?
+                                </button>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="chatInput" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg input-focus transition-all" placeholder="Sorunuzu yazın..." onkeypress="handleKeyPress(event)">
+                                <button onclick="sendMessage()" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all flex items-center gap-2">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span class="hidden sm:inline">Gönder</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Music Section -->
+                <div id="music-section" class="section-content hidden">
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-bold text-gray-800">Çalma Listem</h3>
+                            <button onclick="openYouTubeMusic()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all flex items-center gap-2">
+                                <i class="fab fa-youtube"></i>
+                                YouTube Music'i Aç
+                            </button>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="playlistContainer">
+                            <!-- Playlist items will be populated by JS -->
+                        </div>
+                    </div>
                 </div>
             </div>
+        </main>
+    </div>
+
+    <!-- Music Player Floating Bar -->
+    <div id="musicPlayer" class="fixed bottom-4 right-4 bg-white rounded-2xl shadow-2xl p-4 w-80 transform translate-y-full transition-transform duration-300 z-50">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg flex items-center justify-center text-white">
+                <i class="fab fa-youtube text-xl"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h4 class="font-medium text-gray-800 truncate">YouTube Music</h4>
+                <p class="text-sm text-gray-500 truncate">Çalma Listesi</p>
+            </div>
+            <button onclick="toggleMusicPlayer()" class="text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         
-        <div id="ammoCounter" class="hud-panel">
-            <div id="currentAmmo">30</div>
-            <div id="totalAmmo">120</div>
+        <div class="flex items-center justify-center gap-4 mb-3">
+            <button class="text-gray-600 hover:text-indigo-600 transition-all">
+                <i class="fas fa-step-backward"></i>
+            </button>
+            <button onclick="togglePlay()" id="playBtn" class="w-12 h-12 bg-indigo-600 text-white rounded-full flex items-center justify-center hover:bg-indigo-700 transition-all">
+                <i class="fas fa-play"></i>
+            </button>
+            <button class="text-gray-600 hover:text-indigo-600 transition-all">
+                <i class="fas fa-step-forward"></i>
+            </button>
         </div>
         
-        <div id="minimap" class="hud-panel">
-            <canvas id="minimapCanvas"></canvas>
+        <div class="flex items-center justify-center gap-1 h-8" id="visualizer">
+            <div class="music-bar"></div>
+            <div class="music-bar"></div>
+            <div class="music-bar"></div>
+            <div class="music-bar"></div>
+            <div class="music-bar"></div>
         </div>
         
-        <div id="weaponInfo" class="hud-panel">
-            <div id="weaponName">M416</div>
-            <div id="fireMode">OTOMATIK</div>
-        </div>
-        
-        <div id="inventory" class="hud-panel">
-            <div class="inv-slot active" data-weapon="0">🔫<span class="count"></span></div>
-            <div class="inv-slot" data-weapon="1">🔫<span class="count"></span></div>
-            <div class="inv-slot" data-weapon="2">💊<span class="count">3</span></div>
-            <div class="inv-slot" data-weapon="3">🛡️<span class="count">1</span></div>
-        </div>
-        
-        <div id="killFeed" class="hud-panel"></div>
-        
-        <div id="crosshair">
-            <div id="crosshair-dot"></div>
-        </div>
-        
-        <div id="stormWarning">⚠️ FIRTINA YAKLAŞIYOR! ⚠️</div>
-        
-        <div class="damage-overlay" id="damageOverlay"></div>
-        
-        <div id="reloadIndicator"></div>
-        
-        <div id="joystick">
-            <div id="joystickKnob"></div>
-        </div>
-        
-        <div id="mobileControls">
-            <div class="control-btn" id="shootBtn">🔥</div>
-            <div class="control-btn" id="aimBtn">👁️</div>
-            <div class="control-btn" id="jumpBtn">⬆️</div>
-        </div>
-        
-        <div class="tutorial-box" id="tutorialBox">
-            WASD: Hareket | Mouse: Bak/Nişan | Sol Click: Ateş | Sağ Click: Nişan | R: Şarjör | 1-4: Eşya
+        <div class="mt-3 pt-3 border-t">
+            <p class="text-xs text-gray-500 text-center">YouTube Music'e bağlanmak için tıklayın</p>
         </div>
     </div>
-    
-    <div id="menu">
-        <div class="menu-title">🔥 BATTLE ROYALE 3D 🔥</div>
-        <button class="menu-btn" onclick="startTraining()">🎯 EĞİTİM MODU</button>
-        <button class="menu-btn" onclick="startBattle()">⚔️ SAVAŞ MODU</button>
-        <button class="menu-btn" onclick="showSettings()">⚙️ AYARLAR</button>
-        <div style="margin-top: 30px; color: #888; font-size: 16px;">
-            Three.js WebGL | Akıllı Tahta & PC Uyumlu | Dokunmatik Destekli
-        </div>
-    </div>
-    
-    <div id="planeUI">
-        <div class="plane-container">
-            <h2 style="font-size: 36px; margin-bottom: 20px; text-align: center;">✈️ UÇAKTAN ATLA!</h2>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                <span>Başlangıç</span>
-                <span>Harita</span>
-            </div>
-            <div class="plane-path">
-                <div class="plane-icon" id="planeIcon">✈️</div>
-            </div>
-            <div style="text-align: center; margin-top: 20px; color: #aaa;">
-                İniş noktanızı seçmek için bekleyin veya hemen atlayın!
-            </div>
-            <button class="jump-btn" onclick="jumpFromPlane()">🪂 ATLA!</button>
-        </div>
-    </div>
-    
-    <div id="scopeOverlay"></div>
 
     <script>
-        // Three.js değişkenleri
-        let scene, camera, renderer;
-        let worldMesh, waterMesh;
-        let playerMesh, playerMixer;
-        let enemies = [];
-        let bullets = [];
-        let lootBoxes = [];
-        let buildings = [];
-        let trees = [];
-        let particles = [];
-        let muzzleLights = [];
-        
-        // Oyun değişkenleri
-        const worldSize = 4000;
-        const worldSizeHalf = worldSize / 2;
-        let gameMode = 'menu';
-        let gameRunning = false;
-        let lastTime = 0;
-        let gameTime = 0;
-        let frameCount = 0;
-        let lastFpsTime = 0;
-        
-        // Oyuncu
-        const player = {
-            x: 0,
-            y: 0,
-            z: 0,
-            vx: 0,
-            vy: 0,
-            rotation: 0,
-            pitch: 0,
-            health: 100,
-            maxHealth: 100,
-            armor: 0,
-            maxArmor: 100,
-            speed: 300,
-            sprintSpeed: 500,
-            isSprinting: false,
-            inPlane: false,
-            isParachuting: false,
-            isAiming: false,
-            isShooting: false,
-            isReloading: false,
-            isCrouching: false,
-            currentWeapon: 0,
-            weapons: [
-                { name: 'M416', damage: 35, fireRate: 100, ammo: 30, maxAmmo: 30, totalAmmo: 120, range: 600, automatic: true, recoil: 0.02 },
-                { name: 'AKM', damage: 45, fireRate: 150, ammo: 0, maxAmmo: 30, totalAmmo: 0, range: 500, automatic: true, recoil: 0.03 },
-                { name: 'AWP', damage: 100, fireRate: 1200, ammo: 0, maxAmmo: 5, totalAmmo: 0, range: 1200, automatic: false, scoped: true, recoil: 0.08 },
-                { name: 'POMPALI', damage: 85, fireRate: 800, ammo: 0, maxAmmo: 8, totalAmmo: 0, range: 200, automatic: false, pellets: 6, recoil: 0.05 }
-            ],
-            medkits: 3,
-            armorKits: 1,
-            kills: 0,
-            lastShot: 0,
-            height: 10
+        // Global Variables
+        let currentUser = null;
+        let isPlaying = false;
+        let chatHistory = [];
+
+        // Math Topics Data
+        const mathTopics = [
+            { id: 1, title: "Limit ve Süreklilik", category: "analysis", progress: 85, icon: "fa-chart-line", color: "blue" },
+            { id: 2, title: "Türev ve Uygulamaları", category: "analysis", progress: 75, icon: "fa-wave-square", color: "indigo" },
+            { id: 3, title: "İntegral ve Uygulamaları", category: "analysis", progress: 60, icon: "fa-area-chart", color: "purple" },
+            { id: 4, title: "Trigonometri", category: "geometry", progress: 90, icon: "fa-draw-polygon", color: "green" },
+            { id: 5, title: "Analitik Geometri", category: "geometry", progress: 70, icon: "fa-shapes", color: "yellow" },
+            { id: 6, title: "Sayı Basamakları", category: "algebra", progress: 95, icon: "fa-sort-numeric-up", color: "red" },
+            { id: 7, title: "Polinomlar", category: "algebra", progress: 80, icon: "fa-superscript", color: "pink" },
+            { id: 8, title: "Olasılık ve İstatistik", category: "statistics", progress: 65, icon: "fa-dice", color: "teal" }
+        ];
+
+        // Science Content Data
+        const scienceContent = {
+            physics: {
+                title: "Fizik Konuları",
+                topics: ["Kuvvet ve Hareket", "Elektrostatik", "Manyetizma", "Dalgalar", "Optik"]
+            },
+            chemistry: {
+                title: "Kimya Konuları",
+                topics: ["Atom ve Periyodik Sistem", "Kimyasal Bağlar", "Asit-Baz", "Organik Kimya", "Termokimya"]
+            },
+            biology: {
+                title: "Biyoloji Konuları",
+                topics: ["Hücre Biyolojisi", "Ekosistem Ekolojisi", "Genetik", "İnsan Fizyolojisi", "Bitki Biyolojisi"]
+            }
         };
-        
-        // Storm
-        const storm = {
-            centerX: 0,
-            centerY: 0,
-            radius: worldSizeHalf,
-            targetRadius: worldSizeHalf,
-            shrinkTime: 0,
-            damage: 10,
-            nextShrink: 90
-        };
-        
-        // Input
-        const keys = {};
-        const mouse = { x: 0, y: 0, down: false, rightDown: false, locked: false };
-        const joystick = { active: false, dx: 0, dy: 0 };
-        
-        // Raycaster
-        const raycaster = new THREE.Raycaster();
-        const mouseVector = new THREE.Vector2();
-        
-        // Eğitim
-        let trainingStep = 0;
-        let trainingTargets = [];
-        
-        // Minimap
-        const minimapCanvas = document.getElementById('minimapCanvas');
-        const minimapCtx = minimapCanvas.getContext('2d');
-        
-        // Ses
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const audioCtx = new AudioContext();
-        
-        function init() {
-            // Sahne
-            scene = new THREE.Scene();
-            scene.fog = new THREE.Fog(0x87CEEB, 100, 800);
+
+        // Music Playlist
+        const playlist = [
+            { title: "Lo-Fi Study Beats", artist: "Chill Hop", duration: "45:20", type: "study" },
+            { title: "Klasik Müzik Toplulukları", artist: "Mozart, Beethoven", duration: "62:15", type: "classical" },
+            { title: "Nature Sounds", artist: "Relaxation", duration: "30:00", type: "nature" },
+            { title: "Piano Study Music", artist: "Focus Music", duration: "55:30", type: "study" },
+            { title: "Beyaz Gürültü", artist: "Concentration", duration: "120:00", type: "focus" },
+            { title: "Türkçe Çalma Listesi", artist: "Çeşitli Sanatçılar", duration: "48:45", type: "turkish" }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDate();
+            populateMathTopics();
+            populatePlaylist();
             
-            // Kamera
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
-            
-            // Renderer
-            renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.shadowMap.enabled = true;
-            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-            document.getElementById('gameContainer').appendChild(renderer.domElement);
-            
-            // Işıklar
-            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
-            scene.add(ambientLight);
-            
-            const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-            dirLight.position.set(500, 1000, 500);
-            dirLight.castShadow = true;
-            dirLight.shadow.mapSize.width = 2048;
-            dirLight.shadow.mapSize.height = 2048;
-            dirLight.shadow.camera.near = 0.5;
-            dirLight.shadow.camera.far = 2000;
-            dirLight.shadow.camera.left = -worldSizeHalf;
-            dirLight.shadow.camera.right = worldSizeHalf;
-            dirLight.shadow.camera.top = worldSizeHalf;
-            dirLight.shadow.camera.bottom = -worldSizeHalf;
-            scene.add(dirLight);
-            
-            // Dünya oluştur
-            generateWorld();
-            
-            // Oyuncu mesh
-            createPlayerMesh();
-            
-            // Event listeners
-            setupInputs();
-            
-            // Mobil kontrol
-            setupMobileControls();
-            
-            // Başlat
-            animate();
-        }
-        
-        function generateWorld() {
-            // Zemin - Procedural terrain
-            const geometry = new THREE.PlaneGeometry(worldSize, worldSize, 128, 128);
-            const simplex = new SimplexNoise();
-            
-            const positions = geometry.attributes.position;
-            for (let i = 0; i < positions.count; i++) {
-                const x = positions.getX(i);
-                const y = positions.getY(i);
-                // Tepeler ve vadiler
-                let height = simplex.noise2D(x * 0.001, y * 0.001) * 30;
-                height += simplex.noise2D(x * 0.005, y * 0.005) * 10;
-                positions.setZ(i, height);
+            // Check if user is logged in (simulated)
+            if (localStorage.getItem('akademiAI_user')) {
+                currentUser = JSON.parse(localStorage.getItem('akademiAI_user'));
+                showMainApp();
             }
-            
-            geometry.computeVertexNormals();
-            
-            const material = new THREE.MeshStandardMaterial({
-                color: 0x3d5c3d,
-                roughness: 0.9,
-                metalness: 0.1,
-                flatShading: false
-            });
-            
-            worldMesh = new THREE.Mesh(geometry, material);
-            worldMesh.rotation.x = -Math.PI / 2;
-            worldMesh.receiveShadow = true;
-            scene.add(worldMesh);
-            
-            // Su
-            const waterGeo = new THREE.PlaneGeometry(worldSize, worldSize);
-            const waterMat = new THREE.MeshStandardMaterial({
-                color: 0x006994,
-                transparent: true,
-                opacity: 0.7,
-                roughness: 0.1
-            });
-            waterMesh = new THREE.Mesh(waterGeo, waterMat);
-            waterMesh.rotation.x = -Math.PI / 2;
-            waterMesh.position.y = -15;
-            scene.add(waterMesh);
-            
-            // Binalar
-            for (let i = 0; i < 50; i++) {
-                const x = (Math.random() - 0.5) * worldSize * 0.8;
-                const z = (Math.random() - 0.5) * worldSize * 0.8;
-                const height = 20 + Math.random() * 40;
-                const width = 30 + Math.random() * 40;
-                const depth = 30 + Math.random() * 40;
-                
-                const buildingGeo = new THREE.BoxGeometry(width, height, depth);
-                const buildingMat = new THREE.MeshStandardMaterial({
-                    color: new THREE.Color().setHSL(0.1, 0.3, 0.3 + Math.random() * 0.2),
-                    roughness: 0.8
-                });
-                
-                const building = new THREE.Mesh(buildingGeo, buildingMat);
-                building.position.set(x, height / 2, z);
-                building.castShadow = true;
-                building.receiveShadow = true;
-                
-                // Pencere detayları
-                for (let j = 0; j < 3; j++) {
-                    for (let k = 0; k < 4; k++) {
-                        const windowGeo = new THREE.PlaneGeometry(4, 6);
-                        const windowMat = new THREE.MeshStandardMaterial({
-                            color: 0x87CEEB,
-                            emissive: 0x112244,
-                            roughness: 0.2
-                        });
-                        const window = new THREE.Mesh(windowGeo, windowMat);
-                        window.position.set(
-                            (j - 1) * 10,
-                            5 + k * 8,
-                            depth / 2 + 0.1
-                        );
-                        building.add(window);
-                    }
-                }
-                
-                scene.add(building);
-                buildings.push({
-                    mesh: building,
-                    x: x, z: z,
-                    width: width, depth: depth,
-                    height: height
-                });
-            }
-            
-            // Ağaçlar - InstancedMesh ile optimizasyon
-            const treeCount = 300;
-            const trunkGeo = new THREE.CylinderGeometry(1, 2, 8, 6);
-            const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4a3728 });
-            const leavesGeo = new THREE.ConeGeometry(8, 20, 8);
-            const leavesMat = new THREE.MeshStandardMaterial({ color: 0x2d5016 });
-            
-            for (let i = 0; i < treeCount; i++) {
-                const x = (Math.random() - 0.5) * worldSize * 0.9;
-                const z = (Math.random() - 0.5) * worldSize * 0.9;
-                
-                // Bina çarpışma kontrolü
-                let clear = true;
-                for (let b of buildings) {
-                    if (Math.abs(x - b.x) < b.width && Math.abs(z - b.z) < b.depth) {
-                        clear = false;
-                        break;
-                    }
-                }
-                
-                if (clear) {
-                    const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-                    trunk.position.set(x, 4, z);
-                    trunk.castShadow = true;
-                    
-                    const leaves = new THREE.Mesh(leavesGeo, leavesMat);
-                    leaves.position.set(0, 14, 0);
-                    leaves.castShadow = true;
-                    trunk.add(leaves);
-                    
-                    scene.add(trunk);
-                    trees.push({ mesh: trunk, x: x, z: z, radius: 8 });
-                }
-            }
-            
-            // Loot kutuları
-            for (let i = 0; i < 80; i++) {
-                const x = (Math.random() - 0.5) * worldSize * 0.8;
-                const z = (Math.random() - 0.5) * worldSize * 0.8;
-                
-                const boxGeo = new THREE.BoxGeometry(8, 6, 8);
-                const boxMat = new THREE.MeshStandardMaterial({
-                    color: 0xff6600,
-                    emissive: 0xff2200,
-                    emissiveIntensity: 0.3
-                });
-                
-                const box = new THREE.Mesh(boxGeo, boxMat);
-                box.position.set(x, 3, z);
-                box.castShadow = true;
-                
-                // Işık efekti
-                const light = new THREE.PointLight(0xff6600, 1, 20);
-                light.position.set(0, 5, 0);
-                box.add(light);
-                
-                scene.add(box);
-                lootBoxes.push({
-                    mesh: box,
-                    x: x, z: z,
-                    items: generateLoot(),
-                    opened: false,
-                    light: light
-                });
-            }
-            
-            // Eğitim hedefleri
-            for (let i = 0; i < 8; i++) {
-                const targetGeo = new THREE.CylinderGeometry(0, 15, 30, 8);
-                const targetMat = new THREE.MeshStandardMaterial({
-                    color: 0xff0000,
-                    emissive: 0x440000
-                });
-                const target = new THREE.Mesh(targetGeo, targetMat);
-                target.position.set(
-                    (Math.random() - 0.5) * 400,
-                    15,
-                    (Math.random() - 0.5) * 400
-                );
-                target.castShadow = true;
-                scene.add(target);
-                trainingTargets.push({
-                    mesh: target,
-                    x: target.position.x,
-                    z: target.position.z,
-                    health: 100,
-                    active: true
-                });
-            }
-        }
-        
-        function createPlayerMesh() {
-            // Basit karakter modeli
-            const group = new THREE.Group();
-            
-            // Vücut
-            const bodyGeo = new THREE.BoxGeometry(8, 20, 4);
-            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x4a9eff });
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
-            body.position.y = 10;
-            body.castShadow = true;
-            group.add(body);
-            
-            // Kafa
-            const headGeo = new THREE.BoxGeometry(6, 6, 6);
-            const headMat = new THREE.MeshStandardMaterial({ color: 0xffccaa });
-            const head = new THREE.Mesh(headGeo, headMat);
-            head.position.y = 23;
-            head.castShadow = true;
-            group.add(head);
-            
-            // Silah tutacağı
-            const gunGroup = new THREE.Group();
-            gunGroup.position.set(5, 12, 4);
-            group.add(gunGroup);
-            
-            playerMesh = group;
-            playerMesh.userData.gun = gunGroup;
-            scene.add(playerMesh);
-        }
-        
-        function createEnemyMesh() {
-            const group = new THREE.Group();
-            
-            const bodyGeo = new THREE.BoxGeometry(8, 20, 4);
-            const bodyMat = new THREE.MeshStandardMaterial({ color: 0xd32f2f });
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
-            body.position.y = 10;
-            body.castShadow = true;
-            group.add(body);
-            
-            const headGeo = new THREE.BoxGeometry(6, 6, 6);
-            const headMat = new THREE.MeshStandardMaterial({ color: 0xffccaa });
-            const head = new THREE.Mesh(headGeo, headMat);
-            head.position.y = 23;
-            group.add(head);
-            
-            return group;
-        }
-        
-        function generateLoot() {
-            const items = [];
-            const rand = Math.random();
-            
-            if (rand < 0.25) {
-                items.push({ type: 'weapon', id: 1, ammo: 30 });
-            } else if (rand < 0.4) {
-                items.push({ type: 'weapon', id: 2, ammo: 5 });
-            } else if (rand < 0.55) {
-                items.push({ type: 'weapon', id: 3, ammo: 8 });
-            }
-            
-            if (Math.random() < 0.6) {
-                items.push({ type: 'ammo', amount: 30 + Math.floor(Math.random() * 30) });
-            }
-            if (Math.random() < 0.4) {
-                items.push({ type: 'medkit' });
-            }
-            if (Math.random() < 0.25) {
-                items.push({ type: 'armor' });
-            }
-            
-            return items;
-        }
-        
-        function setupInputs() {
-            // Klavye
-            window.addEventListener('keydown', e => {
-                keys[e.key.toLowerCase()] = true;
-                handleKey(e.key.toLowerCase());
-            });
-            
-            window.addEventListener('keyup', e => {
-                keys[e.key.toLowerCase()] = false;
-                if (e.key === 'Shift') {
-                    player.isSprinting = false;
-                }
-            });
-            
-            // Mouse
-            document.addEventListener('mousemove', e => {
-                if (gameRunning && !player.inPlane) {
-                    if (document.pointerLockElement === renderer.domElement) {
-                        player.rotation -= e.movementX * 0.002;
-                        player.pitch = Math.max(-Math.PI/3, Math.min(Math.PI/3, 
-                            player.pitch - e.movementY * 0.002));
-                    }
-                }
-            });
-            
-            renderer.domElement.addEventListener('click', () => {
-                if (gameRunning && !player.inPlane && !player.isParachuting) {
-                    renderer.domElement.requestPointerLock();
-                    player.isShooting = true;
-                }
-            });
-            
-            document.addEventListener('mouseup', () => {
-                player.isShooting = false;
-            });
-            
-            document.addEventListener('mousedown', e => {
-                if (e.button === 2) {
-                    player.isAiming = true;
-                    document.getElementById('scopeOverlay').style.display = 'block';
-                    document.getElementById('crosshair').style.opacity = '0.3';
-                }
-            });
-            
-            document.addEventListener('contextmenu', e => e.preventDefault());
-            
-            // Resize
-            window.addEventListener('resize', () => {
-                camera.aspect = window.innerWidth / window.innerHeight;
-                camera.updateProjectionMatrix();
-                renderer.setSize(window.innerWidth, window.innerHeight);
-            });
-        }
-        
-        function setupMobileControls() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            if (!isMobile) return;
-            
-            document.getElementById('joystick').style.display = 'block';
-            document.getElementById('mobileControls').style.display = 'block';
-            
-            const joystick = document.getElementById('joystick');
-            const knob = document.getElementById('joystickKnob');
-            let dragging = false;
-            
-            joystick.addEventListener('touchstart', e => {
-                dragging = true;
-                updateJoystick(e.touches[0]);
-            }, { passive: false });
-            
-            joystick.addEventListener('touchmove', e => {
-                if (!dragging) return;
-                e.preventDefault();
-                updateJoystick(e.touches[0]);
-            }, { passive: false });
-            
-            joystick.addEventListener('touchend', () => {
-                dragging = false;
-                window.joystick.active = false;
-                knob.style.transform = 'translate(-50%, -50%)';
-            });
-            
-            function updateJoystick(touch) {
-                const rect = joystick.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-                
-                let dx = touch.clientX - centerX;
-                let dy = touch.clientY - centerY;
-                const dist = Math.hypot(dx, dy);
-                const maxDist = 60;
-                
-                if (dist > maxDist) {
-                    dx = (dx / dist) * maxDist;
-                    dy = (dy / dist) * maxDist;
-                }
-                
-                knob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
-                
-                window.joystick.active = true;
-                window.joystick.dx = dx / maxDist;
-                window.joystick.dy = dy / maxDist;
-            }
-            
-            // Mobil butonlar
-            document.getElementById('shootBtn').addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                player.isShooting = true;
-            });
-            
-            document.getElementById('shootBtn').addEventListener('touchend', (e) => {
-                e.preventDefault();
-                player.isShooting = false;
-            });
-            
-            document.getElementById('aimBtn').addEventListener('click', () => {
-                player.isAiming = !player.isAiming;
-                document.getElementById('scopeOverlay').style.display = player.isAiming ? 'block' : 'none';
-            });
-        }
-        
-        function handleKey(key) {
-            if (!gameRunning) return;
-            
-            switch(key) {
-                case '1': switchWeapon(0); break;
-                case '2': switchWeapon(1); break;
-                case '3': useMedkit(); break;
-                case '4': useArmor(); break;
-                case 'r': reload(); break;
-                case 'e': interact(); break;
-                case 'shift': player.isSprinting = true; break;
-                case 'c': player.isCrouching = !player.isCrouching; break;
-                case ' ': if (player.isParachuting) cutParachute(); break;
-            }
-        }
-        
-        function startTraining() {
-            gameMode = 'training';
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('tutorialBox').style.display = 'block';
-            
-            player.x = 0;
-            player.z = 0;
-            player.health = 100;
-            player.armor = 50;
-            player.y = getTerrainHeight(0, 0);
-            
-            startGame();
-        }
-        
-        function startBattle() {
-            gameMode = 'plane';
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('planeUI').style.display = 'flex';
-            
-            player.inPlane = true;
-            player.x = -worldSizeHalf + 500;
-            player.z = (Math.random() - 0.5) * worldSize * 0.5;
-            player.y = 800;
-            
-            // Uçak animasyonu
-            let planeProgress = 0;
-            const planeInterval = setInterval(() => {
-                planeProgress += 0.3;
-                document.getElementById('planeIcon').style.left = planeProgress + '%';
-                player.x += 10;
-                
-                if (planeProgress >= 100) planeProgress = 0;
-                if (player.x > worldSizeHalf - 500) {
-                    clearInterval(planeInterval);
-                    if (player.inPlane) jumpFromPlane();
-                }
-            }, 50);
-            
-            window.planeInterval = planeInterval;
-        }
-        
-        function jumpFromPlane() {
-            clearInterval(window.planeInterval);
-            document.getElementById('planeUI').style.display = 'none';
-            
-            player.inPlane = false;
-            player.isParachuting = true;
-            
-            // Paraşüt mesh
-            const chuteGeo = new THREE.SphereGeometry(30, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2);
-            const chuteMat = new THREE.MeshStandardMaterial({ 
-                color: 0xff6600,
-                side: THREE.DoubleSide
-            });
-            const chute = new THREE.Mesh(chuteGeo, chuteMat);
-            chute.position.y = 40;
-            playerMesh.add(chute);
-            playerMesh.userData.chute = chute;
-            
-            startGame();
-        }
-        
-        function cutParachute() {
-            if (!player.isParachuting) return;
-            player.isParachuting = false;
-            if (playerMesh.userData.chute) {
-                playerMesh.remove(playerMesh.userData.chute);
-                playerMesh.userData.chute = null;
-            }
-        }
-        
-        function startGame() {
-            gameRunning = true;
-            gameTime = 0;
-            
-            // Düşmanları spawnla
-            if (gameMode === 'battle') {
-                for (let i = 0; i < 20; i++) {
-                    spawnBot();
-                }
-                stormShrink();
-            }
-            
-            updateUI();
-        }
-        
-        function stormShrink() {
-            setTimeout(() => {
-                if (gameMode !== 'battle' || !gameRunning) return;
-                
-                storm.targetRadius *= 0.6;
-                document.getElementById('stormWarning').style.display = 'block';
-                
-                setTimeout(() => {
-                    document.getElementById('stormWarning').style.display = 'none';
-                }, 5000);
-                
-                setTimeout(stormShrink, 90000);
-            }, 60000);
-        }
-        
-        function spawnBot() {
-            const angle = Math.random() * Math.PI * 2;
-            const dist = Math.random() * storm.radius * 0.8;
-            const x = storm.centerX + Math.cos(angle) * dist;
-            const z = storm.centerY + Math.sin(angle) * dist;
-            
-            const mesh = createEnemyMesh();
-            mesh.position.set(x, getTerrainHeight(x, z), z);
-            scene.add(mesh);
-            
-            enemies.push({
-                mesh: mesh,
-                x: x, z: z,
-                y: mesh.position.y,
-                vx: 0, vz: 0,
-                rotation: 0,
-                health: 100,
-                armor: Math.random() > 0.5 ? 50 : 0,
-                speed: 150 + Math.random() * 100,
-                weapon: Math.floor(Math.random() * 2),
-                lastShot: 0,
-                state: 'idle',
-                target: null,
-                id: Math.random()
-            });
-        }
-        
-        function getTerrainHeight(x, z) {
-            // Basit yükseklik hesaplama (noise fonksiyonunu taklit)
-            const simplex = new SimplexNoise();
-            let height = simplex.noise2D(x * 0.001, z * 0.001) * 30;
-            height += simplex.noise2D(x * 0.005, z * 0.005) * 10;
-            return Math.max(height, -10);
-        }
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            const now = performance.now();
-            const dt = Math.min((now - lastTime) / 1000, 0.1);
-            lastTime = now;
-            
-            // FPS sayacı
-            frameCount++;
-            if (now - lastFpsTime >= 1000) {
-                document.getElementById('fps').textContent = 'FPS: ' + frameCount;
-                frameCount = 0;
-                lastFpsTime = now;
-            }
-            
-            if (gameRunning) {
-                update(dt);
-            }
-            
-            render();
-        }
-        
-        function update(dt) {
-            gameTime += dt;
-            
-            // Storm güncelle
-            if (storm.radius > storm.targetRadius) {
-                storm.radius -= 5 * dt;
-            }
-            
-            // Oyuncu güncelle
-            updatePlayer(dt);
-            
-            // Mermiler
-            updateBullets(dt);
-            
-            // Botlar
-            if (gameMode === 'battle') updateBots(dt);
-            
-            // Eğitim
-            if (gameMode === 'training') updateTraining();
-            
-            // Storm hasarı
-            if (gameMode === 'battle') {
-                const distToCenter = Math.hypot(player.x - storm.centerX, player.z - storm.centerY);
-                if (distToCenter > storm.radius) {
-                    player.health -= storm.damage * dt;
-                    document.getElementById('damageOverlay').style.opacity = '0.6';
-                    setTimeout(() => {
-                        document.getElementById('damageOverlay').style.opacity = '0';
-                    }, 200);
-                }
-            }
-            
-            // Partiküller
-            updateParticles(dt);
-            
-            // UI güncelle
-            updateUI();
-            
-            // Ölüm kontrolü
-            if (player.health <= 0) gameOver();
-        }
-        
-        function updatePlayer(dt) {
-            if (player.inPlane) return;
-            
-            // Hareket
-            let dx = 0, dz = 0;
-            
-            if (keys['w'] || keys['arrowup']) dz -= 1;
-            if (keys['s'] || keys['arrowdown']) dz += 1;
-            if (keys['a'] || keys['arrowleft']) dx -= 1;
-            if (keys['d'] || keys['arrowright']) dx += 1;
-            
-            // Joystick
-            if (joystick.active) {
-                dx = joystick.dx;
-                dz = joystick.dy;
-            }
-            
-            if (dx !== 0 || dz !== 0) {
-                // Kamera yönüne göre hareket
-                const moveAngle = Math.atan2(dx, dz) + player.rotation;
-                const speed = player.isSprinting ? player.sprintSpeed : player.speed;
-                
-                player.vx = Math.sin(moveAngle) * speed;
-                player.vz = Math.cos(moveAngle) * speed;
+        });
+
+        // Auth Functions
+        function toggleAuthMode() {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            
+            if (loginForm.classList.contains('hidden')) {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
             } else {
-                player.vx *= 0.8;
-                player.vz *= 0.8;
-            }
-            
-            // Yeni pozisyon
-            let newX = player.x + player.vx * dt;
-            let newZ = player.z + player.vz * dt;
-            
-            // Sınır
-            newX = Math.max(-worldSizeHalf, Math.min(worldSizeHalf, newX));
-            newZ = Math.max(-worldSizeHalf, Math.min(worldSizeHalf, newZ));
-            
-            // Çarpışma (binalar)
-            let collision = false;
-            for (let b of buildings) {
-                if (Math.abs(newX - b.x) < (b.width/2 + 4) && 
-                    Math.abs(newZ - b.z) < (b.depth/2 + 4)) {
-                    collision = true;
-                    break;
-                }
-            }
-            
-            if (!collision) {
-                player.x = newX;
-                player.z = newZ;
-            }
-            
-            // Yükseklik
-            if (player.isParachuting) {
-                player.y -= 100 * dt;
-                player.vx *= 0.98;
-                player.vz *= 0.98;
-                
-                // Yön kontrolü paraşütte
-                if (dx !== 0 || dz !== 0) {
-                    const moveAngle = Math.atan2(dx, dz) + player.rotation;
-                    player.vx += Math.sin(moveAngle) * 50 * dt;
-                    player.vz += Math.cos(moveAngle) * 50 * dt;
-                }
-                
-                player.x += player.vx * dt;
-                player.z += player.vz * dt;
-                
-                if (player.y <= getTerrainHeight(player.x, player.z) + 10) {
-                    player.isParachuting = false;
-                    player.y = getTerrainHeight(player.x, player.z) + 10;
-                    if (playerMesh.userData.chute) {
-                        playerMesh.remove(playerMesh.userData.chute);
-                        playerMesh.userData.chute = null;
-                    }
-                }
-            } else {
-                player.y = getTerrainHeight(player.x, player.z) + (player.isCrouching ? 5 : 10);
-            }
-            
-            // Oyuncu pozisyonu
-            playerMesh.position.set(player.x, player.y, player.z);
-            playerMesh.rotation.y = player.rotation;
-            
-            // Kamera pozisyonu
-            const camDist = player.isAiming ? 15 : 30;
-            const camHeight = player.isAiming ? 5 : 15;
-            const camX = player.x - Math.sin(player.rotation) * camDist;
-            const camZ = player.z - Math.cos(player.rotation) * camDist;
-            
-            camera.position.set(camX, player.y + camHeight, camZ);
-            camera.lookAt(
-                player.x + Math.sin(player.rotation) * 100,
-                player.y + player.pitch * 20,
-                player.z + Math.cos(player.rotation) * 100
-            );
-            
-            // Ateş etme
-            if (player.isShooting && !player.isReloading && !player.inPlane) {
-                shoot();
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
             }
         }
-        
-        function shoot() {
-            const weapon = player.weapons[player.currentWeapon];
-            const now = performance.now();
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
             
-            if (now - player.lastShot < weapon.fireRate) return;
-            if (weapon.ammo <= 0) {
-                reload();
+            if (!email || !password) {
+                alert('Lütfen tüm alanları doldurun!');
                 return;
             }
             
-            player.lastShot = now;
-            weapon.ammo--;
-            
-            // Ses
-            playSound('shoot');
-            
-            // Mermi
-            const spread = player.isAiming ? 0.01 : (weapon.automatic ? 0.05 : 0.02);
-            const pellets = weapon.pellets || 1;
-            
-            for (let i = 0; i < pellets; i++) {
-                const angle = player.rotation + (Math.random() - 0.5) * spread;
-                const pitch = player.pitch + (Math.random() - 0.5) * spread;
-                
-                const bulletGeo = new THREE.SphereGeometry(0.3, 4, 4);
-                const bulletMat = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-                const bullet = new THREE.Mesh(bulletGeo, bulletMat);
-                
-                bullet.position.set(
-                    player.x + Math.sin(player.rotation) * 20,
-                    player.y + 5,
-                    player.z + Math.cos(player.rotation) * 20
-                );
-                
-                const velocity = new THREE.Vector3(
-                    Math.sin(angle) * Math.cos(pitch),
-                    Math.sin(pitch),
-                    Math.cos(angle) * Math.cos(pitch)
-                ).multiplyScalar(150);
-                
-                bullet.userData = {
-                    velocity: velocity,
-                    damage: weapon.damage / pellets,
-                    owner: 'player',
-                    distance: 0,
-                    maxDistance: weapon.range
-                };
-                
-                scene.add(bullet);
-                bullets.push(bullet);
-            }
-            
-            // Namlu flaşı
-            createMuzzleFlash();
-            
-            // Geri tepme
-            if (player.isAiming) {
-                player.pitch += weapon.recoil;
-            }
-            
-            // Tek atış
-            if (!weapon.automatic) player.isShooting = false;
-        }
-        
-        function updateBullets(dt) {
-            for (let i = bullets.length - 1; i >= 0; i--) {
-                const b = bullets[i];
-                const move = b.userData.velocity.clone().multiplyScalar(dt);
-                b.userData.distance += move.length();
-                
-                // Yeni pozisyon
-                b.position.add(move);
-                
-                // Raycast çarpışma
-                const ray = new THREE.Raycaster(
-                    b.position.clone().sub(move),
-                    b.userData.velocity.clone().normalize(),
-                    0,
-                    move.length() * 2
-                );
-                
-                let hit = false;
-                
-                // Binalar
-                for (let building of buildings) {
-                    const intersects = ray.intersectObject(building.mesh);
-                    if (intersects.length > 0 && intersects[0].distance < move.length() * 2) {
-                        hit = true;
-                        createImpact(intersects[0].point);
-                        break;
-                    }
-                }
-                
-                // Düşmanlar
-                if (!hit && b.userData.owner === 'player') {
-                    for (let enemy of enemies) {
-                        if (enemy.health <= 0) continue;
-                        const dist = b.position.distanceTo(enemy.mesh.position);
-                        if (dist < 15) {
-                            hit = true;
-                            damageEnemy(enemy, b.userData.damage, b.position);
-                            break;
-                        }
-                    }
-                }
-                
-                // Oyuncu
-                if (!hit && b.userData.owner === 'bot') {
-                    const dist = b.position.distanceTo(playerMesh.position);
-                    if (dist < 15) {
-                        hit = true;
-                        damagePlayer(b.userData.damage);
-                    }
-                }
-                
-                // Mesafe veya çarpışma
-                if (hit || b.userData.distance > b.userData.maxDistance) {
-                    scene.remove(b);
-                    bullets.splice(i, 1);
-                    continue;
-                }
-                
-                // Yer çekimi (hafif)
-                b.userData.velocity.y -= 2 * dt;
-            }
-        }
-        
-        function updateBots(dt) {
-            // Yeni bot spawn
-            if (enemies.length < 25 && Math.random() < 0.01) {
-                spawnBot();
-            }
-            
-            for (let enemy of enemies) {
-                if (enemy.health <= 0) continue;
-                
-                const distToPlayer = Math.hypot(player.x - enemy.x, player.z - enemy.z);
-                
-                // AI
-                if (distToPlayer < 500 && !player.isParachuting && player.health > 0) {
-                    enemy.state = 'combat';
-                    enemy.target = player;
-                    
-                    // Ateş
-                    const now = performance.now();
-                    if (now - enemy.lastShot > 800 && distToPlayer < 400) {
-                        enemy.lastShot = now;
-                        
-                        const bulletGeo = new THREE.SphereGeometry(0.3, 4, 4);
-                        const bulletMat = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-                        const bullet = new THREE.Mesh(bulletGeo, bulletMat);
-                        bullet.position.copy(enemy.mesh.position);
-                        bullet.position.y += 5;
-                        
-                        const dir = new THREE.Vector3(player.x - enemy.x, 0, player.z - enemy.z).normalize();
-                        bullet.userData = {
-                            velocity: dir.multiplyScalar(120),
-                            damage: 15,
-                            owner: 'bot',
-                            distance: 0,
-                            maxDistance: 400
-                        };
-                        
-                        scene.add(bullet);
-                        bullets.push(bullet);
-                        
-                        // Namlu flash
-                        enemy.mesh.children[0].material.emissive = new THREE.Color(0xffaa00);
-                        setTimeout(() => {
-                            enemy.mesh.children[0].material.emissive = new THREE.Color(0x000000);
-                        }, 50);
-                    }
-                    
-                    // Hareket
-                    const angle = Math.atan2(player.x - enemy.x, player.z - enemy.z);
-                    if (distToPlayer > 200) {
-                        enemy.vx = Math.sin(angle) * enemy.speed;
-                        enemy.vz = Math.cos(angle) * enemy.speed;
-                    } else if (distToPlayer < 100) {
-                        enemy.vx = -Math.sin(angle) * enemy.speed;
-                        enemy.vz = -Math.cos(angle) * enemy.speed;
-                    } else {
-                        // Strafe
-                        enemy.vx = Math.sin(angle + Math.PI/2) * enemy.speed * 0.5;
-                        enemy.vz = Math.cos(angle + Math.PI/2) * enemy.speed * 0.5;
-                    }
-                } else {
-                    // Patrol
-                    enemy.state = 'patrol';
-                    if (Math.random() < 0.02) {
-                        const patrolAngle = Math.random() * Math.PI * 2;
-                        enemy.vx = Math.sin(patrolAngle) * enemy.speed * 0.3;
-                        enemy.vz = Math.cos(patrolAngle) * enemy.speed * 0.3;
-                    }
-                }
-                
-                // Storm kaçınma
-                const distToCenter = Math.hypot(enemy.x - storm.centerX, enemy.z - storm.centerY);
-                if (distToCenter > storm.radius) {
-                    const angle = Math.atan2(storm.centerX - enemy.x, storm.centerY - enemy.z);
-                    enemy.vx = Math.sin(angle) * enemy.speed * 2;
-                    enemy.vz = Math.cos(angle) * enemy.speed * 2;
-                    enemy.health -= storm.damage * dt;
-                }
-                
-                // Uygula
-                let newX = enemy.x + enemy.vx * dt;
-                let newZ = enemy.z + enemy.vz * dt;
-                
-                // Bina çarpışma
-                let collision = false;
-                for (let b of buildings) {
-                    if (Math.abs(newX - b.x) < (b.width/2 + 4) && 
-                        Math.abs(newZ - b.z) < (b.depth/2 + 4)) {
-                        collision = true;
-                        break;
-                    }
-                }
-                
-                if (!collision) {
-                    enemy.x = newX;
-                    enemy.z = newZ;
-                }
-                
-                enemy.y = getTerrainHeight(enemy.x, enemy.z) + 10;
-                enemy.mesh.position.set(enemy.x, enemy.y, enemy.z);
-                
-                // Rotasyon
-                if (enemy.target) {
-                    enemy.rotation = Math.atan2(enemy.target.x - enemy.x, enemy.target.z - enemy.z);
-                } else {
-                    enemy.rotation = Math.atan2(enemy.vx, enemy.vz);
-                }
-                enemy.mesh.rotation.y = enemy.rotation;
-            }
-        }
-        
-        function updateTraining() {
-            for (let i = trainingTargets.length - 1; i >= 0; i--) {
-                const target = trainingTargets[i];
-                if (!target.active) continue;
-                
-                const dist = Math.hypot(player.x - target.x, player.z - target.z);
-                if (dist < 30) {
-                    // Yakınlaşınca yok olmaz, sadece vurulunca
-                }
-            }
-        }
-        
-        function damageEnemy(enemy, damage, point) {
-            playSound('hit');
-            
-            let actualDamage = damage;
-            if (enemy.armor > 0) {
-                enemy.armor -= actualDamage * 0.6;
-                actualDamage *= 0.4;
-                if (enemy.armor < 0) enemy.armor = 0;
-            }
-            enemy.health -= actualDamage;
-            
-            // Kan efekti
-            for (let i = 0; i < 8; i++) {
-                createParticle(point, 0xff0000, 3);
-            }
-            
-            // Hasar göstergesi
-            enemy.mesh.children[0].material.emissive = new THREE.Color(0xff0000);
-            setTimeout(() => {
-                if (enemy.mesh) enemy.mesh.children[0].material.emissive = new THREE.Color(0x000000);
-            }, 100);
-            
-            if (enemy.health <= 0) {
-                player.kills++;
-                scene.remove(enemy.mesh);
-                enemies = enemies.filter(e => e !== enemy);
-                addKillFeed(`Bot-${Math.floor(enemy.id * 100)} öldürüldü!`);
-                
-                // Loot
-                const boxGeo = new THREE.BoxGeometry(8, 6, 8);
-                const boxMat = new THREE.MeshStandardMaterial({
-                    color: 0xff6600,
-                    emissive: 0xff2200,
-                    emissiveIntensity: 0.3
-                });
-                const box = new THREE.Mesh(boxGeo, boxMat);
-                box.position.set(enemy.x, enemy.y, enemy.z);
-                box.castShadow = true;
-                const light = new THREE.PointLight(0xff6600, 1, 20);
-                light.position.set(0, 5, 0);
-                box.add(light);
-                scene.add(box);
-                lootBoxes.push({
-                    mesh: box,
-                    x: enemy.x, z: enemy.z,
-                    items: generateLoot(),
-                    opened: false,
-                    light: light
-                });
-            }
-        }
-        
-        function damagePlayer(damage) {
-            playSound('hit');
-            
-            let actualDamage = damage;
-            if (player.armor > 0) {
-                player.armor -= actualDamage * 0.6;
-                actualDamage *= 0.4;
-                if (player.armor < 0) player.armor = 0;
-            }
-            player.health -= actualDamage;
-            
-            document.getElementById('damageOverlay').style.opacity = '0.8';
-            setTimeout(() => {
-                document.getElementById('damageOverlay').style.opacity = '0';
-            }, 300);
-            
-            // Ekran sarsıntısı
-            camera.position.x += (Math.random() - 0.5) * 2;
-            camera.position.y += (Math.random() - 0.5) * 2;
-        }
-        
-        function interact() {
-            // Loot alma
-            for (let loot of lootBoxes) {
-                if (loot.opened) continue;
-                const dist = Math.hypot(player.x - loot.x, player.z - loot.z);
-                if (dist < 40) {
-                    loot.opened = true;
-                    scene.remove(loot.mesh);
-                    lootBoxes = lootBoxes.filter(l => l !== loot);
-                    collectLoot(loot.items);
-                }
-            }
-        }
-        
-        function collectLoot(items) {
-            for (let item of items) {
-                switch(item.type) {
-                    case 'weapon':
-                        player.weapons[item.id].totalAmmo += item.ammo * 4;
-                        addKillFeed(`${player.weapons[item.id].name} bulundu!`);
-                        break;
-                    case 'ammo':
-                        player.weapons[player.currentWeapon].totalAmmo += item.amount;
-                        break;
-                    case 'medkit':
-                        player.medkits++;
-                        break;
-                    case 'armor':
-                        player.armorKits++;
-                        break;
-                }
-            }
-        }
-        
-        function reload() {
-            if (player.isReloading) return;
-            const weapon = player.weapons[player.currentWeapon];
-            if (weapon.ammo >= weapon.maxAmmo || weapon.totalAmmo <= 0) return;
-            
-            player.isReloading = true;
-            document.getElementById('reloadIndicator').style.display = 'block';
-            playSound('reload');
-            
-            setTimeout(() => {
-                const needed = weapon.maxAmmo - weapon.ammo;
-                const available = Math.min(needed, weapon.totalAmmo);
-                weapon.ammo += available;
-                weapon.totalAmmo -= available;
-                player.isReloading = false;
-                document.getElementById('reloadIndicator').style.display = 'none';
-            }, 2000);
-        }
-        
-        function switchWeapon(index) {
-            if (index < player.weapons.length) {
-                player.currentWeapon = index;
-                player.isReloading = false;
-                updateUI();
-            }
-        }
-        
-        function useMedkit() {
-            if (player.medkits > 0 && player.health < player.maxHealth) {
-                player.medkits--;
-                player.health = Math.min(player.maxHealth, player.health + 50);
-                updateUI();
-            }
-        }
-        
-        function useArmor() {
-            if (player.armorKits > 0 && player.armor < player.maxArmor) {
-                player.armorKits--;
-                player.armor = player.maxArmor;
-                updateUI();
-            }
-        }
-        
-        function createMuzzleFlash() {
-            const light = new THREE.PointLight(0xffaa00, 2, 50);
-            light.position.set(
-                player.x + Math.sin(player.rotation) * 25,
-                player.y + 5,
-                player.z + Math.cos(player.rotation) * 25
-            );
-            scene.add(light);
-            muzzleLights.push({ light: light, life: 0.05 });
-            
-            // Partiküller
-            for (let i = 0; i < 5; i++) {
-                createParticle(light.position, 0xffaa00, 2);
-            }
-        }
-        
-        function createImpact(point) {
-            for (let i = 0; i < 6; i++) {
-                createParticle(point, 0x888888, 2);
-            }
-        }
-        
-        function createParticle(pos, color, size) {
-            const geo = new THREE.BoxGeometry(size, size, size);
-            const mat = new THREE.MeshBasicMaterial({ color: color });
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.copy(pos);
-            mesh.position.x += (Math.random() - 0.5) * 5;
-            mesh.position.y += (Math.random() - 0.5) * 5;
-            mesh.position.z += (Math.random() - 0.5) * 5;
-            
-            mesh.userData = {
-                velocity: new THREE.Vector3(
-                    (Math.random() - 0.5) * 50,
-                    Math.random() * 30,
-                    (Math.random() - 0.5) * 50
-                ),
-                life: 0.5 + Math.random() * 0.5
+            // Simulate login
+            currentUser = {
+                name: email.split('@')[0],
+                email: email
             };
             
-            scene.add(mesh);
-            particles.push(mesh);
+            localStorage.setItem('akademiAI_user', JSON.stringify(currentUser));
+            showMainApp();
         }
-        
-        function updateParticles(dt) {
-            // Muzzle flash
-            for (let i = muzzleLights.length - 1; i >= 0; i--) {
-                muzzleLights[i].life -= dt;
-                if (muzzleLights[i].life <= 0) {
-                    scene.remove(muzzleLights[i].light);
-                    muzzleLights.splice(i, 1);
-                }
+
+        function register() {
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            if (!name || !email || !password) {
+                alert('Lütfen tüm alanları doldurun!');
+                return;
             }
             
-            // Partiküller
-            for (let i = particles.length - 1; i >= 0; i--) {
-                const p = particles[i];
-                p.userData.velocity.y -= 50 * dt; // Yer çekimi
-                p.position.add(p.userData.velocity.clone().multiplyScalar(dt));
-                p.userData.life -= dt;
-                p.scale.multiplyScalar(0.95);
-                
-                if (p.userData.life <= 0) {
-                    scene.remove(p);
-                    particles.splice(i, 1);
-                }
+            // Simulate registration
+            currentUser = {
+                name: name,
+                email: email
+            };
+            
+            localStorage.setItem('akademiAI_user', JSON.stringify(currentUser));
+            showMainApp();
+        }
+
+        function logout() {
+            localStorage.removeItem('akademiAI_user');
+            currentUser = null;
+            location.reload();
+        }
+
+        function showMainApp() {
+            document.getElementById('authModal').classList.remove('active');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            if (currentUser) {
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=6366f1&color=fff`;
             }
         }
-        
-        function playSound(type) {
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            
-            switch(type) {
-                case 'shoot':
-                    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-                    osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.1);
-                    osc.type = 'square';
-                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.1);
-                    break;
-                case 'hit':
-                    osc.frequency.value = 80;
-                    osc.type = 'sawtooth';
-                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.15);
-                    break;
-                case 'reload':
-                    osc.frequency.value = 400;
-                    osc.type = 'sine';
-                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.1);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.1);
-                    break;
-            }
-        }
-        
-        function updateUI() {
-            // Can ve zırh
-            document.getElementById('healthFill').style.width = (player.health / player.maxHealth * 100) + '%';
-            document.getElementById('armorFill').style.width = (player.armor / player.maxArmor * 100) + '%';
-            
-            // Mermi
-            const weapon = player.weapons[player.currentWeapon];
-            document.getElementById('currentAmmo').textContent = weapon.ammo;
-            document.getElementById('totalAmmo').textContent = weapon.totalAmmo;
-            
-            // Silah
-            document.getElementById('weaponName').textContent = weapon.name;
-            document.getElementById('fireMode').textContent = weapon.automatic ? 'OTOMATIK' : 'TEK ATIS';
-            
-            // Envanter
-            document.querySelectorAll('.inv-slot').forEach((slot, i) => {
-                slot.classList.toggle('active', i === player.currentWeapon);
-                if (i === 2) slot.querySelector('.count').textContent = player.medkits;
-                if (i === 3) slot.querySelector('.count').textContent = player.armorKits;
+
+        // Navigation Functions
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.add('hidden');
             });
             
-            // Kalan oyuncu
-            document.getElementById('playersLeft').textContent = `Kalan: ${1 + enemies.filter(e => e.health > 0).length}`;
+            // Show selected section
+            document.getElementById(`${sectionName}-section`).classList.remove('hidden');
             
-            // Minimap
-            renderMinimap();
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Update page title
+            const titles = {
+                'dashboard': 'Ana Sayfa',
+                'math': 'Matematik',
+                'science': 'Fen Bilimleri',
+                'geography': 'Coğrafya',
+                'history': 'Tarih',
+                'turkish': 'Türkçe',
+                'ai-tutor': 'AI Özel Ders',
+                'music': 'Çalma Listem'
+            };
+            document.getElementById('pageTitle').textContent = titles[sectionName] || 'Ana Sayfa';
         }
-        
-        function renderMinimap() {
-            minimapCtx.fillStyle = 'rgba(0, 30, 0, 0.9)';
-            minimapCtx.fillRect(0, 0, 180, 180);
-            
-            const scale = 180 / worldSize;
-            const offsetX = 90;
-            const offsetY = 90;
-            
-            // Storm
-            minimapCtx.fillStyle = 'rgba(128, 0, 128, 0.3)';
-            minimapCtx.beginPath();
-            minimapCtx.arc(offsetX, offsetY, storm.radius * scale, 0, Math.PI * 2);
-            minimapCtx.fill();
-            
-            minimapCtx.strokeStyle = 'rgba(255, 0, 255, 0.6)';
-            minimapCtx.lineWidth = 2;
-            minimapCtx.stroke();
-            
-            // Oyuncu (merkez)
-            minimapCtx.fillStyle = '#00d4ff';
-            minimapCtx.beginPath();
-            minimapCtx.arc(offsetX, offsetY, 6, 0, Math.PI * 2);
-            minimapCtx.fill();
-            
-            // Yön oku
-            minimapCtx.strokeStyle = '#00d4ff';
-            minimapCtx.lineWidth = 2;
-            minimapCtx.beginPath();
-            minimapCtx.moveTo(offsetX, offsetY);
-            minimapCtx.lineTo(
-                offsetX + Math.sin(player.rotation) * 15,
-                offsetY + Math.cos(player.rotation) * 15
-            );
-            minimapCtx.stroke();
-            
-            // Düşmanlar
-            minimapCtx.fillStyle = '#ff4444';
-            for (let e of enemies) {
-                if (e.health > 0) {
-                    const dx = (e.x - player.x) * scale;
-                    const dz = (e.z - player.z) * scale;
-                    if (Math.hypot(dx, dz) < 85) {
-                        minimapCtx.beginPath();
-                        minimapCtx.arc(offsetX + dx, offsetY + dz, 4, 0, Math.PI * 2);
-                        minimapCtx.fill();
-                    }
-                }
-            }
-        }
-        
-        function addKillFeed(msg) {
-            const feed = document.getElementById('killFeed');
-            const div = document.createElement('div');
-            div.className = 'kill-msg';
-            div.textContent = msg;
-            feed.appendChild(div);
-            setTimeout(() => div.remove(), 6000);
-        }
-        
-        function gameOver() {
-            gameRunning = false;
-            
-            const menu = document.getElementById('menu');
-            menu.style.display = 'flex';
-            menu.innerHTML = `
-                <div class="menu-title">💀 ÖLDÜNÜZ 💀</div>
-                <div style="color: white; font-size: 28px; margin: 20px; text-align: center;">
-                    ${player.kills} KILL<br>
-                    ${Math.floor(gameTime / 60)}:${(gameTime % 60).toFixed(0).padStart(2, '0')} Sürdün
+
+        // Math Functions
+        function populateMathTopics() {
+            const container = document.getElementById('mathTopics');
+            container.innerHTML = mathTopics.map(topic => `
+                <div class="bg-white rounded-2xl shadow-lg p-6 card-hover" data-category="${topic.category}">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="w-12 h-12 bg-${topic.color}-100 rounded-lg flex items-center justify-center">
+                            <i class="fas ${topic.icon} text-${topic.color}-600 text-xl"></i>
+                        </div>
+                        <span class="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">${topic.progress}%</span>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-2">${topic.title}</h3>
+                    <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
+                        <div class="bg-${topic.color}-500 h-2 rounded-full transition-all duration-500" style="width: ${topic.progress}%"></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="flex-1 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all text-sm">
+                            <i class="fas fa-play mr-1"></i> Video
+                        </button>
+                        <button class="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all text-sm">
+                            <i class="fas fa-question-circle mr-1"></i> Soru
+                        </button>
+                    </div>
                 </div>
-                <button class="menu-btn" onclick="location.reload()">🔄 YENİDEN BAŞLA</button>
+            `).join('');
+        }
+
+        function filterTopics(category) {
+            const buttons = document.querySelectorAll('.topic-badge');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-indigo-600', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            event.target.classList.remove('bg-gray-200', 'text-gray-700');
+            event.target.classList.add('bg-indigo-600', 'text-white');
+            
+            const cards = document.querySelectorAll('#mathTopics > div');
+            cards.forEach(card => {
+                if (category === 'all' || card.dataset.category === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Science Functions
+        function showScienceSubject(subject) {
+            const content = scienceContent[subject];
+            const container = document.getElementById('scienceContent');
+            
+            container.innerHTML = `
+                <h3 class="text-xl font-bold text-gray-800 mb-4">${content.title}</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    ${content.topics.map((topic, index) => `
+                        <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-indigo-50 transition-all cursor-pointer group">
+                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center font-bold group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                ${index + 1}
+                            </div>
+                            <span class="font-medium text-gray-800">${topic}</span>
+                            <i class="fas fa-chevron-right ml-auto text-gray-400 group-hover:text-indigo-600"></i>
+                        </div>
+                    `).join('')}
+                </div>
             `;
         }
-        
-        function render() {
-            renderer.render(scene, camera);
+
+        // AI Tutor Functions
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
         }
-        
-        function showSettings() {
-            alert('KONTROLLER:\n\nWASD - Hareket\nMouse - Bak/Nişan\nSol Click - Ateş\nSağ Click - Nişan alma\nShift - Koşu\nR - Şarjör\nE - Loot alma\n1-4 - Eşya kullanma\nC - Eğilme\nBoşluk - Paraşütü kes\n\nGrafik: Three.js WebGL\nOptimizasyon: InstancedMesh, LOD, Frustum Culling');
+
+        function quickQuestion(question) {
+            document.getElementById('chatInput').value = question;
+            sendMessage();
         }
-        
-        // Envanter tıklama
-        document.querySelectorAll('.inv-slot').forEach(slot => {
-            slot.addEventListener('click', () => {
-                const index = parseInt(slot.dataset.weapon);
-                if (index < 2) switchWeapon(index);
-                else if (index === 2) useMedkit();
-                else if (index === 3) useArmor();
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const response = generateAIResponse(message);
+                addMessage(response, 'ai');
+            }, 1000);
+        }
+
+        function addMessage(text, sender) {
+            const container = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message flex gap-3';
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="flex-1 flex justify-end">
+                        <div class="bg-indigo-600 text-white p-3 rounded-2xl rounded-tr-none shadow-sm max-w-[80%]">
+                            <p>${text}</p>
+                        </div>
+                    </div>
+                    <div class="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-user text-sm text-gray-600"></i>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                        <i class="fas fa-robot text-sm"></i>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[80%]">
+                        <p class="text-gray-800 typing-animation">${text}</p>
+                    </div>
+                `;
+            }
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function generateAIResponse(question) {
+            const responses = {
+                'türev': 'Türev, bir fonksiyonun değişim hızını gösteren matematiksel bir işlemdir. f(x) fonksiyonunun türevi f\'(x) veya df/dx olarak gösterilir. Temel türev kuralları: 1) Sabitin türevi sıfırdır, 2) x^n nin türevi n*x^(n-1) dir.',
+                'fotosentez': 'Fotosentez, bitkilerin güneş ışığını kullanarak karbondioksit ve suyu glikoz ve oksijene dönüştürdüğü biyokimyasal süreçtir. 6CO₂ + 6H₂O + Işık Enerjisi → C₆H₁₂O₆ + 6O₂',
+                'dağ': 'Türkiye\'nin en yüksek dağı Ağrı Dağı (Büyük Ağrı)\'dır. Deniz seviyesinden yüksekliği 5.137 metredir. İkinci en yüksek dağ ise Cilo Dağı\'dır (4.135 m).',
+                'default': 'Bu konuda size yardımcı olmaktan mutluluk duyarım! Daha spesifik bir soru sorarsanız, konuyu daha detaylı açıklayabilirim. Hangi konuda çalışıyorsunuz?'
+            };
+            
+            const lowerQuestion = question.toLowerCase();
+            for (let key in responses) {
+                if (lowerQuestion.includes(key)) {
+                    return responses[key];
+                }
+            }
+            return responses['default'];
+        }
+
+        function clearChat() {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = `
+                <div class="chat-message flex gap-3">
+                    <div class="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                        <i class="fas fa-robot text-sm"></i>
+                    </div>
+                    <div class="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[80%]">
+                        <p class="text-gray-800">Sohbet temizlendi! Yeni bir soru sorabilirsiniz. 🎓</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Music Functions
+        function populatePlaylist() {
+            const container = document.getElementById('playlistContainer');
+            container.innerHTML = playlist.map((item, index) => `
+                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-indigo-50 transition-all cursor-pointer group" onclick="playTrack(${index})">
+                    <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                        <i class="fas fa-music"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-medium text-gray-800 truncate">${item.title}</h4>
+                        <p class="text-sm text-gray-500">${item.artist}</p>
+                    </div>
+                    <span class="text-sm text-gray-400">${item.duration}</span>
+                    <button class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-indigo-600 shadow-sm opacity-0 group-hover:opacity-100 transition-all">
+                        <i class="fas fa-play"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleMusicPlayer() {
+            const player = document.getElementById('musicPlayer');
+            if (player.classList.contains('translate-y-full')) {
+                player.classList.remove('translate-y-full');
+            } else {
+                player.classList.add('translate-y-full');
+            }
+        }
+
+        function togglePlay() {
+            const btn = document.getElementById('playBtn');
+            const visualizer = document.getElementById('visualizer');
+            const indicator = document.getElementById('musicIndicator');
+            
+            isPlaying = !isPlaying;
+            
+            if (isPlaying) {
+                btn.innerHTML = '<i class="fas fa-pause"></i>';
+                visualizer.style.opacity = '1';
+                indicator.classList.remove('hidden');
+            } else {
+                btn.innerHTML = '<i class="fas fa-play"></i>';
+                visualizer.style.opacity = '0.3';
+                indicator.classList.add('hidden');
+            }
+        }
+
+        function playTrack(index) {
+            toggleMusicPlayer();
+            if (!isPlaying) {
+                togglePlay();
+            }
+        }
+
+        function openYouTubeMusic() {
+            window.open('https://music.youtube.com', '_blank');
+        }
+
+        // Utility Functions
+        function updateDate() {
+            const date = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('currentDate').textContent = date.toLocaleDateString('tr-TR', options);
+        }
+
+        // Make showSection globally accessible
+        window.showSection = function(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.section-content').forEach(section => {
+                section.classList.add('hidden');
             });
-        });
-        
-        // Başlat
-        init();
+            
+            // Show selected section
+            const targetSection = document.getElementById(`${sectionName}-section`);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+            
+            // Update sidebar
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.getAttribute('onclick') && item.getAttribute('onclick').includes(sectionName)) {
+                    item.classList.add('active');
+                }
+            });
+            
+            // Update title
+            const titles = {
+                'dashboard': 'Ana Sayfa',
+                'math': 'Matematik',
+                'science': 'Fen Bilimleri',
+                'geography': 'Coğrafya',
+                'history': 'Tarih',
+                'turkish': 'Türkçe',
+                'ai-tutor': 'AI Özel Ders',
+                'music': 'Çalma Listem'
+            };
+            document.getElementById('pageTitle').textContent = titles[sectionName] || 'Ana Sayfa';
+        };
     </script>
 </body>
 </html>
